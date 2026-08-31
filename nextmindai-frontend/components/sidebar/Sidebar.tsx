@@ -69,7 +69,10 @@ export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: Sideb
               {chats.map((chat) => (
                 <button
                   key={chat.id}
-                  onClick={() => onSelectChat?.(chat.id)}
+                  onClick={() => {
+                    if (onSelectChat) onSelectChat(chat.id);
+                    else router.push("/?chat=" + chat.id);
+                  }}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 text-left group ${
                     activeChatId === chat.id
                       ? "bg-primary/5 text-primary font-medium"
