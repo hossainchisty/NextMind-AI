@@ -1,6 +1,4 @@
 ## NextMind AI
-<<<<<<< HEAD
-=======
 
 A privacy-first, offline AI workspace powered by local LLMs.
 
@@ -13,4 +11,3 @@ A privacy-first, offline AI workspace powered by local LLMs.
 - Ollama integration
 - Hybrid search
 - Privacy-focused
->>>>>>> b8ee1b7 (Refactor code structure for improved readability and maintainability)
