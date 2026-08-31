@@ -4,7 +4,8 @@ interface Props {
   onSend: (text: string) => void;
 }
 
-function ISend() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>); }
+function ISend() { return (<svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>); }
+
 function IAttach() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>); }
 
 export default function ChatInput({ onSend }: Props) {
@@ -26,9 +27,9 @@ export default function ChatInput({ onSend }: Props) {
         <div className="flex items-center justify-between px-3 pb-3">
           <div className="flex items-center gap-1">
             <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors"><IAttach/></button>
-            <div className="ml-1 flex items-center gap-1.5 px-2 py-1 rounded-md bg-bg border border-border"><div className="w-1.5 h-1.5 rounded-full bg-accent-green"/><span className="text-[11px] font-medium text-text-secondary">Local LLM</span></div>
+            {/* <div className="ml-1 flex items-center gap-1.5 px-2 py-1 rounded-md bg-bg border border-border"><div className="w-1.5 h-1.5 rounded-full bg-accent-green"/><span className="text-[11px] font-medium text-text-secondary">Local LLM</span></div> */}
           </div>
-          <button className="p-2.5 rounded-[10px] bg-bg text-text-secondary/40"><ISend/></button>
+          <button className="p-2.5 rounded-[10px] bg-primary text-text-secondary/40"><ISend/></button>
         </div>
       </div>
     </div>
