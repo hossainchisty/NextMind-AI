@@ -1,10 +1,6 @@
 "use client";
 
-import type { Chat } from "@/lib/types";
-
 interface Props {
-  recentChats: Chat[];
-  onSelect: (id: string) => void;
   onAsk: (text: string) => void;
 }
 
@@ -13,7 +9,7 @@ function IDoc() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="non
 function IFile() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>); }
 function IChat() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>); }
 
-export default function ChatEmptyState({ recentChats, onSelect, onAsk }: Props) {
+export default function ChatEmptyState({ onAsk }: Props) {
   const actions = [
     { Icon: ISearch, t: "Search documents", d: "Find anything across your knowledge base", p: "Search my documents for" },
     { Icon: IDoc, t: "Analyze a file", d: "Extract insights from your documents", p: "Analyze this document and summarize" },
@@ -28,12 +24,12 @@ export default function ChatEmptyState({ recentChats, onSelect, onAsk }: Props) 
         <div className="absolute top-[20%] right-[15%] w-[300px] h-[300px] rounded-full bg-soft-accent/40 blur-3xl"/>
       </div>
       <div className="relative z-10 flex flex-col items-center max-w-[640px] w-full">
-        <div className="relative mb-8">
+        {/* <div className="relative mb-8">
           <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-primary to-primary-light flex items-center justify-center shadow-[0_8px_32px_rgba(13,43,35,0.15)]">
             <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="6" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="18" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="12" cy="20" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".15"/><line x1="12" y1="8.5" x2="7.5" y2="12" stroke="currentColor" strokeWidth="1.5" opacity=".4"/><line x1="12" y1="8.5" x2="16.5" y2="12" stroke="currentColor" strokeWidth="1.5" opacity=".4"/></svg>
           </div>
           <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-accent-green border-[3px] border-bg flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-white"/></div>
-        </div>
+        </div> */}
         <h1 className="text-[32px] font-bold tracking-tight text-text-primary mb-3 text-center">Your private AI workspace</h1>
         <p className="text-[15px] text-text-secondary text-center max-w-[440px] leading-relaxed mb-12">Ask questions, explore your documents, and discover insights — all running locally on your device.</p>
         <div className="grid grid-cols-2 gap-3 w-full mb-10">
@@ -46,20 +42,8 @@ export default function ChatEmptyState({ recentChats, onSelect, onAsk }: Props) 
               </button>
             );
           })}
-        </div>
-        <div className="w-full">
-          <div className="flex items-center gap-2 mb-3 px-1"><span className="text-[11px] font-semibold tracking-wider text-text-secondary uppercase">Recent</span><div className="flex-1 h-px bg-border"/></div>
-          <div className="space-y-1">
-            {recentChats.map(c => (
-              <button key={c.id} onClick={() => onSelect(c.id)} className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-[10px] text-left hover:bg-surface border border-transparent hover:border-border transition-all group">
-                <div className="w-7 h-7 rounded-lg bg-bg flex items-center justify-center shrink-0"><IChat/></div>
-                <span className="flex-1 text-[13px] text-text-secondary group-hover:text-text-primary transition-colors line-clamp-1">{c.title}</span>
-                <span className="text-[11px] text-text-secondary/60 shrink-0">{c.updatedAt}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+                  </div>
+                </div>
+              </div>
   );
 }

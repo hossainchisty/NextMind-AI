@@ -17,6 +17,7 @@ export default function App() {
   const [retrieving, setRetrieving] = useState(false);
   const [showSrc, setShowSrc] = useState(false);
   const [srcs, setSrcs] = useState<Source[]>([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const active = CHATS.find(c => c.id === activeId);
@@ -64,13 +65,13 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-bg overflow-hidden">
-      <ChatSidebar chats={CHATS} activeId={activeId} onSelect={open} onNew={fresh} />
+      <ChatSidebar chats={CHATS} activeId={activeId} onSelect={open} onNew={fresh} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(p => !p)} />
       <div className="flex flex-1 h-full overflow-hidden">
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           {activeId && <ChatHeader title={active?.title ?? ""} />}
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
             {messages.length === 0 ? (
-              <ChatEmptyState recentChats={CHATS.slice(0, 3)} onSelect={open} onAsk={ask} />
+              <ChatEmptyState onAsk={ask} />
             ) : (
               <ChatMessages messages={messages} retrieving={retrieving} />
             )}
