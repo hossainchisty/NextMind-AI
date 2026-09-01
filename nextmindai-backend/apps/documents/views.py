@@ -41,8 +41,12 @@ class DocumentListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        doc = serializer.instance
         return Response(
-            success_response(data=serializer.data, message="Document uploaded"),
+            success_response(
+                data=DocumentSerializer(doc).data,
+                message="Document uploaded",
+            ),
             status=status.HTTP_201_CREATED,
         )
 
