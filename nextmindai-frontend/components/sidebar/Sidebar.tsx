@@ -2,30 +2,30 @@
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { chats } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/components/ui/Toast";
 import {
   BrainNodeIcon,
-  PlusIcon,
   ChatIcon,
   DocumentIcon,
   FolderIcon,
   SettingsIcon,
-  ChevronIcon,
 } from "@/components/ui/Icons";
 
-interface SidebarProps {
-  activeChatId?: string | null;
-  onNewChat?: () => void;
-  onSelectChat?: (chatId: string) => void;
-}
+interface SidebarProps {}
 
-export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: SidebarProps) {
+export default function Sidebar({}: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [chatsExpanded, setChatsExpanded] = useState(true);
+  const { user, logout } = useAuth();
+  const { confirm } = useToast();
   const [knowledgeExpanded, setKnowledgeExpanded] = useState(true);
 
   const isActive = (path: string) => pathname === path;
+
+  const initials = user?.name
+    ? user.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
+    : "?";
 
   return (
     <aside className="w-[260px] h-full flex flex-col bg-surface border-r border-border overflow-hidden">
@@ -39,52 +39,21 @@ export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: Sideb
         </span>
       </div>
 
-      {/* New Chat Button */}
-      <div className="px-3 mb-2">
-        <button
-          onClick={() => onNewChat?.()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors duration-200"
-        >
-          <PlusIcon className="w-4 h-4" />
-          New Chat
-        </button>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2">
-        {/* Chats Section */}
+        {/* Chat Link */}
         <div className="mb-4">
           <button
-            onClick={() => setChatsExpanded(!chatsExpanded)}
-            className="flex items-center gap-1.5 w-full px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase hover:text-text-primary transition-colors"
+            onClick={() => router.push("/")}
+            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 text-left group ${
+              pathname === "/"
+                ? "bg-primary/5 text-primary font-medium"
+                : "text-text-secondary hover:bg-bg hover:text-text-primary"
+            }`}
           >
-            <ChevronIcon
-              className="w-3 h-3 transition-transform duration-200"
-              direction={chatsExpanded ? "down" : "right"}
-            />
-            Chats
+            <ChatIcon className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
+            Chat
           </button>
-          {chatsExpanded && (
-            <div className="mt-0.5 space-y-0.5">
-              {chats.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => {
-                    if (onSelectChat) onSelectChat(chat.id);
-                    else router.push("/?chat=" + chat.id);
-                  }}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 text-left group ${
-                    activeChatId === chat.id
-                      ? "bg-primary/5 text-primary font-medium"
-                      : "text-text-secondary hover:bg-bg hover:text-text-primary"
-                  }`}
-                >
-                  <ChatIcon className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
-                  <span className="line-clamp-1">{chat.title}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Knowledge Section */}
@@ -93,10 +62,6 @@ export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: Sideb
             onClick={() => setKnowledgeExpanded(!knowledgeExpanded)}
             className="flex items-center gap-1.5 w-full px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase hover:text-text-primary transition-colors"
           >
-            <ChevronIcon
-              className="w-3 h-3 transition-transform duration-200"
-              direction={knowledgeExpanded ? "down" : "right"}
-            />
             Knowledge
           </button>
           {knowledgeExpanded && (
@@ -130,8 +95,6 @@ export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: Sideb
 
       {/* Bottom */}
       <div className="px-3 pb-4 space-y-2">
-        
-
         <button
           onClick={() => router.push("/settings")}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 ${
@@ -143,6 +106,25 @@ export default function Sidebar({ activeChatId, onNewChat, onSelectChat }: Sideb
           <SettingsIcon className="w-4 h-4 opacity-60" />
           Settings
         </button>
+
+        {user && (
+          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-bg/50 border border-border/50">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[13px] font-medium text-text-primary truncate">{user.name}</div>
+              <div className="text-[11px] text-text-secondary truncate">{user.email}</div>
+            </div>
+            <button
+              onClick={() => confirm("Sign out of your account?", () => { logout(); router.push("/login"); }, { confirmLabel: "Sign out", type: "danger" })}
+              className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+              title="Sign out"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );
