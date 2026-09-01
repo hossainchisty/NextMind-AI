@@ -32,6 +32,20 @@ class DocumentListCreateView(generics.ListCreateAPIView):
         process_document_task.delay(str(doc.id))
         logger.info("Document uploaded: %s, queued for processing", doc.id)
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(success_response(data=serializer.data))
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            success_response(data=serializer.data, message="Document uploaded"),
+            status=status.HTTP_201_CREATED,
+        )
+
 
 class DocumentDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = DocumentSerializer
@@ -40,3 +54,14 @@ class DocumentDetailView(generics.RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return Document.objects.filter(user=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(success_response(data=serializer.data))
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        from apps.documents.tasks import delete_document_task
+        delete_document_task.delay(str(instance.id))
+        return Response(status=status.HTTP_204_NO_CONTENT)

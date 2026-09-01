@@ -49,3 +49,28 @@ def process_document_task(self, document_id: str):
         doc.save(update_fields=["status", "error_message"])
         logger.error("Document processing failed: %s — %s", doc.id, e)
         raise self.retry(exc=e, countdown=60)
+
+
+@shared_task
+def delete_document_task(document_id: str):
+    from apps.documents.models import Document
+
+    try:
+        doc = Document.objects.get(id=document_id)
+    except Document.DoesNotExist:
+        logger.error("Document not found for deletion: %s", document_id)
+        return
+
+    if doc.file_key:
+        try:
+            from apps.documents.services.storage import delete_from_r2
+            delete_from_r2(doc.file_key)
+        except Exception as e:
+            logger.error("Failed to delete R2 file %s: %s", doc.file_key, e)
+
+    from apps.knowledge.models import DocumentChunk
+    deleted_count, _ = DocumentChunk.objects.filter(document=doc).delete()
+    logger.info("Deleted %d chunks for document %s", deleted_count, doc.id)
+
+    doc.delete()
+    logger.info("Deleted document: %s", document_id)

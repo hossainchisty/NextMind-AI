@@ -1,5 +1,3 @@
-import uuid
-
 from django.conf import settings
 from django.db import models
 
@@ -22,7 +20,7 @@ class Document(UUIDModel, TimeStampedModel):
     )
     name = models.CharField(max_length=255)
     original_filename = models.CharField(max_length=500)
-    file = models.FileField(upload_to="documents/%Y/%m/%d/")
+    file_key = models.CharField(max_length=1000, blank=True, default="")
     file_type = models.CharField(max_length=10, choices=DOCUMENT_TYPE_CHOICES)
     file_size = models.BigIntegerField(default=0)
     status = models.CharField(
@@ -38,3 +36,10 @@ class Document(UUIDModel, TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def file_url(self):
+        if not self.file_key:
+            return None
+        from apps.documents.services.storage import get_signed_url
+        return get_signed_url(self.file_key)

@@ -4,17 +4,23 @@ from .models import Document
 
 
 class DocumentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Document
         fields = [
-            "id", "name", "original_filename", "file_type", "file_size",
-            "status", "error_message", "page_count", "collection",
-            "created_at", "updated_at",
+            "id", "name", "original_filename", "file_key", "file_type",
+            "file_size", "status", "error_message", "page_count",
+            "collection", "file_url", "created_at", "updated_at",
         ]
         read_only_fields = [
-            "id", "original_filename", "file_type", "file_size",
-            "status", "error_message", "page_count", "created_at", "updated_at",
+            "id", "original_filename", "file_key", "file_type", "file_size",
+            "status", "error_message", "page_count", "file_url",
+            "created_at", "updated_at",
         ]
+
+    def get_file_url(self, obj):
+        return obj.file_url
 
 
 class DocumentUploadSerializer(serializers.ModelSerializer):
@@ -39,11 +45,24 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        from apps.core.constants import ALLOWED_DOCUMENT_TYPES
+        from apps.documents.services.storage import upload_to_r2, build_r2_key
+
         file = validated_data["file"]
+        user = self.context["request"].user
+
         validated_data["original_filename"] = file.name
         validated_data["file_size"] = file.size
-        from apps.core.constants import ALLOWED_DOCUMENT_TYPES
         validated_data["file_type"] = ALLOWED_DOCUMENT_TYPES.get(file.content_type, "txt")
         if not validated_data.get("name"):
             validated_data["name"] = file.name
-        return super().create(validated_data)
+
+        doc = Document(**validated_data)
+        doc.save()
+
+        file_key = build_r2_key(str(user.id), file.name)
+        upload_to_r2(file, file_key, content_type=file.content_type)
+        doc.file_key = file_key
+        doc.save(update_fields=["file_key"])
+
+        return doc

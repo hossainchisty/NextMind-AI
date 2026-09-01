@@ -182,3 +182,8 @@ CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.environ.get("CHUNK_OVERLAP", "150"))
 
 RRF_K = int(os.environ.get("RRF_K", "60"))
+
+R2_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL", "https://<account_id>.r2.cloudflarestorage.com")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "")
