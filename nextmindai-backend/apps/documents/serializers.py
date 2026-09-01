@@ -48,7 +48,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         from apps.core.constants import ALLOWED_DOCUMENT_TYPES
         from apps.documents.services.storage import upload_to_r2, build_r2_key
 
-        file = validated_data["file"]
+        file = validated_data.pop("file")
         user = self.context["request"].user
 
         validated_data["original_filename"] = file.name
