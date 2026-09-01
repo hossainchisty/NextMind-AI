@@ -47,7 +47,8 @@ def download_from_r2(key: str) -> str:
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
     tmp.close()
 
-    client.download_fileobj(bucket, key, tmp.name)
+    with open(tmp.name, "wb") as f:
+        client.download_fileobj(bucket, key, f)
     logger.info("Downloaded from R2: %s → %s", key, tmp.name)
     return tmp.name
 
