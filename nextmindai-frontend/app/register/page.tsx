@@ -1,0 +1,115 @@
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+
+export default function RegisterPage() {
+  const { register } = useAuth();
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (password !== passwordConfirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      await register(email, name, password, passwordConfirm);
+      router.push("/");
+    } catch (err: unknown) {
+      const msg = err && typeof err === "object" && "message" in err ? (err as { message: string }).message : "Registration failed";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex h-screen bg-bg items-center justify-center">
+      <div className="w-full max-w-[380px] px-6">
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white mx-auto mb-4">
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="6" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="18" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/></svg>
+          </div>
+          <h1 className="text-[22px] font-semibold text-text-primary">Create account</h1>
+          <p className="text-[14px] text-text-secondary mt-1">Start your private AI workspace</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="px-3 py-2 rounded-lg bg-red-50 text-red-600 text-[13px]">{error}</div>
+          )}
+          <div>
+            <label className="block text-[13px] font-medium text-text-primary mb-1.5">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full h-10 px-3 rounded-[10px] bg-surface border border-border text-[13px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/30 focus:ring-2 focus:ring-primary/5 transition-all"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-text-primary mb-1.5">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full h-10 px-3 rounded-[10px] bg-surface border border-border text-[13px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/30 focus:ring-2 focus:ring-primary/5 transition-all"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-text-primary mb-1.5">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              className="w-full h-10 px-3 rounded-[10px] bg-surface border border-border text-[13px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/30 focus:ring-2 focus:ring-primary/5 transition-all"
+              placeholder="Min 8 characters"
+            />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-text-primary mb-1.5">Confirm Password</label>
+            <input
+              type="password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              required
+              minLength={8}
+              className="w-full h-10 px-3 rounded-[10px] bg-surface border border-border text-[13px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/30 focus:ring-2 focus:ring-primary/5 transition-all"
+              placeholder="Repeat password"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-10 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors disabled:opacity-50"
+          >
+            {loading ? "Creating account..." : "Create Account"}
+          </button>
+        </form>
+
+        <p className="text-center text-[13px] text-text-secondary mt-6">
+          Already have an account?{" "}
+          <a href="/login" className="text-primary hover:text-primary-light transition-colors font-medium">
+            Sign in
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}
