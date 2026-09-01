@@ -2,6 +2,7 @@
 
 # dependencies
 /nextmindai-frontend/node_modules
+/nextmindai-backend/venv/
 /nextmindai-frontend/.next
 /.pnp
 .pnp.js
