@@ -9,6 +9,7 @@ interface ModelInfo {
   context: string;
   input_price: string;
   output_price: string;
+  pricing_type: "free" | "freemium" | "paid";
   capabilities: string[];
   description: string;
 }
@@ -50,6 +51,7 @@ export default function ChatInput({ onSend }: Props) {
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
+  const [pricingFilter, setPricingFilter] = useState<"all" | "free" | "paid">("all");
   const ref = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -119,56 +121,85 @@ export default function ChatInput({ onSend }: Props) {
                 </button>
                 {showModelPicker && (
                   <div className="absolute bottom-full left-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
-                    {providers.map((pm) => (
-                      <div key={pm.provider.value}>
-                        <div className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2 sticky top-0 bg-surface">
-                          <ProviderLogo logo_url={pm.provider.logo_url} color={pm.provider.color} label={pm.provider.label} />
-                          {pm.provider.label}
-                        </div>
-                        {pm.models.map((m) => (
-                          <div
-                            key={m.id}
-                            className={`px-3 py-2.5 transition-colors cursor-pointer ${
-                              selectedProvider === pm.provider.value && selectedModel === m.id
-                                ? "bg-primary/10"
-                                : "hover:bg-bg"
-                            }`}
-                            onClick={() => {
-                              setSelectedProvider(pm.provider.value);
-                              setSelectedModel(m.id);
-                              setShowModelPicker(false);
-                            }}
-                            onMouseEnter={() => setHoveredModel(`${pm.provider.value}:${m.id}`)}
-                            onMouseLeave={() => setHoveredModel(null)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className={`text-[13px] font-medium ${selectedProvider === pm.provider.value && selectedModel === m.id ? "text-primary" : "text-text-primary"}`}>
-                                {m.name}
-                              </span>
-                              <span className="text-[11px] text-text-secondary font-mono">{m.context}</span>
-                            </div>
-                            <p className="text-[11px] text-text-secondary mt-0.5 leading-snug">{m.description}</p>
-                            <div className="flex items-center gap-2 mt-1.5">
-                              <span className="text-[10px] text-text-secondary">
-                                <span className="text-text-secondary/60">In</span> {m.input_price}
-                                <span className="text-text-secondary/60 mx-0.5">/</span>
-                                <span className="text-text-secondary/60">Out</span> {m.output_price}
-                                <span className="text-text-secondary/60">/1M</span>
-                              </span>
-                              {m.capabilities.length > 0 && (
-                                <div className="flex items-center gap-1">
-                                  {m.capabilities.map((cap) => (
-                                    <span key={cap} className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/5 text-primary/70">
-                                      {CAPABILITY_LABELS[cap] || cap}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                    <div className="sticky top-0 bg-surface border-b border-border px-3 py-2 flex items-center gap-2 z-10">
+                      {(["all", "free", "paid"] as const).map((f) => (
+                        <button
+                          key={f}
+                          onClick={() => setPricingFilter(f)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                            pricingFilter === f
+                              ? "bg-primary text-white"
+                              : "text-text-secondary hover:bg-bg"
+                          }`}
+                        >
+                          {f === "all" ? "All" : f === "free" ? "Free" : "Paid"}
+                        </button>
+                      ))}
+                    </div>
+                    {providers.map((pm) => {
+                      const filtered = pm.models.filter((m) => {
+                        if (pricingFilter === "all") return true;
+                        if (pricingFilter === "free") return m.pricing_type === "free" || m.pricing_type === "freemium";
+                        return m.pricing_type === "paid";
+                      });
+                      if (filtered.length === 0) return null;
+                      return (
+                        <div key={pm.provider.value}>
+                          <div className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2 sticky top-[37px] bg-surface">
+                            <ProviderLogo logo_url={pm.provider.logo_url} color={pm.provider.color} label={pm.provider.label} />
+                            {pm.provider.label}
                           </div>
-                        ))}
-                      </div>
-                    ))}
+                          {filtered.map((m) => (
+                            <div
+                              key={m.id}
+                              className={`px-3 py-2.5 transition-colors cursor-pointer ${
+                                selectedProvider === pm.provider.value && selectedModel === m.id
+                                  ? "bg-primary/10"
+                                  : "hover:bg-bg"
+                              }`}
+                              onClick={() => {
+                                setSelectedProvider(pm.provider.value);
+                                setSelectedModel(m.id);
+                                setShowModelPicker(false);
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-[13px] font-medium ${selectedProvider === pm.provider.value && selectedModel === m.id ? "text-primary" : "text-text-primary"}`}>
+                                    {m.name}
+                                  </span>
+                                  {m.pricing_type === "free" && (
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-600">FREE</span>
+                                  )}
+                                  {m.pricing_type === "freemium" && (
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-500/10 text-amber-600">FREE TIER</span>
+                                  )}
+                                </div>
+                                <span className="text-[11px] text-text-secondary font-mono">{m.context}</span>
+                              </div>
+                              <p className="text-[11px] text-text-secondary mt-0.5 leading-snug">{m.description}</p>
+                              <div className="flex items-center gap-2 mt-1.5">
+                                <span className="text-[10px] text-text-secondary">
+                                  <span className="text-text-secondary/60">In</span> {m.input_price}
+                                  <span className="text-text-secondary/60 mx-0.5">/</span>
+                                  <span className="text-text-secondary/60">Out</span> {m.output_price}
+                                  <span className="text-text-secondary/60">/1M</span>
+                                </span>
+                                {m.capabilities.length > 0 && (
+                                  <div className="flex items-center gap-1">
+                                    {m.capabilities.map((cap) => (
+                                      <span key={cap} className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/5 text-primary/70">
+                                        {CAPABILITY_LABELS[cap] || cap}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
