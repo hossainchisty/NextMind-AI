@@ -15,14 +15,6 @@ const sections = [
     ],
   },
   {
-    title: "Organization",
-    items: [
-      { label: "Organization Settings", href: "/settings/organization" },
-      { label: "Members", href: "/settings/organization/members" },
-      { label: "Advanced", href: "/settings/organization/advanced" },
-    ],
-  },
-  {
     title: "Personalization",
     items: [
       { label: "Add Your Key(s)", href: "/settings/personalization", badge: "Optional" },
