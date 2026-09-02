@@ -83,6 +83,42 @@ function ProviderLogo({ logo, logo_url, color, className }: { logo: string; logo
         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
       </svg>
     ),
+    groq: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M3.89 15.672L6.255.461A.542.542 0 017.27.288l2.543 4.771zm16.794 3.692l-2.25-14a.543.543 0 00-.919-.295L3.316 19.365l7.856 4.427a1.621 1.621 0 001.588 0zM14.3 7.147l-1.82-3.482a.542.542 0 00-.96 0L3.53 17.984z" />
+      </svg>
+    ),
+    together: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      </svg>
+    ),
+    cohere: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" />
+      </svg>
+    ),
+    huggingface: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M12 2a3.5 3.5 0 00-3.5 3.5v1a3.5 3.5 0 007 0v-1A3.5 3.5 0 0012 2zM5.5 9.5a2 2 0 00-2 2v1a7.5 7.5 0 0015 0v-1a2 2 0 00-2-2h-1v1a5.5 5.5 0 01-11 0v-1h-1z" />
+      </svg>
+    ),
+    perplexity: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <circle cx="12" cy="12" r="10" fill="none" stroke={color} strokeWidth="2" />
+        <path d="M12 6v12M8 8l4 4 4-4M8 16l4-4 4 4" fill="none" stroke={color} strokeWidth="1.5" />
+      </svg>
+    ),
+    cloudflare: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M16.5 18h-9a.5.5 0 010-1h9a.5.5 0 010 1zm4-5.5H19a4 4 0 00-7.76-1.3A3 3 0 008.5 9H6.5a2.5 2.5 0 000 5h14a2.5 2.5 0 000-5z" />
+      </svg>
+    ),
+    replicate: (
+      <svg className={className} viewBox="0 0 24 24" fill={color}>
+        <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" />
+      </svg>
+    ),
   };
   return logos[logo] || <span className={`text-[13px] font-bold`} style={{ color }}>{logo ? logo[0].toUpperCase() : "?"}</span>;
 }

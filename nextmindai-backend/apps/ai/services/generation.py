@@ -21,7 +21,7 @@ def get_llm_provider(user=None):
                 api_key = user_key.api_key
                 provider_value = user_key.provider.value
                 logger.info("Using user's API key for provider: %s", provider_value)
-                if provider_value in ("openai", "gemini", "openrouter", "deepseek", "opencode", "xai", "mistral", "nvidia", "fireworks"):
+                if provider_value in ("openai", "gemini", "openrouter", "deepseek", "opencode", "xai", "mistral", "nvidia", "fireworks", "groq", "together", "cohere", "huggingface", "perplexity", "cloudflare", "replicate"):
                     from apps.ai.providers.openai_provider import OpenAIProvider
                     base_url = None
                     if provider_value == "gemini":
@@ -40,6 +40,20 @@ def get_llm_provider(user=None):
                         base_url = "https://integrate.api.nvidia.com/v1"
                     elif provider_value == "fireworks":
                         base_url = "https://api.fireworks.ai/inference/v1"
+                    elif provider_value == "groq":
+                        base_url = "https://api.groq.com/openai/v1"
+                    elif provider_value == "together":
+                        base_url = "https://api.together.xyz/v1"
+                    elif provider_value == "cohere":
+                        base_url = "https://api.cohere.com/compatibility/v1"
+                    elif provider_value == "huggingface":
+                        base_url = "https://api-inference.huggingface.co/v1"
+                    elif provider_value == "perplexity":
+                        base_url = "https://api.perplexity.ai"
+                    elif provider_value == "cloudflare":
+                        base_url = "https://api.cloudflare.com/client/v4"
+                    elif provider_value == "replicate":
+                        base_url = "https://api.replicate.com/v1"
                     return OpenAIProvider(api_key=api_key, base_url=base_url)
                 elif provider_value == "anthropic":
                     from apps.ai.providers.anthropic_provider import AnthropicProvider
