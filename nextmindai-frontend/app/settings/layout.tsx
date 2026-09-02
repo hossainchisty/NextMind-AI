@@ -17,7 +17,7 @@ const sections = [
   {
     title: "Provider",
     items: [
-      { label: "Connected Providers", href: "/settings/personalization" },
+      { label: "Connected Providers", href: "/settings/providers" },
     ],
   },
   {
@@ -56,7 +56,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
               </h3>
               <div className="space-y-0.5">
                 {section.items.map((item) => {
-                  const isActive = item.href === "/settings/personalization"
+                  const isActive = item.href === "/settings/providers"
                     ? pathname === item.href
                     : pathname.startsWith(item.href);
                   return (
