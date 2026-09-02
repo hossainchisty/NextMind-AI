@@ -15,7 +15,7 @@ const sections = [
     ],
   },
   {
-    title: "AI Models",
+    title: "Provider",
     items: [
       { label: "Connected Providers", href: "/settings/personalization" },
     ],

@@ -115,7 +115,7 @@ export default function PersonalizationPage() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-[22px] font-semibold text-text-primary mb-1">AI Models</h1>
+          <h1 className="text-[22px] font-semibold text-text-primary mb-1">Providers</h1>
           <p className="text-[14px] text-text-secondary">Connect your own API keys to use your preferred models.</p>
         </div>
         {!showForm && (
