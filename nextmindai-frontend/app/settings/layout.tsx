@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Sidebar from "@/components/sidebar/Sidebar";
 
 const sections = [
   {
@@ -34,8 +35,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="flex h-screen bg-bg overflow-hidden">
-      <aside className="w-[260px] bg-surface border-r border-border flex flex-col shrink-0">
-        <div className="px-5 py-5 border-b border-border">
+      <Sidebar />
+      <aside className="w-[240px] bg-surface border-r border-border flex flex-col shrink-0">
+        <div className="px-4 py-5 border-b border-border">
           <Link
             href="/"
             className="flex items-center gap-2 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
@@ -82,10 +84,6 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             </div>
           ))}
         </nav>
-
-        <div className="px-5 py-4 border-t border-border">
-          <p className="text-[11px] text-text-secondary/60">NextMind AI v1.0</p>
-        </div>
       </aside>
 
       <main className="flex-1 overflow-y-auto">
