@@ -91,6 +91,7 @@ export default function SettingsPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [keys, setKeys] = useState<APIKey[]>([]);
   const [provider, setProvider] = useState("");
+  const [showProviderDropdown, setShowProviderDropdown] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchingProviders, setFetchingProviders] = useState(true);
@@ -102,6 +103,17 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchProviders();
     fetchKeys();
+  }, []);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.provider-dropdown')) {
+        setShowProviderDropdown(false);
+      }
+    }
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, []);
 
   async function fetchProviders() {
@@ -198,33 +210,50 @@ export default function SettingsPage() {
             style={{ animationDelay: "50ms" }}
           >
             <div className="space-y-4">
-              {/* Provider Select */}
+              {/* Provider Select with Logos */}
               <div>
                 <label className="block text-[13px] font-medium text-text-primary mb-1.5">
                   Endpoint
                 </label>
-                <div className="relative">
-                  <select
-                    value={provider}
-                    onChange={(e) => {
-                      setProvider(e.target.value);
-                      setTestStatus("idle");
-                      setTestError("");
-                    }}
-                    className="w-full appearance-none px-4 py-2.5 pr-10 rounded-lg bg-bg border border-border text-[13px] text-text-primary focus:outline-none focus:border-primary/40 transition-colors cursor-pointer"
+                <div className="relative provider-dropdown">
+                  <div
+                    className="w-full px-4 py-2.5 rounded-lg bg-bg border border-border text-[13px] text-text-primary cursor-pointer focus:outline-none focus:border-primary/40 transition-colors flex items-center justify-between"
+                    onClick={() => setShowProviderDropdown(!showProviderDropdown)}
                   >
-                    <option value="">Select a provider</option>
-                    {providers.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-4 h-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <span className="flex items-center gap-2">
+                      {selected ? (
+                        <ProviderLogo logo={selected.logo || ""} logo_url={selected.logo_url || ""} color={selected.color || "#666"} className="w-5 h-5" />
+                      ) : (
+                        <span className="w-5 h-5" />
+                      )}
+                      {selected?.label || "Select a provider"}
+                    </span>
+                    <svg className={`w-4 h-4 text-text-secondary transition-transform ${showProviderDropdown ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </div>
+                  {showProviderDropdown && (
+                    <div className="absolute z-10 w-full mt-1 rounded-lg bg-bg border border-border shadow-lg max-h-48 overflow-auto">
+                      {providers.map((p) => (
+                        <button
+                          key={p.value}
+                          type="button"
+                          onClick={() => {
+                            setProvider(p.value);
+                            setShowProviderDropdown(false);
+                            setTestStatus("idle");
+                            setTestError("");
+                          }}
+                          className={`w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-text-primary hover:bg-primary/5 transition-colors ${
+                            provider === p.value ? "bg-primary/10 text-primary" : "text-text-primary"
+                          }`}
+                        >
+                          <ProviderLogo logo={p.logo || ""} logo_url={p.logo_url || ""} color={p.color || "#666"} className="w-5 h-5" />
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
