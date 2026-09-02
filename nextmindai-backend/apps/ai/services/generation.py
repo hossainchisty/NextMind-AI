@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import List, Dict, Optional
 
 import django.conf as conf
@@ -17,23 +16,11 @@ def _get_client():
         _llm_model = getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini")
 
         provider_name = getattr(conf.settings, "LLM_PROVIDER", "openai")
-        api_key = os.environ.get("OPENAI_API_KEY")
-        base_url = None
+        from apps.accounts.models import Provider
+        db_provider = Provider.objects.get(value=provider_name, is_active=True)
 
-        try:
-            from apps.accounts.models import Provider
-            db_provider = Provider.objects.get(value=provider_name, is_active=True)
-            base_url = db_provider.endpoint
-            if not api_key:
-                api_key = os.environ.get(f"{provider_name.upper()}_API_KEY")
-        except Exception:
-            base_url = getattr(conf.settings, "LLM_BASE_URL", None)
-
-        kwargs = {"api_key": api_key or "omniroute"}
-        if base_url:
-            kwargs["base_url"] = base_url
-        _llm_client = openai.OpenAI(**kwargs)
-        logger.info("LLM client initialized: %s (%s)", provider_name, base_url or "default")
+        _llm_client = openai.OpenAI(api_key="omniroute", base_url=db_provider.endpoint)
+        logger.info("LLM client initialized: %s (%s)", provider_name, db_provider.endpoint)
     return _llm_client
 
 
