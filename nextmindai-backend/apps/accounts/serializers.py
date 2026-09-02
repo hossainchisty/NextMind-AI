@@ -37,19 +37,12 @@ class LoginSerializer(serializers.Serializer):
 
 
 class ProviderSerializer(serializers.ModelSerializer):
-    logo_url = serializers.SerializerMethodField()
-
     class Meta:
         model = Provider
         fields = ["id", "value", "label", "endpoint", "placeholder", "logo", "logo_url", "color"]
 
     def get_logo_url(self, obj):
-        if obj.logo:
-            request = self.context.get("request")
-            if request:
-                return request.build_absolute_uri(obj.logo.url)
-            return obj.logo.url
-        return ""
+        return obj.logo_url
 
 
 class UserAPIKeySerializer(serializers.ModelSerializer):

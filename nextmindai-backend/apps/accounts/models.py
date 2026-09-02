@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
@@ -49,10 +50,16 @@ class Provider(TimeStampedModel):
     label = models.CharField(max_length=100)
     endpoint = models.URLField(max_length=500)
     placeholder = models.CharField(max_length=50, default="sk-...")
-    logo = models.ImageField(
-        upload_to="provider_logos/", blank=True, null=True
-    )
+    logo = models.CharField(max_length=500, blank=True, default="")
     color = models.CharField(max_length=20, default="#666666")
+
+    def logo_url(self) -> Optional[str]:
+        import django.conf as conf
+        if self.logo:
+            endpoint = conf.settings.R2_ENDPOINT_URL.rstrip("/")
+            bucket = conf.settings.R2_BUCKET_NAME
+            return f"{endpoint}/{bucket}/{self.logo}"
+        return None
     is_active = models.BooleanField(default=True)
 
     class Meta:
