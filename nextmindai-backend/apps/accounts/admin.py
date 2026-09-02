@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from .models import Provider, User, UserAPIKey
 
 
 @admin.register(User)
@@ -22,3 +22,19 @@ class CustomUserAdmin(UserAdmin):
             "fields": ("email", "name", "password1", "password2", "is_active", "is_staff"),
         }),
     )
+
+
+@admin.register(Provider)
+class ProviderAdmin(admin.ModelAdmin):
+    list_display = ("label", "value", "endpoint", "is_active", "created_at")
+    list_filter = ("is_active",)
+    search_fields = ("label", "value", "endpoint")
+    ordering = ("label",)
+
+
+@admin.register(UserAPIKey)
+class UserAPIKeyAdmin(admin.ModelAdmin):
+    list_display = ("user", "provider", "is_active", "created_at")
+    list_filter = ("is_active", "provider")
+    search_fields = ("user__email", "provider__label")
+    ordering = ("-created_at",)

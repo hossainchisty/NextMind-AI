@@ -7,16 +7,16 @@ import uuid
 def seed_providers(apps, schema_editor):
     Provider = apps.get_model("accounts", "Provider")
     providers = [
-        {"value": "openai", "label": "OpenAI", "endpoint": "https://api.openai.com/v1", "placeholder": "sk-...", "logo": "openai", "color": "#10a37f"},
-        {"value": "anthropic", "label": "Anthropic", "endpoint": "https://api.anthropic.com", "placeholder": "sk-ant-...", "logo": "anthropic", "color": "#d4a574"},
-        {"value": "gemini", "label": "Google Gemini", "endpoint": "https://generativelanguage.googleapis.com", "placeholder": "AIza...", "logo": "gemini", "color": "#4285f4"},
-        {"value": "openrouter", "label": "OpenRouter", "endpoint": "https://openrouter.ai/api/v1", "placeholder": "sk-or-...", "logo": "openrouter", "color": "#8b5cf6"},
-        {"value": "deepseek", "label": "DeepSeek", "endpoint": "https://api.deepseek.com/v1", "placeholder": "sk-...", "logo": "deepseek", "color": "#0ea5e9"},
-        {"value": "xai", "label": "xAI Grok", "endpoint": "https://api.x.ai/v1", "placeholder": "xai-...", "logo": "xai", "color": "#000000"},
-        {"value": "mistral", "label": "Mistral", "endpoint": "https://api.mistral.ai/v1", "placeholder": "mist-...", "logo": "mistral", "color": "#ff7000"},
-        {"value": "nvidia", "label": "NVIDIA", "endpoint": "https://integrate.api.nvidia.com/v1", "placeholder": "nvapi-...", "logo": "nvidia", "color": "#76b900"},
-        {"value": "fireworks", "label": "Fireworks", "endpoint": "https://api.fireworks.ai/inference/v1", "placeholder": "fw-...", "logo": "fireworks", "color": "#ff4d00"},
-        {"value": "opencode", "label": "OpenCode Zen", "endpoint": "https://opencode.ai/zen/v1", "placeholder": "sk-...", "logo": "opencode", "color": "#6366f1"},
+        {"value": "openai", "label": "OpenAI", "endpoint": "https://api.openai.com/v1", "placeholder": "sk-...", "color": "#10a37f"},
+        {"value": "anthropic", "label": "Anthropic", "endpoint": "https://api.anthropic.com", "placeholder": "sk-ant-...", "color": "#d4a574"},
+        {"value": "gemini", "label": "Google Gemini", "endpoint": "https://generativelanguage.googleapis.com", "placeholder": "AIza...", "color": "#4285f4"},
+        {"value": "openrouter", "label": "OpenRouter", "endpoint": "https://openrouter.ai/api/v1", "placeholder": "sk-or-...", "color": "#8b5cf6"},
+        {"value": "deepseek", "label": "DeepSeek", "endpoint": "https://api.deepseek.com/v1", "placeholder": "sk-...", "color": "#0ea5e9"},
+        {"value": "xai", "label": "xAI Grok", "endpoint": "https://api.x.ai/v1", "placeholder": "xai-...", "color": "#000000"},
+        {"value": "mistral", "label": "Mistral", "endpoint": "https://api.mistral.ai/v1", "placeholder": "mist-...", "color": "#ff7000"},
+        {"value": "nvidia", "label": "NVIDIA", "endpoint": "https://integrate.api.nvidia.com/v1", "placeholder": "nvapi-...", "color": "#76b900"},
+        {"value": "fireworks", "label": "Fireworks", "endpoint": "https://api.fireworks.ai/inference/v1", "placeholder": "fw-...", "color": "#ff4d00"},
+        {"value": "opencode", "label": "OpenCode Zen", "endpoint": "https://opencode.ai/zen/v1", "placeholder": "sk-...", "color": "#6366f1"},
     ]
     for p in providers:
         Provider.objects.update_or_create(value=p["value"], defaults=p)
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ('label', models.CharField(max_length=100)),
                 ('endpoint', models.URLField(max_length=500)),
                 ('placeholder', models.CharField(default='sk-...', max_length=50)),
-                ('logo', models.CharField(default='', max_length=50)),
+                ('logo', models.ImageField(blank=True, null=True, upload_to='provider_logos/')),
                 ('color', models.CharField(default='#666666', max_length=20)),
                 ('is_active', models.BooleanField(default=True)),
             ],

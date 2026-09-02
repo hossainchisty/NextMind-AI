@@ -12,6 +12,7 @@ interface Provider {
   endpoint: string;
   placeholder: string;
   logo: string;
+  logo_url: string;
   color: string;
 }
 
@@ -26,7 +27,10 @@ interface APIKey {
   created_at: string;
 }
 
-function ProviderLogo({ logo, color, className }: { logo: string; color: string; className?: string }) {
+function ProviderLogo({ logo, logo_url, color, className }: { logo: string; logo_url: string; color: string; className?: string }) {
+  if (logo_url) {
+    return <img src={logo_url} className={className} alt="" />;
+  }
   const logos: Record<string, React.ReactNode> = {
     openai: (
       <svg className={className} viewBox="0 0 24 24" fill={color}>
@@ -314,7 +318,7 @@ export default function SettingsPage() {
                           className="w-9 h-9 rounded-xl flex items-center justify-center"
                           style={{ backgroundColor: `${p.color || "#666"}10` }}
                         >
-                          <ProviderLogo logo={p.logo || ""} color={p.color || "#666"} className="w-5 h-5" />
+                          <ProviderLogo logo={p.logo || ""} logo_url={p.logo_url || ""} color={p.color || "#666"} className="w-5 h-5" />
                         </div>
                         <div>
                           <div className="text-[13px] font-medium text-text-primary">
