@@ -3,9 +3,19 @@
 import { useState, useRef, useEffect } from "react";
 import { api } from "@/lib/api";
 
+interface ModelInfo {
+  id: string;
+  name: string;
+  context: string;
+  input_price: string;
+  output_price: string;
+  capabilities: string[];
+  description: string;
+}
+
 interface ProviderModel {
   provider: { value: string; label: string; color: string; logo_url: string | null };
-  models: Array<{ id: string; name: string }>;
+  models: ModelInfo[];
 }
 
 interface Props {
@@ -21,12 +31,25 @@ function ProviderLogo({ logo_url, color, label }: { logo_url: string | null; col
   return <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] font-bold text-white" style={{ backgroundColor: color }}>{label[0]}</span>;
 }
 
+const CAPABILITY_LABELS: Record<string, string> = {
+  vision: "Vision",
+  function_calling: "Tools",
+  json_mode: "JSON",
+  reasoning: "Reasoning",
+  extended_thinking: "Thinking",
+  grounding: "Grounding",
+  rag: "RAG",
+  web_search: "Web Search",
+  routing: "Routing",
+};
+
 export default function ChatInput({ onSend }: Props) {
   const [value, setValue] = useState("");
   const [providers, setProviders] = useState<ProviderModel[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const ref = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -95,29 +118,54 @@ export default function ChatInput({ onSend }: Props) {
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 {showModelPicker && (
-                  <div className="absolute bottom-full left-0 mb-2 w-[320px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50">
+                  <div className="absolute bottom-full left-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
                     {providers.map((pm) => (
                       <div key={pm.provider.value}>
-                        <div className="px-3 pt-3 pb-1 text-[11px] font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+                        <div className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2 sticky top-0 bg-surface">
                           <ProviderLogo logo_url={pm.provider.logo_url} color={pm.provider.color} label={pm.provider.label} />
                           {pm.provider.label}
                         </div>
                         {pm.models.map((m) => (
-                          <button
+                          <div
                             key={m.id}
+                            className={`px-3 py-2.5 transition-colors cursor-pointer ${
+                              selectedProvider === pm.provider.value && selectedModel === m.id
+                                ? "bg-primary/10"
+                                : "hover:bg-bg"
+                            }`}
                             onClick={() => {
                               setSelectedProvider(pm.provider.value);
                               setSelectedModel(m.id);
                               setShowModelPicker(false);
                             }}
-                            className={`w-full text-left px-4 py-2 text-[13px] transition-colors ${
-                              selectedProvider === pm.provider.value && selectedModel === m.id
-                                ? "bg-primary/10 text-primary"
-                                : "text-text-primary hover:bg-bg"
-                            }`}
+                            onMouseEnter={() => setHoveredModel(`${pm.provider.value}:${m.id}`)}
+                            onMouseLeave={() => setHoveredModel(null)}
                           >
-                            {m.name}
-                          </button>
+                            <div className="flex items-center justify-between">
+                              <span className={`text-[13px] font-medium ${selectedProvider === pm.provider.value && selectedModel === m.id ? "text-primary" : "text-text-primary"}`}>
+                                {m.name}
+                              </span>
+                              <span className="text-[11px] text-text-secondary font-mono">{m.context}</span>
+                            </div>
+                            <p className="text-[11px] text-text-secondary mt-0.5 leading-snug">{m.description}</p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] text-text-secondary">
+                                <span className="text-text-secondary/60">In</span> {m.input_price}
+                                <span className="text-text-secondary/60 mx-0.5">/</span>
+                                <span className="text-text-secondary/60">Out</span> {m.output_price}
+                                <span className="text-text-secondary/60">/1M</span>
+                              </span>
+                              {m.capabilities.length > 0 && (
+                                <div className="flex items-center gap-1">
+                                  {m.capabilities.map((cap) => (
+                                    <span key={cap} className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/5 text-primary/70">
+                                      {CAPABILITY_LABELS[cap] || cap}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     ))}
