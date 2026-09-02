@@ -22,6 +22,8 @@ class ChatService:
         message: str,
         conversation_id: Optional[UUID] = None,
         collection_id: Optional[UUID] = None,
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
     ) -> Dict:
         conversation = self._get_or_create_conversation(conversation_id, collection_id)
 
@@ -48,7 +50,7 @@ class ChatService:
 
         context = build_context(context_chunks)
 
-        provider = get_llm_provider(user=self.user)
+        provider = get_llm_provider(user=self.user, provider_value=provider, model=model)
         answer = provider.generate(
             messages=self._build_messages(message, context),
         )

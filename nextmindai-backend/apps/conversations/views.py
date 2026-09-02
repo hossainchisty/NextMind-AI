@@ -98,5 +98,7 @@ class ChatView(APIView):
             message=serializer.validated_data["message"],
             conversation_id=serializer.validated_data.get("conversation_id"),
             collection_id=serializer.validated_data.get("collection_id"),
+            model=serializer.validated_data.get("model"),
+            provider=serializer.validated_data.get("provider"),
         )
         return Response(success_response(data=result))

@@ -117,7 +117,7 @@ export default function App() {
     }
   }
 
-  async function ask(text: string) {
+  async function ask(text: string, provider?: string, model?: string) {
     const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setMessages((p) => [...p, { id: "u-" + Date.now(), role: "user", content: text, timestamp: ts }]);
     setRetrieving(true);
@@ -130,7 +130,12 @@ export default function App() {
         };
       }>("/chat/", {
         method: "POST",
-        json: { message: text, conversation_id: activeId || undefined },
+        json: {
+          message: text,
+          conversation_id: activeId || undefined,
+          provider: provider || undefined,
+          model: model || undefined,
+        },
       });
 
       const msg = res.data.message;

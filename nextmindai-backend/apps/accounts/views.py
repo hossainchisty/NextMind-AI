@@ -158,6 +158,104 @@ class ProviderListView(generics.ListAPIView):
     queryset = Provider.objects.filter(is_active=True)
 
 
+PROVIDER_MODELS = {
+    "openai": [
+        {"id": "gpt-4o", "name": "GPT-4o"},
+        {"id": "gpt-4o-mini", "name": "GPT-4o Mini"},
+        {"id": "gpt-4-turbo", "name": "GPT-4 Turbo"},
+        {"id": "o1-preview", "name": "o1 Preview"},
+        {"id": "o1-mini", "name": "o1 Mini"},
+    ],
+    "anthropic": [
+        {"id": "claude-sonnet-4-20250514", "name": "Claude Sonnet 4"},
+        {"id": "claude-3-5-haiku-20241022", "name": "Claude 3.5 Haiku"},
+        {"id": "claude-3-opus-20240229", "name": "Claude 3 Opus"},
+    ],
+    "gemini": [
+        {"id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash"},
+        {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro"},
+        {"id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash"},
+    ],
+    "deepseek": [
+        {"id": "deepseek-chat", "name": "DeepSeek Chat"},
+        {"id": "deepseek-reasoner", "name": "DeepSeek Reasoner"},
+    ],
+    "groq": [
+        {"id": "llama-3.3-70b-versatile", "name": "Llama 3.3 70B"},
+        {"id": "llama-3.1-8b-instant", "name": "Llama 3.1 8B"},
+        {"id": "mixtral-8x7b-32768", "name": "Mixtral 8x7B"},
+        {"id": "gemma2-9b-it", "name": "Gemma 2 9B"},
+    ],
+    "mistral": [
+        {"id": "mistral-large-latest", "name": "Mistral Large"},
+        {"id": "mistral-medium-latest", "name": "Mistral Medium"},
+        {"id": "mistral-small-latest", "name": "Mistral Small"},
+    ],
+    "together": [
+        {"id": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "name": "Llama 3.3 70B Turbo"},
+        {"id": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo", "name": "Llama 3.1 405B"},
+        {"id": "Qwen/Qwen2.5-72B-Instruct-Turbo", "name": "Qwen 2.5 72B"},
+    ],
+    "openrouter": [
+        {"id": "auto", "name": "Auto (OpenRouter)"},
+    ],
+    "xai": [
+        {"id": "grok-2", "name": "Grok 2"},
+        {"id": "grok-2-mini", "name": "Grok 2 Mini"},
+    ],
+    "nvidia": [
+        {"id": "meta/llama-3.1-405b-instruct", "name": "Llama 3.1 405B"},
+        {"id": "meta/llama-3.3-70b-instruct", "name": "Llama 3.3 70B"},
+    ],
+    "fireworks": [
+        {"id": "accounts/fireworks/models/llama-v3p3-70b-instruct", "name": "Llama 3.3 70B"},
+        {"id": "accounts/fireworks/models/mixtral-8x22b-instruct", "name": "Mixtral 8x22B"},
+    ],
+    "cohere": [
+        {"id": "command-r-plus", "name": "Command R+"},
+        {"id": "command-r", "name": "Command R"},
+    ],
+    "perplexity": [
+        {"id": "llama-3.1-sonar-large-128k-online", "name": "Sonar Large"},
+        {"id": "llama-3.1-sonar-small-128k-online", "name": "Sonar Small"},
+    ],
+    "huggingface": [
+        {"id": "meta-llama/Llama-3.3-70B-Instruct", "name": "Llama 3.3 70B"},
+    ],
+    "replicate": [
+        {"id": "meta/meta-llama-3.1-405b-instruct", "name": "Llama 3.1 405B"},
+    ],
+    "cloudflare": [
+        {"id": "@cf/meta/llama-3.3-70b-instruct-fp8", "name": "Llama 3.3 70B"},
+    ],
+    "opencode": [
+        {"id": "default", "name": "OpenCode Default"},
+    ],
+}
+
+
+class UserModelsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .models import UserAPIKey
+        user_keys = UserAPIKey.objects.filter(user=request.user, is_active=True).select_related("provider")
+        connected = {}
+        for uk in user_keys:
+            p = uk.provider
+            models = PROVIDER_MODELS.get(p.value, [])
+            connected[p.value] = {
+                "provider": {
+                    "value": p.value,
+                    "label": p.label,
+                    "color": p.color,
+                    "logo_url": p.logo_url(),
+                },
+                "models": models,
+            }
+        return Response(success_response(data=connected))
+
+
 class APIKeyTestView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

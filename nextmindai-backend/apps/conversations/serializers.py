@@ -36,3 +36,5 @@ class ChatRequestSerializer(serializers.Serializer):
     message = serializers.CharField()
     conversation_id = serializers.UUIDField(required=False, allow_null=True)
     collection_id = serializers.UUIDField(required=False, allow_null=True)
+    model = serializers.CharField(required=False, allow_blank=True)
+    provider = serializers.CharField(required=False, allow_blank=True)
