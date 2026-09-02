@@ -15,9 +15,9 @@ const sections = [
     ],
   },
   {
-    title: "Personalization",
+    title: "AI Models",
     items: [
-      { label: "Add Your Key(s)", href: "/settings/personalization", badge: "Optional" },
+      { label: "Connected Providers", href: "/settings/personalization" },
     ],
   },
   {

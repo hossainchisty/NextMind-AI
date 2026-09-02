@@ -133,9 +133,9 @@ export default function PersonalizationPage() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-[22px] font-semibold text-text-primary mb-1">Add Your Key(s)</h1>
+      <h1 className="text-[22px] font-semibold text-text-primary mb-1">AI Models</h1>
       <p className="text-[14px] text-text-secondary mb-8">
-        Connect your own API keys to use your preferred models. This is optional — NextMind provides default models.
+        Connect your own API keys to use your preferred models.
       </p>
 
       {/* Add Key Form */}
