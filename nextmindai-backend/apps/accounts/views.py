@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -113,6 +114,21 @@ class UserAPIKeyListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserAPIKey.objects.filter(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            self.perform_create(serializer)
+        except IntegrityError:
+            return Response(
+                error_response("API key already exists for this provider"),
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(
+            success_response(data=serializer.data, message="API key added"),
+            status=status.HTTP_201_CREATED,
+        )
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -120,15 +136,6 @@ class UserAPIKeyListCreateView(generics.ListCreateAPIView):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(success_response(data=serializer.data))
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(
-            success_response(data=serializer.data, message="API key added"),
-            status=status.HTTP_201_CREATED,
-        )
 
 
 class UserAPIKeyDetailView(generics.RetrieveDestroyAPIView):

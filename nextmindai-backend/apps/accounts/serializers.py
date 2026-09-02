@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -48,11 +50,26 @@ class ProviderSerializer(serializers.ModelSerializer):
 class UserAPIKeySerializer(serializers.ModelSerializer):
     api_key_masked = serializers.SerializerMethodField()
     provider_detail = ProviderSerializer(source="provider", read_only=True)
+    provider = serializers.CharField(write_only=True)
 
     class Meta:
         model = UserAPIKey
         fields = ["id", "provider", "provider_detail", "label", "api_key", "api_key_masked", "is_active", "created_at"]
         read_only_fields = ["id", "created_at"]
+
+    def validate_provider(self, value):
+        try:
+            Provider.objects.get(value=value)
+        except Provider.DoesNotExist:
+            raise serializers.ValidationError(f"Provider '{value}' does not exist.")
+        return value
+
+    def create(self, validated_data):
+        provider_value = validated_data.pop("provider")
+        provider = Provider.objects.get(value=provider_value)
+        validated_data["provider"] = provider
+        validated_data["id"] = uuid.uuid4()
+        return super().create(validated_data)
 
     def get_api_key_masked(self, obj):
         if len(obj.api_key) > 8:
