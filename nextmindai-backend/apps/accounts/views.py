@@ -172,46 +172,25 @@ class APIKeyTestView(APIView):
 
         import requests as http_requests
 
-        test_urls = {
-            "openai": "https://api.openai.com/v1/models",
-            "anthropic": "https://api.anthropic.com/v1/messages",
-            "gemini": "https://generativelanguage.googleapis.com/v1beta/models",
-            "openrouter": "https://openrouter.ai/api/v1/models",
-            "deepseek": "https://api.deepseek.com/v1/models",
-            "opencode": "https://opencode.ai/zen/v1/models",
-            "xai": "https://api.x.ai/v1/models",
-            "mistral": "https://api.mistral.ai/v1/models",
-            "nvidia": "https://integrate.api.nvidia.com/v1/models",
-            "fireworks": "https://api.fireworks.ai/inference/v1/models",
-            "groq": "https://api.groq.com/openai/v1/models",
-            "together": "https://api.together.xyz/v1/models",
-            "cohere": "https://api.cohere.com/v1/models",
-            "huggingface": "https://api-inference.huggingface.co/models",
-            "perplexity": "https://api.perplexity.ai/models",
-            "cloudflare": "https://api.cloudflare.com/client/v4/accounts",
-            "replicate": "https://api.replicate.com/v1/models",
-        }
-
-        url = test_urls.get(provider)
-        if not url:
+        try:
+            provider_obj = Provider.objects.get(value=provider, is_active=True)
+        except Provider.DoesNotExist:
             return Response(
                 error_response("Unknown provider"),
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        url = provider_obj.endpoint.rstrip("/") + "/models"
+
         headers = {}
         if provider == "anthropic":
             headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01"}
+            url = provider_obj.endpoint.rstrip("/") + "/v1/models"
         elif provider == "gemini":
-            url = f"{url}?key={api_key}"
+            url = f"{provider_obj.endpoint}/v1beta/models?key={api_key}"
         elif provider == "cohere":
             headers = {"Authorization": f"Bearer {api_key}"}
-        elif provider == "huggingface":
-            headers = {"Authorization": f"Bearer {api_key}"}
-        elif provider == "cloudflare":
-            headers = {"Authorization": f"Bearer {api_key}"}
-        elif provider == "replicate":
-            headers = {"Authorization": f"Bearer {api_key}"}
+            url = provider_obj.endpoint.rstrip("/") + "/models"
         else:
             headers = {"Authorization": f"Bearer {api_key}"}
 
