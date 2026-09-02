@@ -109,7 +109,7 @@ export default function PersonalizationPage() {
   }
 
   const currentProvider = providers.find((p) => p.value === selectedProvider);
-  const connectedProviderValues = new Set(keys.map((k) => k.provider.value));
+  const connectedProviderValues = new Set(keys.map((k) => k.provider_detail.value));
 
   return (
     <div className="animate-fade-in">
