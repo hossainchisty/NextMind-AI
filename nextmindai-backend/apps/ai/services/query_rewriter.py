@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 logger = logging.getLogger("apps")
 
 
-def rewrite_query(message: str, history: List[Dict], use_llm: bool = False) -> str:
+def rewrite_query(message: str, history: List[Dict], use_llm: bool = False, user=None) -> str:
     if not use_llm or not history:
         return message
 
@@ -22,7 +22,7 @@ def rewrite_query(message: str, history: List[Dict], use_llm: bool = False) -> s
 
     try:
         from apps.ai.services.generation import get_llm_provider
-        provider = get_llm_provider()
+        provider = get_llm_provider(user=user)
         result = provider.generate(
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,

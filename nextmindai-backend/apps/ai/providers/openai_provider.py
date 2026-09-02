@@ -8,13 +8,13 @@ logger = logging.getLogger("apps")
 
 
 class OpenAIProvider(BaseLLMProvider):
-    def __init__(self):
+    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         import openai
-        api_key = os.environ.get("OPENAI_API_KEY", "omniroute")
-        base_url = os.environ.get("LLM_BASE_URL")
-        kwargs = {"api_key": api_key}
-        if base_url:
-            kwargs["base_url"] = base_url
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "omniroute")
+        self.base_url = base_url or os.environ.get("LLM_BASE_URL")
+        kwargs = {"api_key": self.api_key}
+        if self.base_url:
+            kwargs["base_url"] = self.base_url
         self.client = openai.OpenAI(**kwargs)
 
     def generate(

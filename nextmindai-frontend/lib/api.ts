@@ -1,7 +1,8 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1").replace(/\/+$/, "");
 
 function ensureSlash(path: string): string {
-  return path.endsWith("/") ? path : path + "/";
+  let p = path.startsWith("/") ? path : "/" + path;
+  return p.endsWith("/") ? p : p + "/";
 }
 
 function getTokens(): { access: string | null; refresh: string | null } {

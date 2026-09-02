@@ -32,7 +32,7 @@ class ChatService:
         )
 
         history = self._get_history(conversation)
-        search_query = rewrite_query(message, history)
+        search_query = rewrite_query(message, history, user=self.user)
 
         retrieval_start = time.time()
         candidates = hybrid_search(
@@ -48,7 +48,7 @@ class ChatService:
 
         context = build_context(context_chunks)
 
-        provider = get_llm_provider()
+        provider = get_llm_provider(user=self.user)
         answer = provider.generate(
             messages=self._build_messages(message, context),
         )

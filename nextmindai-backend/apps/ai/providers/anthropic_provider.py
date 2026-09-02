@@ -8,12 +8,12 @@ logger = logging.getLogger("apps")
 
 
 class AnthropicProvider(BaseLLMProvider):
-    def __init__(self):
+    def __init__(self, api_key: Optional[str] = None):
         import anthropic
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-        if not api_key:
+        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+        if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY not set")
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.client = anthropic.Anthropic(api_key=self.api_key)
 
     def generate(
         self,

@@ -41,3 +41,43 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
     def __str__(self):
         return self.email
+
+
+class Provider(TimeStampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    value = models.CharField(max_length=50, unique=True)
+    label = models.CharField(max_length=100)
+    endpoint = models.URLField(max_length=500)
+    placeholder = models.CharField(max_length=50, default="sk-...")
+    logo = models.CharField(max_length=50, default="")
+    color = models.CharField(max_length=20, default="#666666")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["label"]
+
+    def __str__(self):
+        return self.label
+
+
+class UserAPIKey(TimeStampedModel):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="api_keys",
+    )
+    provider = models.ForeignKey(
+        Provider,
+        on_delete=models.CASCADE,
+        related_name="user_keys",
+    )
+    api_key = models.CharField(max_length=500)
+    label = models.CharField(max_length=100, blank=True, default="")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        unique_together = ["user", "provider"]
+
+    def __str__(self):
+        return f"{self.user.email} — {self.provider.label}"
