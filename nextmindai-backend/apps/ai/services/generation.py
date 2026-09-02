@@ -2,41 +2,78 @@ import logging
 import os
 from typing import List, Dict, Optional
 
-from .base import BaseLLMProvider
+import django.conf as conf
 
 logger = logging.getLogger("apps")
 
-_provider = None
+_llm_client = None
+_llm_model = None
+
+
+def _get_client():
+    global _llm_client, _llm_model
+    if _llm_client is None:
+        import openai
+        _llm_model = getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini")
+
+        provider_name = getattr(conf.settings, "LLM_PROVIDER", "openai")
+        api_key = os.environ.get("OPENAI_API_KEY")
+        base_url = None
+
+        try:
+            from apps.accounts.models import Provider
+            db_provider = Provider.objects.get(value=provider_name, is_active=True)
+            base_url = db_provider.endpoint
+            if not api_key:
+                api_key = os.environ.get(f"{provider_name.upper()}_API_KEY")
+        except Exception:
+            base_url = getattr(conf.settings, "LLM_BASE_URL", None)
+
+        kwargs = {"api_key": api_key or "omniroute"}
+        if base_url:
+            kwargs["base_url"] = base_url
+        _llm_client = openai.OpenAI(**kwargs)
+        logger.info("LLM client initialized: %s (%s)", provider_name, base_url or "default")
+    return _llm_client
+
+
+def generate(messages: List[Dict], temperature: float = 0.3, max_tokens: int = 2048) -> str:
+    client = _get_client()
+    response = client.chat.completions.create(
+        model=_llm_model or "gpt-4o-mini",
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    return response.choices[0].message.content
 
 
 def get_llm_provider(user=None):
-    global _provider
-
     if user is not None:
         try:
             from apps.accounts.models import UserAPIKey
             user_key = UserAPIKey.objects.filter(user=user, is_active=True).first()
             if user_key:
+                import openai
                 logger.info("Using user's API key for provider: %s", user_key.provider.value)
-                from apps.ai.providers.openai_provider import OpenAIProvider
-                return OpenAIProvider(api_key=user_key.api_key, base_url=user_key.provider.endpoint)
+                client = openai.OpenAI(api_key=user_key.api_key, base_url=user_key.provider.endpoint)
+                model = getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini")
+                return _ProviderStub(client, model)
         except Exception:
             pass
+    return _ProviderStub(_get_client(), getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini"))
 
-    if _provider is None:
-        from apps.ai.providers.openai_provider import OpenAIProvider
-        import django.conf as conf
 
-        provider_name = getattr(conf.settings, "LLM_PROVIDER", "openai")
-        try:
-            from apps.accounts.models import Provider
-            db_provider = Provider.objects.get(value=provider_name, is_active=True)
-            _provider = OpenAIProvider(
-                api_key=os.environ.get("OPENAI_API_KEY"),
-                base_url=db_provider.endpoint,
-            )
-        except Exception:
-            _provider = OpenAIProvider()
+class _ProviderStub:
+    def __init__(self, client, model):
+        self._client = client
+        self._model = model
 
-        logger.info("LLM provider initialized: %s", provider_name)
-    return _provider
+    def generate(self, messages, temperature=0.3, max_tokens=2048):
+        response = self._client.chat.completions.create(
+            model=self._model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        return response.choices[0].message.content
