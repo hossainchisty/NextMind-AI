@@ -84,7 +84,7 @@ function ProviderLogo({ logo, logo_url, color, className }: { logo: string; logo
       </svg>
     ),
   };
-  return logos[logo] || <span className={`text-[13px] font-bold`} style={{ color }}>{logo[0].toUpperCase()}</span>;
+  return logos[logo] || <span className={`text-[13px] font-bold`} style={{ color }}>{logo ? logo[0].toUpperCase() : "?"}</span>;
 }
 
 export default function SettingsPage() {
