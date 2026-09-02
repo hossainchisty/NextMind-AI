@@ -42,7 +42,7 @@ class ProviderSerializer(serializers.ModelSerializer):
         fields = ["id", "value", "label", "endpoint", "placeholder", "logo", "logo_url", "color"]
 
     def get_logo_url(self, obj):
-        return obj.logo_url
+        return obj.logo_url()
 
 
 class UserAPIKeySerializer(serializers.ModelSerializer):
