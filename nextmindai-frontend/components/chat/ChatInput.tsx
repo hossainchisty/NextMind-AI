@@ -107,6 +107,8 @@ export default function ChatInput({ onSend }: Props) {
         <div className="flex items-center justify-between px-3 pb-3">
           <div className="flex items-center gap-1">
             <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors"><IAttach/></button>
+          </div>
+          <div className="flex items-center gap-1">
             {providers.length > 0 && (
               <div className="relative" ref={pickerRef}>
                 <button
@@ -120,7 +122,7 @@ export default function ChatInput({ onSend }: Props) {
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 {showModelPicker && (
-                  <div className="absolute bottom-full left-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
+                  <div className="absolute bottom-full right-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
                     <div className="sticky top-0 bg-surface border-b border-border px-3 py-2 flex items-center gap-2 z-10">
                       {(["all", "free", "paid"] as const).map((f) => (
                         <button
@@ -204,12 +206,12 @@ export default function ChatInput({ onSend }: Props) {
                 )}
               </div>
             )}
+            <button
+              onClick={send}
+              disabled={!value.trim()}
+              className="p-2.5 rounded-[10px] bg-primary text-white disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
+            ><ISend/></button>
           </div>
-          <button
-            onClick={send}
-            disabled={!value.trim()}
-            className="p-2.5 rounded-[10px] bg-primary text-white disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
-          ><ISend/></button>
         </div>
       </div>
     </div>
