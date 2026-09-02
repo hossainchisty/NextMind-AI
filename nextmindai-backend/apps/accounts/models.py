@@ -54,11 +54,9 @@ class Provider(TimeStampedModel):
     color = models.CharField(max_length=20, default="#666666")
 
     def logo_url(self) -> Optional[str]:
-        import django.conf as conf
+        from apps.documents.services.storage import get_signed_url
         if self.logo:
-            endpoint = conf.settings.R2_ENDPOINT_URL.rstrip("/")
-            bucket = conf.settings.R2_BUCKET_NAME
-            return f"{endpoint}/{bucket}/{self.logo}"
+            return get_signed_url(self.logo, expires_in=86400)
         return None
     is_active = models.BooleanField(default=True)
 
