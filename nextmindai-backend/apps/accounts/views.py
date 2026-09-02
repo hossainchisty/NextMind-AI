@@ -183,6 +183,13 @@ class APIKeyTestView(APIView):
             "mistral": "https://api.mistral.ai/v1/models",
             "nvidia": "https://integrate.api.nvidia.com/v1/models",
             "fireworks": "https://api.fireworks.ai/inference/v1/models",
+            "groq": "https://api.groq.com/openai/v1/models",
+            "together": "https://api.together.xyz/v1/models",
+            "cohere": "https://api.cohere.com/v1/models",
+            "huggingface": "https://api-inference.huggingface.co/models",
+            "perplexity": "https://api.perplexity.ai/models",
+            "cloudflare": "https://api.cloudflare.com/client/v4/accounts",
+            "replicate": "https://api.replicate.com/v1/models",
         }
 
         url = test_urls.get(provider)
@@ -197,6 +204,14 @@ class APIKeyTestView(APIView):
             headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01"}
         elif provider == "gemini":
             url = f"{url}?key={api_key}"
+        elif provider == "cohere":
+            headers = {"Authorization": f"Bearer {api_key}"}
+        elif provider == "huggingface":
+            headers = {"Authorization": f"Bearer {api_key}"}
+        elif provider == "cloudflare":
+            headers = {"Authorization": f"Bearer {api_key}"}
+        elif provider == "replicate":
+            headers = {"Authorization": f"Bearer {api_key}"}
         else:
             headers = {"Authorization": f"Bearer {api_key}"}
 
