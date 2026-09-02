@@ -20,6 +20,12 @@ const sections = [
       { label: "Add Your Key(s)", href: "/settings/personalization", badge: "Optional" },
     ],
   },
+  {
+    title: "Advanced",
+    items: [
+      { label: "Data & Export", href: "/settings/advanced" },
+    ],
+  },
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
