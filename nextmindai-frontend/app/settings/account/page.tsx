@@ -118,13 +118,18 @@ export default function AccountPage() {
 
         {/* Email */}
         <div className="bg-surface border border-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Email</h2>
+          <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-4">Email</h2>
+          <p className="text-[15px] text-text-primary">{user?.email}</p>
+        </div>
+
+        {/* Password */}
+        <div className="bg-surface border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Password</h2>
             <button className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors">
               Change Password
             </button>
           </div>
-          <p className="text-[15px] text-text-primary">{user?.email}</p>
         </div>
       </div>
     </div>
