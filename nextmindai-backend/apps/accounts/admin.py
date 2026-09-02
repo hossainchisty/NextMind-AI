@@ -26,7 +26,7 @@ class ProviderAdmin(admin.ModelAdmin):
     search_fields = ("label", "value", "endpoint")
     ordering = ("label",)
     fieldsets = (
-        (None, {"fields": ("label", "value", "endpoint", "placeholder", "color", "is_active")}),
+        (None, {"fields": ("label", "value", "endpoint", "api_key", "placeholder", "color", "is_active")}),
         ("Logo", {"fields": ("logo",)}),
     )
 

@@ -49,6 +49,7 @@ class Provider(TimeStampedModel):
     value = models.CharField(max_length=50, unique=True)
     label = models.CharField(max_length=100)
     endpoint = models.URLField(max_length=500)
+    api_key = models.CharField(max_length=500, blank=True, default="")
     placeholder = models.CharField(max_length=50, default="sk-...")
     logo = models.CharField(max_length=500, blank=True, default="")
     color = models.CharField(max_length=20, default="#666666")

@@ -19,7 +19,9 @@ def _get_client():
         from apps.accounts.models import Provider
         db_provider = Provider.objects.get(value=provider_name, is_active=True)
 
-        _llm_client = openai.OpenAI(api_key="omniroute", base_url=db_provider.endpoint)
+        if not db_provider.api_key:
+            raise ValueError(f"No API key configured for provider: {provider_name}")
+        _llm_client = openai.OpenAI(api_key=db_provider.api_key, base_url=db_provider.endpoint)
         logger.info("LLM client initialized: %s (%s)", provider_name, db_provider.endpoint)
     return _llm_client
 
