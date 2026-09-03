@@ -39,7 +39,7 @@ const sections: NavSection[] = [
   {
     title: "Provider",
     items: [
-      { label: "Connected Providers", href: "/settings/providers", icon: "key", badge: "Active" },
+      { label: "Connected Providers", href: "/settings/providers", icon: "key" },
     ],
   },
   {
