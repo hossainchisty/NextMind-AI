@@ -2,7 +2,7 @@
 
 import { renderMarkdown } from "@/components/ui/Markdown";
 import type { Msg } from "@/lib/types";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface Props {
   messages: Msg[];
@@ -19,6 +19,15 @@ function XIcon() { return <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill=
 export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (editingId && textareaRef.current) {
+      const t = textareaRef.current;
+      t.style.height = 'auto';
+      t.style.height = t.scrollHeight + 'px';
+    }
+  }, [editingId]);
 
   function startEdit(msg: Msg) {
     setEditingId(msg.id);
@@ -47,6 +56,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
               <div className="max-w-[65%]">
                 <div className="px-4 py-3 rounded-[14px] bg-primary text-white">
                   <textarea
+                    ref={textareaRef}
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
                     className="w-full bg-transparent text-[14px] leading-relaxed resize-none focus:outline-none min-h-[24px] overflow-hidden"

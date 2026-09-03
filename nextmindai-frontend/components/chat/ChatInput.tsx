@@ -21,6 +21,9 @@ interface ProviderModel {
 
 interface Props {
   onSend: (text: string, provider?: string, model?: string) => void;
+  selectedProvider?: string;
+  selectedModel?: string;
+  onModelChange?: (provider: string, model: string) => void;
 }
 
 function ISend() { return (<svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>); }
@@ -44,28 +47,31 @@ const CAPABILITY_LABELS: Record<string, string> = {
   routing: "Routing",
 };
 
-export default function ChatInput({ onSend }: Props) {
+export default function ChatInput({ onSend, selectedProvider, selectedModel, onModelChange }: Props) {
   const [value, setValue] = useState("");
   const [providers, setProviders] = useState<ProviderModel[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [localProvider, setLocalProvider] = useState<string>("");
+  const [localModel, setLocalModel] = useState<string>("");
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const [pricingFilter, setPricingFilter] = useState<"all" | "free" | "paid">("all");
   const ref = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  const activeProvider = selectedProvider || localProvider;
+  const activeModel = selectedModel || localModel;
+
   useEffect(() => {
     api<{ data: Record<string, ProviderModel> }>("auth/models/").then((res) => {
       const list = Object.values(res.data || {});
       setProviders(list);
-      if (list.length > 0) {
+      if (list.length > 0 && !selectedProvider) {
         const first = list[0];
-        setSelectedProvider(first.provider.value);
-        if (first.models.length > 0) setSelectedModel(first.models[0].id);
+        setLocalProvider(first.provider.value);
+        if (first.models.length > 0) setLocalModel(first.models[0].id);
       }
     }).catch(() => {});
-  }, []);
+  }, [selectedProvider]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -80,13 +86,13 @@ export default function ChatInput({ onSend }: Props) {
   function send() {
     const v = value.trim();
     if (!v) return;
-    onSend(v, selectedProvider || undefined, selectedModel || undefined);
+    onSend(v, activeProvider || undefined, activeModel || undefined);
     setValue("");
     if (ref.current) ref.current.value = "";
   }
 
-  const currentProvider = providers.find((p) => p.provider.value === selectedProvider);
-  const currentModel = currentProvider?.models.find((m) => m.id === selectedModel);
+  const currentProvider = providers.find((p) => p.provider.value === activeProvider);
+  const currentModel = currentProvider?.models.find((m) => m.id === activeModel);
 
   return (
     <div className="px-6 pb-5 pt-2 shrink-0">
@@ -155,19 +161,20 @@ export default function ChatInput({ onSend }: Props) {
                             <div
                               key={m.id}
                               className={`px-3 py-2.5 transition-colors cursor-pointer ${
-                                selectedProvider === pm.provider.value && selectedModel === m.id
+                                activeProvider === pm.provider.value && activeModel === m.id
                                   ? "bg-primary/10"
                                   : "hover:bg-bg"
                               }`}
                               onClick={() => {
-                                setSelectedProvider(pm.provider.value);
-                                setSelectedModel(m.id);
+                                setLocalProvider(pm.provider.value);
+                                setLocalModel(m.id);
+                                if (onModelChange) onModelChange(pm.provider.value, m.id);
                                 setShowModelPicker(false);
                               }}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className={`text-[13px] font-medium ${selectedProvider === pm.provider.value && selectedModel === m.id ? "text-primary" : "text-text-primary"}`}>
+                                  <span className={`text-[13px] font-medium ${activeProvider === pm.provider.value && activeModel === m.id ? "text-primary" : "text-text-primary"}`}>
                                     {m.name}
                                   </span>
                                   {m.pricing_type === "free" && (

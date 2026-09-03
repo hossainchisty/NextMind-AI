@@ -19,6 +19,7 @@ export default function App() {
   const [showSrc, setShowSrc] = useState(false);
   const [srcs, setSrcs] = useState<Source[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<{ provider: string; model: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const active = chats.find((c) => c.id === activeId);
@@ -96,6 +97,7 @@ export default function App() {
     setRetrieving(false);
     setSrcs([]);
     setShowSrc(false);
+    setSelectedModel(null);
   }
 
   async function renameChat(id: string, title: string) {
@@ -213,7 +215,12 @@ export default function App() {
               <ChatMessages messages={messages} retrieving={retrieving} onEdit={handleEditMessage} />
             )}
           </div>
-          <ChatInput onSend={ask} />
+          <ChatInput
+            onSend={ask}
+            selectedProvider={selectedModel?.provider}
+            selectedModel={selectedModel?.model}
+            onModelChange={(provider, model) => setSelectedModel({ provider, model })}
+          />
         </div>
         {showSrc && srcs.length > 0 && <SourcesPanel sources={srcs} />}
       </div>
