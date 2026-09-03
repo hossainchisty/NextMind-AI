@@ -111,8 +111,20 @@ export default function ProvidersPage() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-[22px] font-semibold text-text-primary mb-1">Provider Keys</h1>
-        <p className="text-[14px] text-text-secondary">Securely manage and monitor your API keys</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[22px] font-semibold text-text-primary mb-1">Provider Keys</h1>
+            <p className="text-[14px] text-text-secondary">Securely manage and monitor your API keys</p>
+          </div>
+          {unconnectedProviders.length > 0 && (
+            <button
+              onClick={() => { setConnectModal(unconnectedProviders[0]); setTestStatus("idle"); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors"
+            >
+              <PlusIcon /> Add provider key
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Provider Keys List */}
@@ -188,14 +200,6 @@ export default function ProvidersPage() {
                 })}
               </div>
             </div>
-
-            {/* Add Key Button */}
-            <button
-              onClick={() => { setConnectModal(connectedProviders[0] || unconnectedProviders[0]); setTestStatus("idle"); }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border text-[13px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 transition-colors mb-8"
-            >
-              <PlusIcon /> Add key
-            </button>
           </>
         )}
       </div>
