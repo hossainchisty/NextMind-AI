@@ -170,7 +170,7 @@ export default function ProvidersPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[12px] font-mono text-text-secondary">{k.api_key_masked}</span>
+                              <span className="text-[12px] font-mono text-text-secondary">••••••••</span>
                               <span className="text-[11px] text-text-secondary/40">•</span>
                               <span className="text-[11px] text-text-secondary/60">Last used {timeAgo(k.created_at)}</span>
                             </div>
@@ -205,49 +205,22 @@ export default function ProvidersPage() {
       </div>
 
       {/* Add Another Provider */}
-      {keys.length > 0 ? (
+      {unconnectedProviders.length > 0 && (
         <div>
           <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
           <div className="grid grid-cols-2 gap-2">
-            {providers.map((p) => {
-              const isConnected = connectedMap.has(p.value);
-              return (
-                <button
-                  key={p.value}
-                  onClick={() => { if (!isConnected) { setConnectModal(p); setTestStatus("idle"); } }}
-                  disabled={isConnected}
-                  className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
-                    isConnected
-                      ? "bg-bg border-border opacity-60 cursor-not-allowed"
-                      : "bg-surface border-border hover:border-primary/20 hover:bg-primary/5"
-                  }`}
-                >
-                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                  <span className="text-[13px] font-medium flex-1 text-text-primary">{p.label}</span>
-                  {isConnected && <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent-green/10 text-accent-green">Connected</span>}
-                </button>
-              );
-            })}
+            {unconnectedProviders.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
+                className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
+              >
+                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
+              </button>
+            ))}
           </div>
         </div>
-      ) : (
-        unconnectedProviders.length > 0 && (
-          <div>
-            <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {unconnectedProviders.map((p) => (
-                <button
-                  key={p.value}
-                  onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
-                >
-                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                  <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )
       )}
 
       {/* Connect Modal */}
@@ -266,8 +239,8 @@ export default function ProvidersPage() {
                 <ProviderLogo logo_url={connectModal.logo_url} color={connectModal.color} label={connectModal.label} size="md" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-[15px] font-semibold text-text-primary leading-tight">Connect {connectModal.label}</h2>
-                <p className="text-[12px] font-mono text-text-secondary truncate">{connectModal.endpoint.replace("https://", "")}</p>
+                <h2 className="text-[15px] font-semibold text-text-primary leading-tight">Add {connectModal.label} Key</h2>
+                {/* <p className="text-[12px] font-mono text-text-secondary truncate">{connectModal.endpoint.replace("https://", "")}</p> */}
               </div>
               <button
                 onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
