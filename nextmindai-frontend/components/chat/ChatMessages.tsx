@@ -54,29 +54,26 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
           {m.role === "user" ? (
             editingId === m.id ? (
               <div className="max-w-[65%]">
-                <div className="px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed whitespace-pre-wrap">{editText}</div>
-                <div className="mt-2">
-                  <textarea
-                    ref={textareaRef}
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="w-full px-4 py-3 rounded-[14px] bg-surface border border-border text-[14px] text-text-primary leading-relaxed resize-none focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all min-h-[80px]"
-                    autoFocus
-                    rows={3}
-                    onInput={(e) => {
-                      const t = e.target as HTMLTextAreaElement;
-                      t.style.height = 'auto';
-                      t.style.height = t.scrollHeight + 'px';
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        saveEdit(m.id);
-                      }
-                      if (e.key === "Escape") cancelEdit();
-                    }}
-                  />
-                </div>
+                <textarea
+                  ref={textareaRef}
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  className="w-full px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed resize-none focus:outline-none min-h-[44px] max-h-[200px] overflow-auto"
+                  autoFocus
+                  rows={1}
+                  onInput={(e) => {
+                    const t = e.target as HTMLTextAreaElement;
+                    t.style.height = 'auto';
+                    t.style.height = Math.min(t.scrollHeight, 200) + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      saveEdit(m.id);
+                    }
+                    if (e.key === "Escape") cancelEdit();
+                  }}
+                />
                 <div className="flex items-center gap-2 mt-2 justify-end">
                   <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
                     <XIcon /> Cancel
