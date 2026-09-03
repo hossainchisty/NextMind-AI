@@ -132,7 +132,7 @@ export default function ProvidersPage() {
                                 onClick={() => handleDelete(k.id)}
                                 className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
                               >
-                                <TrashIcon /> Remove key
+                                <TrashIcon /> Remove
                               </button>
                             </div>
                           )}
