@@ -54,14 +54,15 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
           {m.role === "user" ? (
             editingId === m.id ? (
               <div className="max-w-[65%]">
-                <div className="px-4 py-3 rounded-[14px] bg-primary text-white">
+                <div className="px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed whitespace-pre-wrap">{editText}</div>
+                <div className="mt-2">
                   <textarea
                     ref={textareaRef}
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
-                    className="w-full bg-transparent text-[14px] leading-relaxed resize-none focus:outline-none min-h-[24px] overflow-hidden"
+                    className="w-full px-4 py-3 rounded-[14px] bg-surface border border-border text-[14px] text-text-primary leading-relaxed resize-none focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all min-h-[80px]"
                     autoFocus
-                    rows={1}
+                    rows={3}
                     onInput={(e) => {
                       const t = e.target as HTMLTextAreaElement;
                       t.style.height = 'auto';
@@ -81,7 +82,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                     <XIcon /> Cancel
                   </button>
                   <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
-                    <CheckIcon />  Send
+                    <CheckIcon /> Save & Send
                   </button>
                 </div>
               </div>
