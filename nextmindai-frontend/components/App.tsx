@@ -179,6 +179,18 @@ export default function App() {
     }
   }
 
+  function handleEditMessage(messageId: string, newContent: string) {
+    const idx = messages.findIndex((m) => m.id === messageId);
+    if (idx === -1) return;
+
+    const kept = messages.slice(0, idx);
+    setMessages(kept);
+    setSrcs([]);
+    setShowSrc(false);
+
+    setTimeout(() => ask(newContent), 50);
+  }
+
   return (
     <div className="flex h-screen bg-bg overflow-hidden">
       <ChatSidebar
@@ -198,7 +210,7 @@ export default function App() {
             {messages.length === 0 ? (
               <ChatEmptyState onAsk={ask} />
             ) : (
-              <ChatMessages messages={messages} retrieving={retrieving} />
+              <ChatMessages messages={messages} retrieving={retrieving} onEdit={handleEditMessage} />
             )}
           </div>
           <ChatInput onSend={ask} />
