@@ -76,7 +76,7 @@ export default function ProvidersPage() {
       setTimeout(() => { setConnectModal(null); setTestStatus("idle"); }, 800);
     } catch (err: any) {
       setTestStatus("error");
-      setTestError(err?.detail || "Connection failed");
+      setTestError(err?.message || err?.detail || "Connection failed");
     } finally {
       setLoading(false);
     }
@@ -91,26 +91,7 @@ export default function ProvidersPage() {
     } catch { alert("Failed to delete"); }
   }
 
-  async function handleTest() {
-    if (!apiKey.trim() || !connectModal) return;
-    setTestStatus("testing");
-    setTestError("");
-    try {
-      await api("auth/api-keys/test", { method: "POST", json: { provider: connectModal.value, api_key: apiKey.trim() } });
-      setTestStatus("ok");
-    } catch (err: any) {
-      setTestStatus("error");
-      setTestError(err?.detail || "Connection failed");
-    }
-  }
-
-  function timeAgo(date: string) {
-    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    if (seconds < 60) return "just now";
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
-  }
+  
 
   return (
     <div className="animate-fade-in">
