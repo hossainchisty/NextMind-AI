@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { useToast } from "@/components/ui/Toast";
+import AddProviderModal from "./AddProviderModal";
 
 interface Provider {
   id: string;
@@ -32,83 +33,28 @@ function ProviderLogo({ logo_url, color, label, size = "md" }: { logo_url: strin
   return <span className={`${s} rounded-lg flex items-center justify-center ${t} font-bold text-white`} style={{ backgroundColor: color }}>{label[0]}</span>;
 }
 
-function PlusIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>; }
-function XIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
 function MoreIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>; }
 function TrashIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>; }
 function KeyIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>; }
-function CheckIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>; }
-function ChevronDown() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>; }
-
-interface ModelInfo {
-  id: string;
-  name: string;
-  context: string;
-  input_price: string;
-  output_price: string;
-  pricing_type: "free" | "freemium" | "paid";
-  description: string;
-}
 
 export default function ProvidersPage() {
   const { toast } = useToast();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [keys, setKeys] = useState<APIKey[]>([]);
-  const [connectModal, setConnectModal] = useState<Provider | null>(null);
-  const [apiKey, setApiKey] = useState("");
-  const [selectedModel, setSelectedModel] = useState("");
-  const [providerModels, setProviderModels] = useState<ModelInfo[]>([]);
-  const [loading, setLoading] = useState(false);
   const [fetchingKeys, setFetchingKeys] = useState(true);
-  const [testStatus, setTestStatus] = useState<"idle" | "testing" | "ok" | "error">("idle");
-  const [testError, setTestError] = useState("");
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   useEffect(() => {
     api<{ data: Provider[] }>("auth/providers").then((res) => setProviders(res.data)).catch(() => {});
     api<{ data: APIKey[] }>("auth/api-keys").then((res) => { setKeys(res.data); setFetchingKeys(false); }).catch(() => setFetchingKeys(false));
   }, []);
 
-  useEffect(() => {
-    if (connectModal) {
-      api<{ data: ModelInfo[] }>(`auth/models/all/?provider=${connectModal.value}`).then((res) => {
-        setProviderModels(res.data);
-        if (res.data.length > 0) {
-          setSelectedModel(res.data[0].id);
-        }
-      }).catch(() => {});
-    }
-  }, [connectModal]);
-
   const connectedMap = new Map(keys.map((k) => [k.provider_detail.value, k]));
   const connectedProviders = providers.filter((p) => connectedMap.has(p.value));
   const unconnectedProviders = providers.filter((p) => !connectedMap.has(p.value));
 
-  async function handleConnect(e: React.FormEvent) {
-    e.preventDefault();
-    if (!apiKey.trim() || !connectModal) return;
-    setLoading(true);
-    setTestStatus("testing");
-    setTestError("");
-    try {
-      await api("auth/api-keys/test", { method: "POST", json: { provider: connectModal.value, api_key: apiKey.trim() } });
-      setTestStatus("ok");
-      const res = await api<{ data: APIKey }>("auth/api-keys", {
-        method: "POST",
-        json: { provider: connectModal.value, api_key: apiKey.trim() },
-      });
-      setKeys((prev) => [res.data, ...prev]);
-      setApiKey("");
-      setSelectedModel("");
-      toast(`${connectModal.label} connected`, "success");
-      setTimeout(() => { setConnectModal(null); setTestStatus("idle"); }, 800);
-    } catch (err: any) {
-      setTestStatus("error");
-      setTestError(err?.message || err?.detail || "Connection failed");
-    } finally {
-      setLoading(false);
-    }
+  function handleConnected(newKey: APIKey) {
+    setKeys((prev) => [newKey, ...prev]);
   }
 
   async function handleDelete(id: string) {
@@ -123,8 +69,6 @@ export default function ProvidersPage() {
     }
   }
 
-  
-
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
@@ -133,14 +77,7 @@ export default function ProvidersPage() {
             <h1 className="text-[22px] font-semibold text-text-primary mb-1">Provider Keys</h1>
             <p className="text-[14px] text-text-secondary">Securely manage and monitor your API keys</p>
           </div>
-          {unconnectedProviders.length > 0 && (
-            <button
-              onClick={() => { setConnectModal(unconnectedProviders[0]); setTestStatus("idle"); }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
-            >
-              <PlusIcon /> Add provider key
-            </button>
-          )}
+          <AddProviderModal unconnectedProviders={unconnectedProviders} onConnected={handleConnected} />
         </div>
       </div>
 
@@ -154,12 +91,7 @@ export default function ProvidersPage() {
             <p className="text-[14px] font-medium text-text-primary mb-1">No provider keys yet</p>
             <p className="text-[13px] text-text-secondary mb-4">Add your first provider key to get started</p>
             {unconnectedProviders.length > 0 && (
-              <button
-                onClick={() => { setConnectModal(unconnectedProviders[0]); setTestStatus("idle"); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors"
-              >
-                <PlusIcon /> Add Provider Key
-              </button>
+              <AddProviderModal unconnectedProviders={unconnectedProviders} onConnected={handleConnected} />
             )}
           </div>
         ) : (
@@ -200,7 +132,7 @@ export default function ProvidersPage() {
                                 onClick={() => handleDelete(k.id)}
                                 className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
                               >
-                                <TrashIcon /> Remove
+                                <TrashIcon /> Remove key
                               </button>
                             </div>
                           )}
@@ -221,123 +153,14 @@ export default function ProvidersPage() {
           <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
           <div className="grid grid-cols-2 gap-2">
             {unconnectedProviders.map((p) => (
-              <button
+              <AddProviderModal
                 key={p.value}
-                onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
-              >
-                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
-              </button>
+                unconnectedProviders={unconnectedProviders}
+                onConnected={handleConnected}
+                initialProvider={p}
+                variant="grid"
+              />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Connect Modal */}
-      {connectModal && (
-        <div
-          className="fixed inset-0 flex items-start justify-center z-50 p-4 pt-12 overflow-y-auto animate-fade-in"
-          onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
-        >
-          <div
-            className="bg-surface border border-border rounded-2xl w-full max-w-[440px] shadow-xl overflow-hidden animate-fade-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center gap-4 px-6 pt-6 pb-5">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${connectModal.color}12` }}>
-                <ProviderLogo logo_url={connectModal.logo_url} color={connectModal.color} label={connectModal.label} size="md" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-[15px] font-semibold text-text-primary leading-tight">Add {connectModal.label} Key</h2>
-                {/* <p className="text-[12px] font-mono text-text-secondary truncate">{connectModal.endpoint.replace("https://", "")}</p> */}
-              </div>
-              <button
-                type="button"
-                onClick={() => { setConnectModal(null); setTestStatus("idle"); setSelectedModel(""); setShowModelDropdown(false); }}
-                className="w-8 h-8 rounded-full bg-bg border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/20 transition-colors shrink-0"
-              >
-                <XIcon />
-              </button>
-            </div>
-
-            <div className="h-px bg-border" />
-
-            <form onSubmit={handleConnect} className="px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">API Key</label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => { setApiKey(e.target.value); setTestStatus("idle"); }}
-                    placeholder={connectModal.placeholder}
-                    required
-                    className="w-full px-4 py-3 pr-4 rounded-xl bg-bg border border-border text-[13px] font-mono text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
-                    autoFocus
-                  />
-                </div>
-                <p className="text-[11px] text-text-secondary mt-2">Find your key in the {connectModal.label} dashboard.</p>
-              </div>
-
-              {providerModels.length > 0 && (
-                <div>
-                  <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">Default Model</label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowModelDropdown(!showModelDropdown)}
-                      className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[13px] text-text-primary flex items-center justify-between hover:border-primary/30 transition-colors"
-                    >
-                      <span>{providerModels.find(m => m.id === selectedModel)?.name || "Select model"}</span>
-                      <ChevronDown />
-                    </button>
-                    {showModelDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-xl shadow-lg overflow-hidden max-h-[200px] overflow-y-auto">
-                        {providerModels.map((m) => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => { setSelectedModel(m.id); setShowModelDropdown(false); }}
-                            className={`w-full px-4 py-2.5 text-left text-[13px] hover:bg-bg transition-colors flex items-center justify-between ${
-                              selectedModel === m.id ? "bg-primary/10 text-primary" : "text-text-primary"
-                            }`}
-                          >
-                            <span>{m.name}</span>
-                            <span className="text-[11px] text-text-secondary">{m.context}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {testStatus === "error" && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
-                  <span className="text-[12px] text-red-600">{testError}</span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-bg text-[13px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading || !apiKey.trim()}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2"
-                >
-                  {testStatus === "testing" && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                  {testStatus === "ok" ? "Connected" : testStatus === "testing" ? "Testing..." : loading ? "Saving..." : "Connect"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

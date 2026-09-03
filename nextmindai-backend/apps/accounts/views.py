@@ -256,20 +256,6 @@ class UserModelsView(APIView):
         return Response(success_response(data=connected))
 
 
-class ProviderModelsView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request):
-        provider = request.query_params.get("provider", "")
-        if not provider:
-            return Response(
-                error_response("provider query parameter is required"),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        models = PROVIDER_MODELS.get(provider, [])
-        return Response(success_response(data=models))
-
-
 class APIKeyTestView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
