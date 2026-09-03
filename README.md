@@ -415,8 +415,111 @@ erDiagram
 | **Cross-encoder reranking** | Re-ranks top-30 candidates to top-5 for higher precision |
 | **Celery for document processing** | Non-blocking ingestion — upload returns immediately, embedding runs async |
 | **JWT with 30min expiry** | Stateless auth with auto-refresh for seamless UX |
-| **Multi-provider LLM** | Swap between OpenAI, Anthropic, Gemini, or local models via env variable |
+| **Multi-provider LLM** | Swap between OpenAI, Anthropic, Gemini, or local models via DB config |
 | **LimitOffset pagination** | Consistent `{success, data, pagination}` response format |
+
+---
+
+## AI Models & Providers
+
+NextMind supports **17 LLM providers** with per-message model selection and user-owned API keys.
+
+### Providers
+
+| Provider | Models | Pricing |
+|---|---|---|
+| OpenAI | gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo, o1, o1-mini | Paid |
+| Anthropic | claude-opus-4, claude-sonnet-4, claude-3.5-haiku | Paid |
+| Google Gemini | gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash | Free/Paid |
+| OpenRouter | gpt-4o, claude-opus-4, mixtral-8x7b, llama-3-70b | Paid |
+| DeepSeek | deepseek-chat, deepseek-reasoner | Free/Paid |
+| xAI Grok | grok-2, grok-2-mini, grok-3, grok-3-mini | Free/Paid |
+| Mistral | mistral-large, mistral-medium, codestral | Paid |
+| NVIDIA | nemotron-super-49b | Free |
+| Fireworks | llama-3.3-70b, mixtral-8x22b, deepseek-v3 | Paid |
+| Groq | llama-3.3-70b-versatile, gemma2-9b-it | Free |
+| Together AI | llama-3.3-70b, mixtral-8x22b | Paid |
+| Cohere | command-r-plus, command-r | Paid |
+| Hugging Face | llama-3.3-70b, qwen-72b, mixtral-8x7b | Free/Paid |
+| Perplexity | sonar, sonar-pro, sonar-reasoning | Paid |
+| Cloudflare Workers AI | llama-3.3-70b, mixtral-8x7b | Free |
+| Replicate | llama-3.3-70b, mixtral-8x7b | Paid |
+
+### How It Works
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Flow                            │
+├─────────────────────────────────────────────────────────┤
+│ 1. Settings → AI Models → Connect Provider              │
+│    - Select provider from list                          │
+│    - Enter API key                                      │
+│    - Test connection                                    │
+│    - Key stored encrypted in UserAPIKey table           │
+│                                                         │
+│ 2. Chat → Model Picker (right side of input)            │
+│    - Shows connected providers with models              │
+│    - Filter: All / Free / Paid                          │
+│    - Each model shows context window, pricing           │
+│    - Select per message or use default                  │
+│                                                         │
+│ 3. Backend → Model Router                               │
+│    - Reads user's API key from DB                       │
+│    - Uses provider's endpoint from Provider table       │
+│    - Sends to selected model via OpenAI-compatible API  │
+│    - Falls back to system default if no user key        │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Database Models
+
+```mermaid
+erDiagram
+    Provider {
+        uuid id PK
+        string value UK
+        string label
+        string endpoint
+        string api_key "System-level key (DB only)"
+        string logo
+        string color
+        boolean is_active
+    }
+
+    UserAPIKey {
+        uuid id PK
+        uuid user_id FK
+        uuid provider_id FK
+        string api_key "User's key (encrypted)"
+        string label
+        boolean is_active
+        datetime created_at
+    }
+
+    User ||--o{ UserAPIKey : has
+    Provider ||--o{ UserAPIKey : belongs_to
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/auth/providers/` | List all available providers |
+| `GET` | `/api/v1/auth/api-keys/` | List user's connected keys |
+| `POST` | `/api/v1/auth/api-keys/` | Connect a new API key |
+| `POST` | `/api/v1/auth/api-keys/test/` | Test API key connection |
+| `DELETE` | `/api/v1/auth/api-keys/:id/` | Remove a connected key |
+| `GET` | `/api/v1/auth/models/` | List available models per provider |
+
+### Key Design Decisions
+
+| Decision | Rationale |
+|---|---|
+| **DB-driven providers** | No env vars — providers configured in DB, system key in `Provider.api_key` |
+| **User-owned keys** | Each user brings their own API key, no shared rate limits |
+| **Per-message selection** | Switch models mid-conversation based on task complexity |
+| **OpenAI-compatible API** | All providers use OpenAI SDK format for consistency |
+| **Encrypted storage** | API keys stored with masking, never exposed in responses |
 
 ---
 
