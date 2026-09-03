@@ -72,13 +72,10 @@ export default function ProvidersPage() {
 
   useEffect(() => {
     if (connectModal) {
-      api<{ data: Record<string, { provider: { value: string }; models: ModelInfo[] }> }>("auth/models/").then((res) => {
-        const providerData = res.data[connectModal.value];
-        if (providerData?.models) {
-          setProviderModels(providerData.models);
-          if (providerData.models.length > 0) {
-            setSelectedModel(providerData.models[0].id);
-          }
+      api<{ data: ModelInfo[] }>(`auth/models/all/?provider=${connectModal.value}`).then((res) => {
+        setProviderModels(res.data);
+        if (res.data.length > 0) {
+          setSelectedModel(res.data[0].id);
         }
       }).catch(() => {});
     }
