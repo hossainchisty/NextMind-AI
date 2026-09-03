@@ -82,7 +82,6 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                   <XIcon />
                 </button>
               </div>
-              </div>
             ) : (
               <div className="max-w-[65%] relative group/msg">
                 <div className="px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed">{m.content}</div>
