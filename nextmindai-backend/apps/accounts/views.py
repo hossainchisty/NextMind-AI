@@ -256,6 +256,14 @@ PROVIDER_MODELS = {
         {"id": "mimo-v2-pro", "name": "MiMo V2 Pro", "context": "1M", "input_price": "$1.00", "output_price": "$3.00", "pricing_type": "paid", "capabilities": ["function_calling", "reasoning"], "description": "Previous gen flagship, strong reasoning"},
         {"id": "mimo-v2-flash", "name": "MiMo V2 Flash", "context": "56K", "input_price": "$0.10", "output_price": "$0.30", "pricing_type": "paid", "capabilities": [], "description": "Fast and cheap, open-source"},
     ],
+    "z": [
+        {"id": "glm-5.3", "name": "GLM 5.3", "context": "128K", "input_price": "$1.00", "output_price": "$3.20", "pricing_type": "paid", "capabilities": ["function_calling", "reasoning"], "description": "Latest flagship, best reasoning"},
+        {"id": "glm-5.1", "name": "GLM 5.1", "context": "128K", "input_price": "$1.00", "output_price": "$3.20", "pricing_type": "paid", "capabilities": ["function_calling", "reasoning"], "description": "Top coding model, SWE-bench leader"},
+        {"id": "glm-5-turbo", "name": "GLM 5 Turbo", "context": "128K", "input_price": "$0.50", "output_price": "$1.50", "pricing_type": "paid", "capabilities": ["function_calling"], "description": "Fast and capable"},
+        {"id": "glm-4.7", "name": "GLM 4.7", "context": "128K", "input_price": "$0.30", "output_price": "$0.90", "pricing_type": "paid", "capabilities": ["function_calling"], "description": "Good coding model, budget-friendly"},
+        {"id": "glm-4.5-air", "name": "GLM 4.5 Air", "context": "128K", "input_price": "$0.10", "output_price": "$0.30", "pricing_type": "paid", "capabilities": [], "description": "Fastest, quick questions"},
+        {"id": "glm-4.7-flash", "name": "GLM 4.7 Flash", "context": "128K", "input_price": "Free", "output_price": "Free", "pricing_type": "free", "capabilities": [], "description": "Free tier, prototyping"},
+    ],
     "opencode": [
         {"id": "default", "name": "OpenCode Default", "context": "N/A", "input_price": "N/A", "output_price": "N/A", "pricing_type": "free", "capabilities": [], "description": "OpenCode managed model"},
     ],
