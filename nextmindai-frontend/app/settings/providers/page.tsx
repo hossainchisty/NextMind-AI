@@ -38,6 +38,17 @@ function MoreIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="
 function TrashIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>; }
 function KeyIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>; }
 function CheckIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>; }
+function ChevronDown() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>; }
+
+interface ModelInfo {
+  id: string;
+  name: string;
+  context: string;
+  input_price: string;
+  output_price: string;
+  pricing_type: "free" | "freemium" | "paid";
+  description: string;
+}
 
 export default function ProvidersPage() {
   const { toast } = useToast();
@@ -45,16 +56,33 @@ export default function ProvidersPage() {
   const [keys, setKeys] = useState<APIKey[]>([]);
   const [connectModal, setConnectModal] = useState<Provider | null>(null);
   const [apiKey, setApiKey] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [providerModels, setProviderModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingKeys, setFetchingKeys] = useState(true);
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "ok" | "error">("idle");
   const [testError, setTestError] = useState("");
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   useEffect(() => {
     api<{ data: Provider[] }>("auth/providers").then((res) => setProviders(res.data)).catch(() => {});
     api<{ data: APIKey[] }>("auth/api-keys").then((res) => { setKeys(res.data); setFetchingKeys(false); }).catch(() => setFetchingKeys(false));
   }, []);
+
+  useEffect(() => {
+    if (connectModal) {
+      api<{ data: Record<string, { provider: { value: string }; models: ModelInfo[] }> }>("auth/models/").then((res) => {
+        const providerData = res.data[connectModal.value];
+        if (providerData?.models) {
+          setProviderModels(providerData.models);
+          if (providerData.models.length > 0) {
+            setSelectedModel(providerData.models[0].id);
+          }
+        }
+      }).catch(() => {});
+    }
+  }, [connectModal]);
 
   const connectedMap = new Map(keys.map((k) => [k.provider_detail.value, k]));
   const connectedProviders = providers.filter((p) => connectedMap.has(p.value));
@@ -75,6 +103,7 @@ export default function ProvidersPage() {
       });
       setKeys((prev) => [res.data, ...prev]);
       setApiKey("");
+      setSelectedModel("");
       toast(`${connectModal.label} connected`, "success");
       setTimeout(() => { setConnectModal(null); setTestStatus("idle"); }, 800);
     } catch (err: any) {
@@ -174,7 +203,7 @@ export default function ProvidersPage() {
                                 onClick={() => handleDelete(k.id)}
                                 className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
                               >
-                                <TrashIcon /> Remove key
+                                <TrashIcon /> Remove
                               </button>
                             </div>
                           )}
@@ -228,7 +257,8 @@ export default function ProvidersPage() {
                 {/* <p className="text-[12px] font-mono text-text-secondary truncate">{connectModal.endpoint.replace("https://", "")}</p> */}
               </div>
               <button
-                onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
+                type="button"
+                onClick={() => { setConnectModal(null); setTestStatus("idle"); setSelectedModel(""); setShowModelDropdown(false); }}
                 className="w-8 h-8 rounded-full bg-bg border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/20 transition-colors shrink-0"
               >
                 <XIcon />
@@ -253,6 +283,39 @@ export default function ProvidersPage() {
                 </div>
                 <p className="text-[11px] text-text-secondary mt-2">Find your key in the {connectModal.label} dashboard.</p>
               </div>
+
+              {providerModels.length > 0 && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">Default Model</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowModelDropdown(!showModelDropdown)}
+                      className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[13px] text-text-primary flex items-center justify-between hover:border-primary/30 transition-colors"
+                    >
+                      <span>{providerModels.find(m => m.id === selectedModel)?.name || "Select model"}</span>
+                      <ChevronDown />
+                    </button>
+                    {showModelDropdown && (
+                      <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-xl shadow-lg overflow-hidden max-h-[200px] overflow-y-auto">
+                        {providerModels.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => { setSelectedModel(m.id); setShowModelDropdown(false); }}
+                            className={`w-full px-4 py-2.5 text-left text-[13px] hover:bg-bg transition-colors flex items-center justify-between ${
+                              selectedModel === m.id ? "bg-primary/10 text-primary" : "text-text-primary"
+                            }`}
+                          >
+                            <span>{m.name}</span>
+                            <span className="text-[11px] text-text-secondary">{m.context}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {testStatus === "error" && (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
