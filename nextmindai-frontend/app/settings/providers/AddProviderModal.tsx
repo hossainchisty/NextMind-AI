@@ -7,6 +7,9 @@ import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { ProviderLogo } from "@/components/ui/Icons";
+import { ChevronDown } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Provider, APIKey } from "@/lib/types";
 
 interface Props {
@@ -15,15 +18,6 @@ interface Props {
   initialProvider?: Provider | null;
   variant?: "button" | "grid";
 }
-
-function ProviderLogo({ logo_url, color, label, size = "md" }: { logo_url: string | null; color: string; label: string; size?: "sm" | "md" | "lg" }) {
-  const s = size === "lg" ? "w-10 h-10" : size === "md" ? "w-8 h-8" : "w-6 h-6";
-  const t = size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[10px]";
-  if (logo_url) return <img src={logo_url} className={`${s} rounded-lg`} alt="" />;
-  return <span className={`${s} rounded-lg flex items-center justify-center ${t} font-bold text-white`} style={{ backgroundColor: color }}>{label[0]}</span>;
-}
-
-function ChevronDown() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
 export default function AddProviderModal({ unconnectedProviders, onConnected, initialProvider, variant = "button" }: Props) {
   const { toast } = useToast();
@@ -94,7 +88,7 @@ export default function AddProviderModal({ unconnectedProviders, onConnected, in
         </button>
       ) : (
         <Button onClick={() => handleOpen()}>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <Plus className="w-4 h-4" />
           Add provider key
         </Button>
       )}

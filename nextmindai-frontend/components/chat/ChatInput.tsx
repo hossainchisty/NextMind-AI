@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { api } from "@/lib/api";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { SendIcon, AttachIcon, ChevronIcon, ProviderLogo } from "@/components/ui/Icons";
-import { ProviderLogo as ProviderLogoType } from "@/components/ui/Icons";
+import { Send, Paperclip, ChevronRight } from "lucide-react";
+import { ProviderLogo } from "@/components/ui/Icons";
 import type { ProviderModel } from "@/lib/types";
 
 interface Props {
@@ -83,7 +83,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
         <div className="flex items-center justify-between px-3 pb-3">
           <div className="flex items-center gap-1">
             <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
-              <AttachIcon />
+              <Paperclip className="w-4 h-4" />
             </button>
           </div>
           <div className="flex items-center gap-1">
@@ -97,7 +97,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
                     <ProviderLogo logo_url={currentProvider.provider.logo_url} color={currentProvider.provider.color} label={currentProvider.provider.label} />
                   )}
                   <span className="max-w-[120px] truncate">{currentModel?.name || "Select model"}</span>
-                  <ChevronIcon direction="down" className="w-3 h-3" />
+                  <ChevronRight className="w-3 h-3" />
                 </button>
                 {showModelPicker && (
                   <div className="absolute bottom-full right-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
@@ -193,7 +193,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
               disabled={!value.trim()}
               className="p-2.5 rounded-[10px] bg-primary text-white disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
             >
-              <SendIcon className="w-4 h-4 text-white" />
+              <Send className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>

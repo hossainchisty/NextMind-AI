@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { XIcon } from "./Icons";
+import { X } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -32,7 +32,7 @@ export default function Modal({ open, onClose, title, children, className = "" }
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-[16px] font-semibold text-text-primary">{title}</h2>
               <button onClick={onClose} className="w-8 h-8 rounded-full bg-bg border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/20 transition-colors">
-                <XIcon className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </button>
             </div>
             <div className="h-px bg-border" />

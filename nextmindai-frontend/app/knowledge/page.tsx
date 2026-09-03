@@ -5,13 +5,14 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import { api, apiUpload } from "@/lib/api";
 import { useToast } from "@/components/ui/Toast";
 import {
-  SearchIcon,
-  UploadIcon,
-  DocumentIcon,
-  CheckIcon,
-  FilterIcon,
-  ChevronIcon,
-} from "@/components/ui/Icons";
+  Search,
+  Upload,
+  FileText,
+  Check,
+  Filter,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
 
 interface Doc {
   id: string;
@@ -109,7 +110,7 @@ export default function KnowledgePage() {
 
           <div className="flex items-center gap-3 mb-6 animate-fade-in" style={{ animationDelay: "50ms" }}>
             <div className="flex-1 relative">
-              <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary/50" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary/50" />
               <input
                 type="text"
                 value={search}
@@ -123,9 +124,9 @@ export default function KnowledgePage() {
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                 className="h-10 px-3.5 rounded-[10px] bg-surface border border-border text-[13px] text-text-secondary hover:text-text-primary hover:border-primary/20 transition-all flex items-center gap-2"
               >
-                <FilterIcon className="w-4 h-4" />
+                <Filter className="w-4 h-4" />
                 {activeFilter}
-                <ChevronIcon className="w-3 h-3" direction={showFilterDropdown ? "down" : "right"} />
+                {showFilterDropdown ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
               </button>
               {showFilterDropdown && (
                 <div className="absolute top-11 right-0 w-44 bg-surface border border-border rounded-[10px] shadow-lg py-1.5 z-50 animate-slide-up">
@@ -146,7 +147,7 @@ export default function KnowledgePage() {
               disabled={uploading}
               className="h-10 px-4 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors flex items-center gap-2 disabled:opacity-50"
             >
-              <UploadIcon className="w-4 h-4" />
+              <Upload className="w-4 h-4" />
               {uploading ? "Uploading..." : "Upload"}
             </button>
           </div>
@@ -167,7 +168,7 @@ export default function KnowledgePage() {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0 group-hover:border-primary/20 transition-colors">
-                    <DocumentIcon className="w-4 h-4 text-text-secondary" />
+                    <FileText className="w-4 h-4 text-text-secondary" />
                   </div>
                   <div className="min-w-0">
                     <div className="text-[13px] font-medium text-text-primary line-clamp-1 group-hover:text-primary transition-colors">
@@ -184,7 +185,7 @@ export default function KnowledgePage() {
                 <div>
                   {doc.status === "completed" ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent-green/10 text-accent-green text-[11px] font-medium">
-                      <CheckIcon className="w-3 h-3" />
+                      <Check className="w-3 h-3" />
                       Indexed
                     </span>
                   ) : doc.status === "failed" ? (

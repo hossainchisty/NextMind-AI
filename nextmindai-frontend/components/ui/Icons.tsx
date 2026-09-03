@@ -38,34 +38,3 @@ export function ProviderLogo({ logo_url, color, label, size = "md" }: { logo_url
   if (logo_url) return <img src={logo_url} className={`${s} rounded-lg`} alt="" />;
   return <span className={`${s} rounded-lg flex items-center justify-center ${t} font-bold text-white`} style={{ backgroundColor: color }}>{label[0]}</span>;
 }
-
-// Re-export lucide-react icons with friendly names
-export {
-  Plus as PlusIcon,
-  MessageSquare as ChatIcon,
-  FileText as DocumentIcon,
-  Folder as FolderIcon,
-  Settings as SettingsIcon,
-  Search as SearchIcon,
-  Send as SendIcon,
-  Paperclip as AttachIcon,
-  ChevronRight as ChevronIcon,
-  Check as CheckIcon,
-  Shield as ShieldIcon,
-  Globe as GlobeIcon,
-  Upload as UploadIcon,
-  MoreVertical as MoreIcon,
-  Share2 as ShareIcon,
-  Cpu as CpuIcon,
-  Layers as LayersIcon,
-  BookOpen as BookIcon,
-  File as FileTextIcon,
-  X as XIcon,
-  Filter as FilterIcon,
-  Menu as MenuIcon,
-  Key as KeyIcon,
-  Trash2 as TrashIcon,
-  Edit as EditIcon,
-  LogOut as LogoutIcon,
-  MoreVertical as VerticalDotsIcon,
-} from "lucide-react";

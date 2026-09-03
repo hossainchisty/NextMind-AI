@@ -6,21 +6,21 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { BrainNodeIcon } from "@/components/ui/Icons";
 import {
-  BrainNodeIcon,
-  PlusIcon,
-  ChatIcon,
-  DocumentIcon,
-  FolderIcon,
-  SettingsIcon,
-  ChevronIcon,
-  VerticalDotsIcon,
-  EditIcon,
-  TrashIcon,
-  CheckIcon,
-  XIcon,
-  LogoutIcon,
-} from "@/components/ui/Icons";
+  Plus,
+  MessageSquare,
+  FileText,
+  Folder,
+  Settings,
+  ChevronRight,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Check,
+  X,
+  LogOut,
+} from "lucide-react";
 
 interface Props {
   chats: Chat[];
@@ -64,7 +64,7 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
     return (
       <button onClick={onSelect} title={chat.title}
         className={`w-full flex items-center justify-center px-0 py-2 rounded-lg text-[13px] transition-all duration-150 ${isActive ? "bg-primary/5 text-primary font-medium" : "text-text-secondary hover:bg-bg hover:text-text-primary"}`}>
-        <ChatIcon />
+        <MessageSquare className="w-4 h-4" />
       </button>
     );
   }
@@ -73,15 +73,15 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
     <div className="relative group">
       <button onClick={onSelect}
         className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 text-left ${isActive ? "bg-primary/5 text-primary font-medium" : "text-text-secondary hover:bg-bg hover:text-text-primary"}`}>
-        <ChatIcon />
+        <MessageSquare className="w-4 h-4 shrink-0" />
         {editing ? (
           <div className="flex items-center gap-1 flex-1 min-w-0">
             <input ref={inputRef} value={editVal} onChange={(e) => setEditVal(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") saveRename(); if (e.key === "Escape") { setEditing(false); setEditVal(chat.title); } }}
               className="flex-1 min-w-0 px-1.5 py-0.5 rounded bg-bg border border-primary/30 text-text-primary text-[13px] outline-none"
               onClick={(e) => e.stopPropagation()} />
-            <button onClick={(e) => { e.stopPropagation(); saveRename(); }} className="p-0.5 rounded hover:bg-primary/10 text-primary shrink-0"><CheckIcon className="w-3.5 h-3.5" /></button>
-            <button onClick={(e) => { e.stopPropagation(); setEditing(false); setEditVal(chat.title); setMenuOpen(false); }} className="p-0.5 rounded hover:bg-red-50 text-text-secondary shrink-0"><XIcon className="w-3.5 h-3.5" /></button>
+            <button onClick={(e) => { e.stopPropagation(); saveRename(); }} className="p-0.5 rounded hover:bg-primary/10 text-primary shrink-0"><Check className="w-3.5 h-3.5" /></button>
+            <button onClick={(e) => { e.stopPropagation(); setEditing(false); setEditVal(chat.title); setMenuOpen(false); }} className="p-0.5 rounded hover:bg-red-50 text-text-secondary shrink-0"><X className="w-3.5 h-3.5" /></button>
           </div>
         ) : (
           <span className="line-clamp-1 flex-1 min-w-0">{chat.title}</span>
@@ -91,13 +91,13 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
         <div ref={menuRef} className="absolute right-1.5 top-1/2 -translate-y-1/2 z-50">
           <button onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
             className={`p-1 rounded-md hover:bg-bg text-text-secondary transition-opacity ${menuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-            <VerticalDotsIcon />
+            <MoreVertical className="w-4 h-4" />
           </button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 w-36 py-1 rounded-lg bg-surface border border-border shadow-xl z-[60]">
               <button onClick={(e) => { e.stopPropagation(); setEditing(true); setEditVal(chat.title); setMenuOpen(false); }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-text-secondary hover:bg-bg hover:text-text-primary transition-colors">
-                <EditIcon /> Rename
+                <Edit className="w-3.5 h-3.5" /> Rename
               </button>
               <button onClick={(e) => {
                 e.stopPropagation();
@@ -105,7 +105,7 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
                 confirm("Delete this chat permanently?", () => onDelete(), { confirmLabel: "Delete", type: "danger" });
               }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-red-500 hover:bg-red-50 transition-colors">
-                <TrashIcon /> Delete
+                <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
             </div>
           )}
@@ -148,7 +148,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
 
       <div className={`px-3 mb-2 ${collapsed ? "flex justify-center" : ""}`}>
         <button onClick={onNew} className={`${collapsed ? "w-10 h-10 p-0 justify-center" : "w-full px-4 py-2.5"} flex items-center gap-2 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors`}>
-          <PlusIcon /> {!collapsed && "New Chat"}
+          <Plus className="w-4 h-4" /> {!collapsed && "New Chat"}
         </button>
       </div>
 
@@ -156,7 +156,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
         <div className="mb-4">
           {!collapsed && (
             <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
-              <ChevronIcon direction="down" className="w-3 h-3" /> Chats
+              <ChevronRight className="w-3 h-3" /> Chats
             </div>
           )}
           <div className="mt-0.5 space-y-0.5">
@@ -176,15 +176,15 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
         <div>
           {!collapsed && (
             <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
-              <ChevronIcon direction="down" className="w-3 h-3" /> Knowledge
+              <ChevronRight className="w-3 h-3" /> Knowledge
             </div>
           )}
           <div className="mt-0.5 space-y-0.5">
             <a href="/knowledge" title={collapsed ? "My Documents" : undefined} className={`flex items-center gap-2.5 ${collapsed ? "justify-center px-0 py-2" : "px-2.5 py-2"} rounded-lg text-[13px] text-text-secondary hover:bg-bg hover:text-text-primary transition-all`}>
-              <DocumentIcon /> {!collapsed && "My Documents"}
+              <FileText className="w-4 h-4" /> {!collapsed && "My Documents"}
             </a>
             <a href="/collections" title={collapsed ? "Collections" : undefined} className={`flex items-center gap-2.5 ${collapsed ? "justify-center px-0 py-2" : "px-2.5 py-2"} rounded-lg text-[13px] text-text-secondary hover:bg-bg hover:text-text-primary transition-all`}>
-              <FolderIcon /> {!collapsed && "Collections"}
+              <Folder className="w-4 h-4" /> {!collapsed && "Collections"}
             </a>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
 
       <div className="px-3 pb-4 space-y-2">
         <a href="/settings" title={collapsed ? "Settings" : undefined} className={`flex items-center gap-2.5 ${collapsed ? "justify-center px-0 py-2" : "px-2.5 py-2 w-full"} rounded-lg text-[13px] text-text-secondary hover:bg-bg hover:text-text-primary transition-all`}>
-          <SettingsIcon /> {!collapsed && "Settings"}
+          <Settings className="w-4 h-4" /> {!collapsed && "Settings"}
         </a>
         {user && !collapsed && (
           <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-bg/50 border border-border/50">
@@ -208,7 +208,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
               className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
               title="Sign out"
             >
-              <LogoutIcon />
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         )}

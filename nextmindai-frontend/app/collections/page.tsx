@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { api } from "@/lib/api";
-import { FolderIcon, PlusIcon, DocumentIcon } from "@/components/ui/Icons";
+import { Folder, Plus, FileText } from "lucide-react";
 
 interface Collection {
   id: string;
@@ -78,7 +78,7 @@ export default function CollectionsPage() {
               onClick={() => setShowNew(!showNew)}
               className="h-10 px-4 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors flex items-center gap-2"
             >
-              <PlusIcon className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
               New Collection
             </button>
           </div>
@@ -130,7 +130,7 @@ export default function CollectionsPage() {
                       collectionColors[col.name] || "bg-bg text-text-secondary"
                     }`}
                   >
-                    <FolderIcon className="w-5 h-5" />
+                    <Folder className="w-5 h-5" />
                   </div>
                   <span className="text-[11px] text-text-secondary">
                     {formatDate(col.created_at)}
@@ -144,7 +144,7 @@ export default function CollectionsPage() {
                 )}
                 <div className="flex items-center gap-3 text-[12px] text-text-secondary">
                   <span className="flex items-center gap-1">
-                    <DocumentIcon className="w-3.5 h-3.5" />
+                    <FileText className="w-3.5 h-3.5" />
                     {col.document_count} documents
                   </span>
                 </div>

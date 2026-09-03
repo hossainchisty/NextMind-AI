@@ -6,7 +6,8 @@ import { useToast } from "@/components/ui/Toast";
 import AddProviderModal from "./AddProviderModal";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { ProviderLogo, MoreIcon, TrashIcon, KeyIcon } from "@/components/ui/Icons";
+import { ProviderLogo } from "@/components/ui/Icons";
+import { MoreVertical, Trash2, Key } from "lucide-react";
 import type { Provider, APIKey } from "@/lib/types";
 
 export default function ProvidersPage() {
@@ -58,7 +59,7 @@ export default function ProvidersPage() {
         {keys.length === 0 && !fetchingKeys ? (
           <Card className="flex flex-col items-center justify-center py-16 border-dashed">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-              <KeyIcon />
+              <Key className="w-5 h-5" />
             </div>
             <p className="text-[14px] font-medium text-text-primary mb-1">No provider keys yet</p>
             <p className="text-[13px] text-text-secondary mb-4">Add your first provider key to get started</p>
@@ -93,7 +94,7 @@ export default function ProvidersPage() {
                             onClick={() => setMenuOpen(menuOpen === k.id ? null : k.id)}
                             className="p-2 rounded-lg text-text-secondary/40 hover:text-text-primary hover:bg-bg transition-colors"
                           >
-                            <MoreIcon />
+                            <MoreVertical className="w-4 h-4" />
                           </button>
                           {menuOpen === k.id && (
                             <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
@@ -101,7 +102,7 @@ export default function ProvidersPage() {
                                 onClick={() => handleDelete(k.id)}
                                 className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
                               >
-                                <TrashIcon /> Remove
+                                <Trash2 className="w-4 h-4" /> Remove
                               </button>
                             </div>
                           )}

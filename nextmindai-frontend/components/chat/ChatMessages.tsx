@@ -3,7 +3,8 @@
 import { renderMarkdown } from "@/components/ui/Markdown";
 import type { Msg } from "@/lib/types";
 import { useState, useRef, useEffect } from "react";
-import { BrainNodeIcon, EditIcon, CheckIcon, XIcon } from "@/components/ui/Icons";
+import { BrainNodeIcon } from "@/components/ui/Icons";
+import { Edit, Check, X } from "lucide-react";
 
 interface Props {
   messages: Msg[];
@@ -73,10 +74,10 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                 </div>
                 <div className="flex items-center gap-2 mt-2 justify-end">
                   <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
-                    <XIcon className="w-3.5 h-3.5" /> Cancel
+                    <X className="w-3.5 h-3.5" /> Cancel
                   </button>
                   <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
-                    <CheckIcon className="w-3.5 h-3.5" /> Save & Send
+                    <Check className="w-3.5 h-3.5" /> Save & Send
                   </button>
                 </div>
               </div>
@@ -88,7 +89,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                   className="absolute -left-10 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-secondary/50 hover:text-text-primary hover:bg-bg transition-all opacity-0 group-hover/msg:opacity-100"
                   title="Edit message"
                 >
-                  <EditIcon />
+                  <Edit className="w-3.5 h-3.5" />
                 </button>
               </div>
             )

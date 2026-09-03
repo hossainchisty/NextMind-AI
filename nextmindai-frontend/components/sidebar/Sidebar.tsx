@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
+import { BrainNodeIcon } from "@/components/ui/Icons";
 import {
-  BrainNodeIcon,
-  ChatIcon,
-  DocumentIcon,
-  FolderIcon,
-  SettingsIcon,
-} from "@/components/ui/Icons";
+  MessageSquare,
+  FileText,
+  Folder,
+  Settings,
+} from "lucide-react";
 
 interface SidebarProps {}
 
@@ -51,7 +51,7 @@ export default function Sidebar({}: SidebarProps) {
                 : "text-text-secondary hover:bg-bg hover:text-text-primary"
             }`}
           >
-            <ChatIcon className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
+            <MessageSquare className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
             Chat
           </button>
         </div>
@@ -74,7 +74,7 @@ export default function Sidebar({}: SidebarProps) {
                     : "text-text-secondary hover:bg-bg hover:text-text-primary"
                 }`}
               >
-                <DocumentIcon className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
+                <FileText className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
                 My Documents
               </button>
               <button
@@ -85,7 +85,7 @@ export default function Sidebar({}: SidebarProps) {
                     : "text-text-secondary hover:bg-bg hover:text-text-primary"
                 }`}
               >
-                <FolderIcon className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
+                <Folder className="w-4 h-4 shrink-0 opacity-50 group-hover:opacity-70" />
                 Collections
               </button>
             </div>
@@ -103,7 +103,7 @@ export default function Sidebar({}: SidebarProps) {
               : "text-text-secondary hover:bg-bg hover:text-text-primary"
           }`}
         >
-          <SettingsIcon className="w-4 h-4 opacity-60" />
+          <Settings className="w-4 h-4 opacity-60" />
           Settings
         </button>
 

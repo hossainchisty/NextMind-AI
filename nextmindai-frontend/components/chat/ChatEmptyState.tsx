@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchIcon, DocumentIcon, FileTextIcon, ChatIcon } from "@/components/ui/Icons";
+import { Search, FileText, File, MessageSquare } from "lucide-react";
 
 interface Props {
   onAsk: (text: string) => void;
@@ -8,10 +8,10 @@ interface Props {
 
 export default function ChatEmptyState({ onAsk }: Props) {
   const actions = [
-    { Icon: SearchIcon, t: "Search documents", d: "Find anything across your knowledge base", p: "Search my documents for" },
-    { Icon: DocumentIcon, t: "Analyze a file", d: "Extract insights from your documents", p: "Analyze this document and summarize" },
-    { Icon: FileTextIcon, t: "Explain a concept", d: "Get clear answers grounded in your docs", p: "Explain the concept of" },
-    { Icon: ChatIcon, t: "Summarize knowledge", d: "Create summaries from your sources", p: "Summarize the key points about" },
+    { Icon: Search, t: "Search documents", d: "Find anything across your knowledge base", p: "Search my documents for" },
+    { Icon: FileText, t: "Analyze a file", d: "Extract insights from your documents", p: "Analyze this document and summarize" },
+    { Icon: File, t: "Explain a concept", d: "Get clear answers grounded in your docs", p: "Explain the concept of" },
+    { Icon: MessageSquare, t: "Summarize knowledge", d: "Create summaries from your sources", p: "Summarize the key points about" },
   ];
 
   return (
