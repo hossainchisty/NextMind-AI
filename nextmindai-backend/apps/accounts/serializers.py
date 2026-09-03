@@ -54,7 +54,7 @@ class UserAPIKeySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserAPIKey
-        fields = ["id", "provider", "provider_detail", "label", "api_key", "api_key_masked", "is_active", "created_at"]
+        fields = ["id", "provider", "provider_detail", "api_key", "api_key_masked", "is_active", "created_at"]
         read_only_fields = ["id", "created_at"]
 
     def validate_provider(self, value):

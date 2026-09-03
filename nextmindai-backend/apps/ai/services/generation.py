@@ -13,13 +13,15 @@ def _get_default_client():
     global _default_client, _default_model
     if _default_client is None:
         import openai
+        import os
         _default_model = getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini")
         provider_name = getattr(conf.settings, "LLM_PROVIDER", "openai")
         from apps.accounts.models import Provider
         db_provider = Provider.objects.get(value=provider_name, is_active=True)
-        if not db_provider.api_key:
+        api_key = getattr(conf.settings, "OPENAI_API_KEY", "") or os.environ.get("OPENAI_API_KEY", "")
+        if not api_key:
             raise ValueError(f"No API key configured for provider: {provider_name}")
-        _default_client = openai.OpenAI(api_key=db_provider.api_key, base_url=db_provider.endpoint)
+        _default_client = openai.OpenAI(api_key=api_key, base_url=db_provider.endpoint)
         logger.info("Default LLM client: %s", provider_name)
     return _default_client
 
