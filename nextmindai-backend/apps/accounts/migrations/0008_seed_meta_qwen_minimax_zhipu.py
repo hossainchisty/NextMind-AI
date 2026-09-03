@@ -6,6 +6,13 @@ def seed_providers(apps, schema_editor):
     Provider = apps.get_model("accounts", "Provider")
     providers = [
         {
+            "value": "meta",
+            "label": "Meta (Llama)",
+            "endpoint": "https://api.llama.com/compat/v1",
+            "placeholder": "LLM_...",
+            "color": "#0668E1",
+        },
+        {
             "value": "qwen",
             "label": "Qwen (Alibaba)",
             "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
