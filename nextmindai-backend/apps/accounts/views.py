@@ -228,6 +228,28 @@ PROVIDER_MODELS = {
     "cloudflare": [
         {"id": "@cf/meta/llama-3.3-70b-instruct-fp8", "name": "Llama 3.3 70B", "context": "128K", "input_price": "Free", "output_price": "Free", "pricing_type": "free", "capabilities": [], "description": "Free tier on Cloudflare edge"},
     ],
+    "meta": [
+        {"id": "muse-spark-1.3", "name": "Muse Spark 1.3", "context": "128K", "input_price": "$1.25", "output_price": "$4.25", "pricing_type": "paid", "capabilities": ["vision", "function_calling"], "description": "Latest Meta model, best quality"},
+        {"id": "muse-spark-1.2", "name": "Muse Spark 1.2", "context": "128K", "input_price": "$1.25", "output_price": "$4.25", "pricing_type": "paid", "capabilities": ["vision", "function_calling"], "description": "Balanced performance and speed"},
+        {"id": "muse-spark-1.1", "name": "Muse Spark 1.1", "context": "128K", "input_price": "$1.25", "output_price": "$4.25", "pricing_type": "paid", "capabilities": ["vision"], "description": "Fast and reliable"},
+        {"id": "muse-spark-1.3-contributor", "name": "Muse Spark 1.3 (Contributor)", "context": "128K", "input_price": "$0.10", "output_price": "$0.20", "pricing_type": "paid", "capabilities": ["vision", "function_calling"], "description": "Discounted, data used for training"},
+        {"id": "muse-spark-1.2-contributor", "name": "Muse Spark 1.2 (Contributor)", "context": "128K", "input_price": "$0.10", "output_price": "$0.20", "pricing_type": "paid", "capabilities": ["vision"], "description": "Discounted, data used for training"},
+    ],
+    "qwen": [
+        {"id": "qwen-max", "name": "Qwen Max", "context": "32K", "input_price": "$1.60", "output_price": "$6.40", "pricing_type": "paid", "capabilities": ["function_calling"], "description": "Most capable Qwen model"},
+        {"id": "qwen-plus", "name": "Qwen Plus", "context": "128K", "input_price": "$0.40", "output_price": "$1.20", "pricing_type": "paid", "capabilities": ["function_calling"], "description": "Balanced performance and cost"},
+        {"id": "qwen-turbo", "name": "Qwen Turbo", "context": "128K", "input_price": "$0.05", "output_price": "$0.20", "pricing_type": "paid", "capabilities": [], "description": "Fast and affordable"},
+        {"id": "qwen-long", "name": "Qwen Long", "context": "10M", "input_price": "$0.50", "output_price": "$2.00", "pricing_type": "paid", "capabilities": [], "description": "Ultra-long context for documents"},
+    ],
+    "minimax": [
+        {"id": "MiniMax-Text-01", "name": "MiniMax Text 01", "context": "1M", "input_price": "$1.00", "output_price": "$8.00", "pricing_type": "paid", "capabilities": ["function_calling"], "description": "Flagship model, 1M context"},
+        {"id": "abab6.5s-chat", "name": "Abab 6.5S", "context": "256K", "input_price": "$0.50", "output_price": "$1.50", "pricing_type": "paid", "capabilities": [], "description": "Fast chat model"},
+    ],
+    "zhipu": [
+        {"id": "glm-4-plus", "name": "GLM-4 Plus", "context": "128K", "input_price": "$0.70", "output_price": "$2.10", "pricing_type": "paid", "capabilities": ["function_calling", "vision"], "description": "Most capable GLM model"},
+        {"id": "glm-4-flash", "name": "GLM-4 Flash", "context": "128K", "input_price": "Free", "output_price": "Free", "pricing_type": "free", "capabilities": [], "description": "Free tier, fast inference"},
+        {"id": "glm-4-long", "name": "GLM-4 Long", "context": "1M", "input_price": "$0.50", "output_price": "$1.00", "pricing_type": "paid", "capabilities": [], "description": "Ultra-long context"},
+    ],
     "opencode": [
         {"id": "default", "name": "OpenCode Default", "context": "N/A", "input_price": "N/A", "output_price": "N/A", "pricing_type": "free", "capabilities": [], "description": "OpenCode managed model"},
     ],
