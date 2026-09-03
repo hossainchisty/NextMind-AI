@@ -79,7 +79,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                     <XIcon /> Cancel
                   </button>
                   <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
-                    <CheckIcon /> Save & Send
+                    <CheckIcon /> Send
                   </button>
                 </div>
               </div>
