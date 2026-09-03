@@ -53,7 +53,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
         <div key={m.id} className={`animate-fade-in group ${m.role === "user" ? "flex justify-end" : ""}`}>
           {m.role === "user" ? (
             editingId === m.id ? (
-              <div className="max-w-[65%]">
+              <div className="max-w-[65%] relative group/msg">
                 <textarea
                   ref={textareaRef}
                   value={editText}
@@ -74,14 +74,14 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                     if (e.key === "Escape") cancelEdit();
                   }}
                 />
-                <div className="flex items-center gap-2 mt-2 justify-end">
-                  <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
-                    <XIcon /> Cancel
-                  </button>
-                  <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
-                    <CheckIcon /> Send
-                  </button>
-                </div>
+                <button
+                  className="absolute -left-10 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-secondary/50 hover:text-text-primary hover:bg-bg transition-all opacity-0 group-hover/msg:opacity-100"
+                  title="Cancel edit"
+                  onClick={cancelEdit}
+                >
+                  <XIcon />
+                </button>
+              </div>
               </div>
             ) : (
               <div className="max-w-[65%] relative group/msg">
