@@ -123,7 +123,7 @@ export default function PersonalizationPage() {
             onClick={() => setShowForm(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
           >
-            <PlusIcon /> Add Key
+            <PlusIcon /> Add Provider
           </button>
         )}
       </div>
@@ -136,7 +136,7 @@ export default function PersonalizationPage() {
               <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <KeyIcon />
               </div>
-              <h2 className="text-[15px] font-semibold text-text-primary">Add New Key</h2>
+              <h2 className="text-[15px] font-semibold text-text-primary">Add Provider</h2>
             </div>
             <button onClick={() => { setShowForm(false); setTestStatus("idle"); }} className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
               <XIcon />
@@ -283,25 +283,6 @@ export default function PersonalizationPage() {
           </div>
         )}
       </div>
-
-      {/* Available Providers */}
-      {keys.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-4">Available Providers</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {providers.filter((p) => !connectedProviderValues.has(p.value)).map((p) => (
-              <button
-                key={p.value}
-                onClick={() => { setSelectedProvider(p.value); setShowForm(true); }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
-              >
-                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
