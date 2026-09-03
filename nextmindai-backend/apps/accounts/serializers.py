@@ -27,10 +27,34 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "email", "name", "avatar", "created_at", "updated_at"]
-        read_only_fields = ["id", "email", "created_at", "updated_at"]
+        fields = ["id", "email", "name", "avatar", "avatar_url", "created_at", "updated_at"]
+        read_only_fields = ["id", "email", "avatar_url", "created_at", "updated_at"]
+
+    def get_avatar_url(self, obj):
+        return obj.avatar_url()
+
+    def update(self, instance, validated_data):
+        avatar_file = self.context["request"].FILES.get("avatar")
+        if avatar_file:
+            import uuid as uuid_pkg
+            from apps.documents.services.storage import upload_to_r2, delete_from_r2
+
+            if instance.avatar:
+                try:
+                    delete_from_r2(instance.avatar)
+                except Exception:
+                    pass
+
+            ext = avatar_file.name[avatar_file.name.rfind("."):]
+            key = f"avatars/{instance.id}/{uuid_pkg.uuid4()}{ext}"
+            upload_to_r2(avatar_file, key, avatar_file.content_type)
+            validated_data["avatar"] = key
+
+        return super().update(instance, validated_data)
 
 
 class LoginSerializer(serializers.Serializer):

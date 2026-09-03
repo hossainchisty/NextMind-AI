@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
 
 interface UserProfile {
   id: string;
   email: string;
   name: string;
-  avatar: string | null;
+  avatar: string;
+  avatar_url: string | null;
 }
 
 export default function AccountPage() {
@@ -16,6 +17,8 @@ export default function AccountPage() {
   const [editingName, setEditingName] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api<{ data: UserProfile }>("auth/me/").then((res) => {
@@ -36,6 +39,32 @@ export default function AccountPage() {
     setSaving(false);
   }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me/`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUser((prev) => prev ? { ...prev, avatar: data.data.avatar, avatar_url: data.data.avatar_url } : null);
+      }
+    } catch {}
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
@@ -50,18 +79,33 @@ export default function AccountPage() {
           <div className="flex items-center gap-6">
             <div className="relative group">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-[28px] font-bold text-primary overflow-hidden">
-                {user?.avatar ? (
-                  <img src={user.avatar} className="w-full h-full object-cover" alt="" />
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} className="w-full h-full object-cover" alt="" />
                 ) : (
                   user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "?"
                 )}
               </div>
-              <button className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity disabled:opacity-50"
+              >
+                {uploading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                )}
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
             </div>
             <div>
               <p className="text-[14px] font-medium text-text-primary mb-1">Profile Photo</p>

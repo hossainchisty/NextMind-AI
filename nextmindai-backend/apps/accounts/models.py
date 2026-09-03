@@ -27,7 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True, max_length=255)
     name = models.CharField(max_length=255, blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    avatar = models.CharField(max_length=500, blank=True, default="")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -42,6 +42,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
     def __str__(self):
         return self.email
+
+    def avatar_url(self) -> Optional[str]:
+        from apps.documents.services.storage import get_signed_url
+        if self.avatar:
+            return get_signed_url(self.avatar, expires_in=86400)
+        return None
 
 
 class Provider(TimeStampedModel):
