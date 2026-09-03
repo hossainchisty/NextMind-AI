@@ -3,27 +3,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/sidebar/Sidebar";
+import { User, Settings, CreditCard, Wallet, KeyRound, Database } from "lucide-react";
+
+const iconMap: Record<string, React.ElementType> = {
+  user: User,
+  settings: Settings,
+  credit: CreditCard,
+  wallet: Wallet,
+  key: KeyRound,
+  data: Database,
+};
 
 const sections = [
   {
     title: "Account",
     items: [
-      { label: "Profile", href: "/settings/account" },
-      { label: "Preferences", href: "/settings/account/preferences" },
-      { label: "Billing and Plans", href: "/settings/account/billing" },
-      { label: "Credits", href: "/settings/account/credits" },
+      { label: "Profile", href: "/settings/account", icon: "user" },
+      { label: "Preferences", href: "/settings/account/preferences", icon: "settings" },
+      { label: "Billing and Plans", href: "/settings/account/billing", icon: "credit" },
+      { label: "Credits", href: "/settings/account/credits", icon: "wallet" },
     ],
   },
   {
     title: "Provider",
     items: [
-      { label: "Connected Providers", href: "/settings/providers" },
+      { label: "Connected Providers", href: "/settings/providers", icon: "key" },
     ],
   },
   {
     title: "Advanced",
     items: [
-      { label: "Data & Export", href: "/settings/advanced" },
+      { label: "Data & Export", href: "/settings/advanced", icon: "data" },
     ],
   },
 ];
@@ -57,16 +67,18 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
               <div className="space-y-0.5">
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
+                  const Icon = iconMap[item.icon] || User;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
                         isActive
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-text-secondary hover:bg-bg hover:text-text-primary"
                       }`}
                     >
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : "text-text-secondary/60"}`} />
                       <span>{item.label}</span>
                       {item.badge && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">

@@ -115,15 +115,16 @@ export default function PersonalizationPage() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-[22px] font-semibold text-text-primary mb-1">Providers</h1>
-          <p className="text-[14px] text-text-secondary">Connect your own API keys to use your preferred models.</p>
+          <h1 className="text-[22px] font-semibold text-text-primary mb-1">Providers Keys</h1>
+          <p className="text-[14px] text-text-secondary">Bring your own provider API keys to use them through NextMind without additional fees.
+          </p>
         </div>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
           >
-            <PlusIcon /> Add Provider
+            <PlusIcon /> Add Provider Key
           </button>
         )}
       </div>
@@ -136,7 +137,7 @@ export default function PersonalizationPage() {
               <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <KeyIcon />
               </div>
-              <h2 className="text-[15px] font-semibold text-text-primary">Add Provider</h2>
+              <h2 className="text-[15px] font-semibold text-text-primary">Add Provider Key</h2>
             </div>
             <button onClick={() => { setShowForm(false); setTestStatus("idle"); }} className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
               <XIcon />
@@ -145,6 +146,7 @@ export default function PersonalizationPage() {
 
           <form onSubmit={handleAdd} className="space-y-4">
             <div>
+              <p>Create a new provider key to connect to an LLM provider.</p>
               <label className="block text-[12px] font-medium text-text-secondary mb-2 uppercase tracking-wider">Provider</label>
               <div className="relative provider-dropdown">
                 <div
@@ -283,6 +285,8 @@ export default function PersonalizationPage() {
           </div>
         )}
       </div>
+
+
     </div>
   );
 }
