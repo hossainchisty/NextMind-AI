@@ -250,6 +250,12 @@ PROVIDER_MODELS = {
         {"id": "glm-4-flash", "name": "GLM-4 Flash", "context": "128K", "input_price": "Free", "output_price": "Free", "pricing_type": "free", "capabilities": [], "description": "Free tier, fast inference"},
         {"id": "glm-4-long", "name": "GLM-4 Long", "context": "1M", "input_price": "$0.50", "output_price": "$1.00", "pricing_type": "paid", "capabilities": [], "description": "Ultra-long context"},
     ],
+    "xiaomi": [
+        {"id": "mimo-v2.5-pro", "name": "MiMo V2.5 Pro", "context": "1M", "input_price": "$0.44", "output_price": "$0.87", "pricing_type": "paid", "capabilities": ["function_calling", "vision", "reasoning"], "description": "Flagship model, best for coding and agents"},
+        {"id": "mimo-v2.5", "name": "MiMo V2.5", "context": "1M", "input_price": "$0.14", "output_price": "$0.28", "pricing_type": "paid", "capabilities": ["function_calling", "vision"], "description": "Balanced performance and cost"},
+        {"id": "mimo-v2-pro", "name": "MiMo V2 Pro", "context": "1M", "input_price": "$1.00", "output_price": "$3.00", "pricing_type": "paid", "capabilities": ["function_calling", "reasoning"], "description": "Previous gen flagship, strong reasoning"},
+        {"id": "mimo-v2-flash", "name": "MiMo V2 Flash", "context": "56K", "input_price": "$0.10", "output_price": "$0.30", "pricing_type": "paid", "capabilities": [], "description": "Fast and cheap, open-source"},
+    ],
     "opencode": [
         {"id": "default", "name": "OpenCode Default", "context": "N/A", "input_price": "N/A", "output_price": "N/A", "pricing_type": "free", "capabilities": [], "description": "OpenCode managed model"},
     ],

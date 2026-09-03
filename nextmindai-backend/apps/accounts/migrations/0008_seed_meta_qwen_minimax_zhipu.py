@@ -33,6 +33,13 @@ def seed_providers(apps, schema_editor):
             "placeholder": "...",
             "color": "#4D5BFF",
         },
+        {
+            "value": "xiaomi",
+            "label": "Xiaomi",
+            "endpoint": "https://api.xiaomimimo.com/v1",
+            "placeholder": "...",
+            "color": "#FF6900",
+        },
     ]
     for p in providers:
         Provider.objects.update_or_create(value=p["value"], defaults=p)
