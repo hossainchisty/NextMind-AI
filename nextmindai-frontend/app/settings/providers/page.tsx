@@ -25,28 +25,27 @@ interface APIKey {
 }
 
 function ProviderLogo({ logo_url, color, label, size = "md" }: { logo_url: string | null; color: string; label: string; size?: "sm" | "md" | "lg" }) {
-  const s = size === "lg" ? "w-10 h-10" : size === "md" ? "w-9 h-9" : "w-6 h-6";
+  const s = size === "lg" ? "w-10 h-10" : size === "md" ? "w-8 h-8" : "w-6 h-6";
   const t = size === "lg" ? "text-[14px]" : size === "md" ? "text-[12px]" : "text-[10px]";
   if (logo_url) return <img src={logo_url} className={`${s} rounded-lg`} alt="" />;
   return <span className={`${s} rounded-lg flex items-center justify-center ${t} font-bold text-white`} style={{ backgroundColor: color }}>{label[0]}</span>;
 }
 
-function CheckIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>; }
-function TrashIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>; }
 function PlusIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>; }
 function XIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
-function SearchIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>; }
+function MoreIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>; }
+function TrashIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>; }
 
 export default function ProvidersPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [keys, setKeys] = useState<APIKey[]>([]);
-  const [search, setSearch] = useState("");
   const [connectModal, setConnectModal] = useState<Provider | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchingKeys, setFetchingKeys] = useState(true);
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "ok" | "error">("idle");
   const [testError, setTestError] = useState("");
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
   useEffect(() => {
     api<{ data: Provider[] }>("auth/providers").then((res) => setProviders(res.data)).catch(() => {});
@@ -54,10 +53,8 @@ export default function ProvidersPage() {
   }, []);
 
   const connectedMap = new Map(keys.map((k) => [k.provider_detail.value, k]));
-
-  const filtered = providers.filter((p) =>
-    p.label.toLowerCase().includes(search.toLowerCase())
-  );
+  const connectedProviders = providers.filter((p) => connectedMap.has(p.value));
+  const unconnectedProviders = providers.filter((p) => !connectedMap.has(p.value));
 
   async function handleConnect(e: React.FormEvent) {
     e.preventDefault();
@@ -84,6 +81,7 @@ export default function ProvidersPage() {
     try {
       await api(`auth/api-keys/${id}`, { method: "DELETE" });
       setKeys((prev) => prev.filter((k) => k.id !== id));
+      setMenuOpen(null);
     } catch { alert("Failed to delete"); }
   }
 
@@ -103,68 +101,86 @@ export default function ProvidersPage() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-[22px] font-semibold text-text-primary mb-1">Connect a provider</h1>
-        <p className="text-[14px] text-text-secondary">Add your own API keys to use your preferred models.</p>
+        <h1 className="text-[22px] font-semibold text-text-primary mb-1">Your providers</h1>
+        <p className="text-[14px] text-text-secondary">{keys.length} key{keys.length !== 1 ? "s" : ""}</p>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <SearchIcon />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search providers..."
-          className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface border border-border text-[14px] text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
-        />
-        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary/40">
-          <SearchIcon />
-        </div>
-      </div>
-
-      {/* Provider List */}
-      <div className="space-y-2">
-        {filtered.map((p) => {
-          const connected = connectedMap.get(p.value);
+      {/* Connected Providers */}
+      <div className="space-y-3 mb-8">
+        {connectedProviders.map((p) => {
+          const k = connectedMap.get(p.value)!;
           return (
-            <div
-              key={p.value}
-              className="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/20 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
-                    {connected && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green flex items-center gap-1">
-                        <CheckIcon /> Connected
-                      </span>
-                    )}
+            <div key={p.value} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                  <div>
+                    <div className="text-[14px] font-semibold text-text-primary">{p.label}</div>
+                    <div className="text-[12px] text-text-secondary">1 key</div>
                   </div>
-                  <span className="text-[12px] font-mono text-text-secondary">{p.endpoint.replace("https://", "")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setMenuOpen(menuOpen === p.value ? null : p.value)}
+                    className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors"
+                  >
+                    <MoreIcon />
+                  </button>
                 </div>
               </div>
-              {connected ? (
-                <button
-                  onClick={() => handleDelete(connected.id)}
-                  className="p-2 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 transition-colors"
-                  title="Remove key"
-                >
-                  <TrashIcon />
-                </button>
-              ) : (
-                <button
-                  onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-[12px] font-medium hover:bg-primary/90 transition-colors"
-                >
-                  <PlusIcon /> Connect
-                </button>
+
+              {/* Key Row */}
+              <div className="mt-3 flex items-center justify-between bg-bg rounded-lg px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent-green/10 text-accent-green">Active</span>
+                  <span className="text-[13px] font-mono text-text-secondary">{k.api_key_masked}</span>
+                </div>
+              </div>
+
+              {/* Dropdown Menu */}
+              {menuOpen === p.value && (
+                <div className="mt-2 bg-surface border border-border rounded-lg shadow-lg overflow-hidden">
+                  <button
+                    onClick={() => handleDelete(k.id)}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <TrashIcon /> Remove key
+                  </button>
+                </div>
               )}
             </div>
           );
         })}
+
+        {/* Add Key Button for connected providers */}
+        {connectedProviders.length > 0 && (
+          <button
+            onClick={() => setConnectModal(connectedProviders[0])}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border text-[13px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 transition-colors"
+          >
+            <PlusIcon /> Add key
+          </button>
+        )}
       </div>
+
+      {/* Add Another Provider */}
+      {unconnectedProviders.length > 0 && (
+        <div>
+          <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {unconnectedProviders.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
+                className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
+              >
+                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Connect Modal */}
       {connectModal && (
@@ -206,7 +222,7 @@ export default function ProvidersPage() {
                 >
                   {testStatus === "testing" ? "..." : "Test Connection"}
                 </button>
-                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] text-accent-green"><CheckIcon /> Success</span>}
+                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] text-accent-green"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Success</span>}
                 {testStatus === "error" && <span className="text-[12px] text-red-500">{testError}</span>}
               </div>
 
