@@ -161,19 +161,12 @@ export default function ProvidersPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
-                              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green">
-                                <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
-                                active
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[12px] font-mono text-text-secondary">••••••••</span>
-                              <span className="text-[11px] text-text-secondary/40">•</span>
-                              <span className="text-[11px] text-text-secondary/60">Last used {timeAgo(k.created_at)}</span>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green">
+                              <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
+                              {k.api_key_masked}
+                            </span>
                           </div>
                         </div>
                         <div className="relative">
