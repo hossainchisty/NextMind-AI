@@ -35,6 +35,8 @@ function PlusIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="
 function XIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
 function MoreIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>; }
 function TrashIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>; }
+function KeyIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>; }
+function CheckIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>; }
 
 export default function ProvidersPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -53,7 +55,6 @@ export default function ProvidersPage() {
   }, []);
 
   const connectedMap = new Map(keys.map((k) => [k.provider_detail.value, k]));
-  const connectedProviders = providers.filter((p) => connectedMap.has(p.value));
   const unconnectedProviders = providers.filter((p) => !connectedMap.has(p.value));
 
   async function handleConnect(e: React.FormEvent) {
@@ -98,68 +99,84 @@ export default function ProvidersPage() {
     }
   }
 
+  function timeAgo(date: string) {
+    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+    if (seconds < 60) return "just now";
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  }
+
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-[22px] font-semibold text-text-primary mb-1">Your providers</h1>
-        <p className="text-[14px] text-text-secondary">{keys.length} key{keys.length !== 1 ? "s" : ""}</p>
+        <h1 className="text-[22px] font-semibold text-text-primary mb-1">Provider Keys</h1>
+        <p className="text-[14px] text-text-secondary">Securely manage and monitor your API keys</p>
       </div>
 
-      {/* Connected Providers */}
+      {/* Provider Keys List */}
       <div className="space-y-3 mb-8">
-        {connectedProviders.map((p) => {
-          const k = connectedMap.get(p.value)!;
-          return (
-            <div key={p.value} className="bg-surface border border-border rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                  <div>
-                    <div className="text-[14px] font-semibold text-text-primary">{p.label}</div>
-                    <div className="text-[12px] text-text-secondary">1 key</div>
+        {keys.length === 0 && !fetchingKeys ? (
+          <div className="flex flex-col items-center justify-center py-16 bg-surface border border-border border-dashed rounded-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+              <KeyIcon />
+            </div>
+            <p className="text-[14px] font-medium text-text-primary mb-1">No provider keys yet</p>
+            <p className="text-[13px] text-text-secondary mb-4">Add your first provider key to get started</p>
+            {unconnectedProviders.length > 0 && (
+              <button
+                onClick={() => { setConnectModal(unconnectedProviders[0]); setTestStatus("idle"); }}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors"
+              >
+                <PlusIcon /> Add Provider Key
+              </button>
+            )}
+          </div>
+        ) : (
+          keys.map((k) => {
+            const p = k.provider_detail;
+            return (
+              <div key={k.id} className="bg-surface border border-border rounded-xl p-4 hover:border-primary/20 transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <ProviderLogo logo_url={p.logo_url} color={p.color || "#666"} label={p.label} />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
+                          active
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[12px] font-mono text-text-secondary">{k.api_key_masked}</span>
+                        <span className="text-[11px] text-text-secondary/40">•</span>
+                        <span className="text-[11px] text-text-secondary/60">Last used {timeAgo(k.created_at)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => setMenuOpen(menuOpen === k.id ? null : k.id)}
+                      className="p-2 rounded-lg text-text-secondary/40 hover:text-text-primary hover:bg-bg transition-colors"
+                    >
+                      <MoreIcon />
+                    </button>
+                    {menuOpen === k.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
+                        <button
+                          onClick={() => handleDelete(k.id)}
+                          className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <TrashIcon /> Remove key
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setMenuOpen(menuOpen === p.value ? null : p.value)}
-                    className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors"
-                  >
-                    <MoreIcon />
-                  </button>
-                </div>
               </div>
-
-              {/* Key Row */}
-              <div className="mt-3 flex items-center justify-between bg-bg rounded-lg px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent-green/10 text-accent-green">Active</span>
-                  <span className="text-[13px] font-mono text-text-secondary">{k.api_key_masked}</span>
-                </div>
-              </div>
-
-              {/* Dropdown Menu */}
-              {menuOpen === p.value && (
-                <div className="mt-2 bg-surface border border-border rounded-lg shadow-lg overflow-hidden">
-                  <button
-                    onClick={() => handleDelete(k.id)}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
-                  >
-                    <TrashIcon /> Remove key
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Add Key Button for connected providers */}
-        {connectedProviders.length > 0 && (
-          <button
-            onClick={() => setConnectModal(connectedProviders[0])}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border text-[13px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 transition-colors"
-          >
-            <PlusIcon /> Add key
-          </button>
+            );
+          })
         )}
       </div>
 
@@ -222,7 +239,7 @@ export default function ProvidersPage() {
                 >
                   {testStatus === "testing" ? "..." : "Test Connection"}
                 </button>
-                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] text-accent-green"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Success</span>}
+                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] text-accent-green"><CheckIcon /> Success</span>}
                 {testStatus === "error" && <span className="text-[12px] text-red-500">{testError}</span>}
               </div>
 
