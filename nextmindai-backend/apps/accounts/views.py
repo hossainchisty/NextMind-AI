@@ -257,24 +257,16 @@ class UserModelsView(APIView):
 
 
 class ProviderModelsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        from .models import Provider
-        provider_value = request.query_params.get("provider", "")
-        if not provider_value:
+        provider = request.query_params.get("provider", "")
+        if not provider:
             return Response(
-                error_response("Provider parameter required"),
+                error_response("provider query parameter is required"),
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        try:
-            provider = Provider.objects.get(value=provider_value, is_active=True)
-        except Provider.DoesNotExist:
-            return Response(
-                error_response("Provider not found"),
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        models = PROVIDER_MODELS.get(provider_value, [])
+        models = PROVIDER_MODELS.get(provider, [])
         return Response(success_response(data=models))
 
 
