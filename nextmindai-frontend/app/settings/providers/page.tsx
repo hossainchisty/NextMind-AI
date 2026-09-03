@@ -55,6 +55,7 @@ export default function ProvidersPage() {
   }, []);
 
   const connectedMap = new Map(keys.map((k) => [k.provider_detail.value, k]));
+  const connectedProviders = providers.filter((p) => connectedMap.has(p.value));
   const unconnectedProviders = providers.filter((p) => !connectedMap.has(p.value));
 
   async function handleConnect(e: React.FormEvent) {
@@ -133,50 +134,69 @@ export default function ProvidersPage() {
             )}
           </div>
         ) : (
-          keys.map((k) => {
-            const p = k.provider_detail;
-            return (
-              <div key={k.id} className="bg-surface border border-border rounded-xl p-4 hover:border-primary/20 transition-all">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <ProviderLogo logo_url={p.logo_url} color={p.color || "#666"} label={p.label} />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
-                          active
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[12px] font-mono text-text-secondary">{k.api_key_masked}</span>
-                        <span className="text-[11px] text-text-secondary/40">•</span>
-                        <span className="text-[11px] text-text-secondary/60">Last used {timeAgo(k.created_at)}</span>
+          <>
+            {/* Your Providers */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Your providers</h2>
+                <span className="text-[13px] text-text-secondary">{keys.length} key{keys.length !== 1 ? "s" : ""}</span>
+              </div>
+              <div className="space-y-3">
+                {connectedProviders.map((p) => {
+                  const k = connectedMap.get(p.value)!;
+                  return (
+                    <div key={p.value} className="bg-surface border border-border rounded-xl p-4 hover:border-primary/20 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[14px] font-semibold text-text-primary">{p.label}</span>
+                              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent-green/10 text-accent-green">
+                                <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
+                                active
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[12px] font-mono text-text-secondary">{k.api_key_masked}</span>
+                              <span className="text-[11px] text-text-secondary/40">•</span>
+                              <span className="text-[11px] text-text-secondary/60">Last used {timeAgo(k.created_at)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <button
+                            onClick={() => setMenuOpen(menuOpen === k.id ? null : k.id)}
+                            className="p-2 rounded-lg text-text-secondary/40 hover:text-text-primary hover:bg-bg transition-colors"
+                          >
+                            <MoreIcon />
+                          </button>
+                          {menuOpen === k.id && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
+                              <button
+                                onClick={() => handleDelete(k.id)}
+                                className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
+                              >
+                                <TrashIcon /> Remove key
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="relative">
-                    <button
-                      onClick={() => setMenuOpen(menuOpen === k.id ? null : k.id)}
-                      className="p-2 rounded-lg text-text-secondary/40 hover:text-text-primary hover:bg-bg transition-colors"
-                    >
-                      <MoreIcon />
-                    </button>
-                    {menuOpen === k.id && (
-                      <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
-                        <button
-                          onClick={() => handleDelete(k.id)}
-                          className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
-                        >
-                          <TrashIcon /> Remove key
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-            );
-          })
+            </div>
+
+            {/* Add Key Button */}
+            <button
+              onClick={() => { setConnectModal(connectedProviders[0] || unconnectedProviders[0]); setTestStatus("idle"); }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border text-[13px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 transition-colors mb-8"
+            >
+              <PlusIcon /> Add key
+            </button>
+          </>
         )}
       </div>
 
