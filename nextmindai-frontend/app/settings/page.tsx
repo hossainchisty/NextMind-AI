@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function SettingsPage() {
   const router = useRouter();
   useEffect(() => {
-    router.replace("/settings/personalization");
+    router.replace("/settings/account");
   }, [router]);
   return null;
 }
