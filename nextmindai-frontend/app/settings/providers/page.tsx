@@ -62,17 +62,21 @@ export default function ProvidersPage() {
     e.preventDefault();
     if (!apiKey.trim() || !connectModal) return;
     setLoading(true);
+    setTestStatus("testing");
+    setTestError("");
     try {
+      await api("auth/api-keys/test", { method: "POST", json: { provider: connectModal.value, api_key: apiKey.trim() } });
+      setTestStatus("ok");
       const res = await api<{ data: APIKey }>("auth/api-keys", {
         method: "POST",
         json: { provider: connectModal.value, api_key: apiKey.trim() },
       });
       setKeys((prev) => [res.data, ...prev]);
       setApiKey("");
-      setConnectModal(null);
-      setTestStatus("idle");
+      setTimeout(() => { setConnectModal(null); setTestStatus("idle"); }, 800);
     } catch (err: any) {
-      alert(err?.detail || err?.message || "Failed to save");
+      setTestStatus("error");
+      setTestError(err?.detail || "Connection failed");
     } finally {
       setLoading(false);
     }
@@ -262,19 +266,11 @@ export default function ProvidersPage() {
                 <p className="text-[11px] text-text-secondary mt-2">Find your key in the {connectModal.label} dashboard.</p>
               </div>
 
-              <div className="flex items-center gap-2 py-1">
-                <button
-                  type="button"
-                  onClick={handleTest}
-                  disabled={!apiKey.trim() || testStatus === "testing"}
-                  className="px-3.5 py-2 rounded-lg border border-border bg-bg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 hover:bg-surface transition-colors disabled:opacity-40 flex items-center gap-1.5"
-                >
-                  {testStatus === "testing" ? <span className="w-3 h-3 border-2 border-text-secondary/30 border-t-text-secondary rounded-full animate-spin" /> : null}
-                  {testStatus === "testing" ? "Testing..." : "Test connection"}
-                </button>
-                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] font-medium text-accent-green"><CheckIcon /> Connected</span>}
-                {testStatus === "error" && <span className="text-[12px] text-red-500">{testError}</span>}
-              </div>
+              {testStatus === "error" && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
+                  <span className="text-[12px] text-red-600">{testError}</span>
+                </div>
+              )}
 
               <div className="flex items-center gap-3 pt-2">
                 <button
@@ -287,9 +283,10 @@ export default function ProvidersPage() {
                 <button
                   type="submit"
                   disabled={loading || !apiKey.trim()}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors shadow-sm"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2"
                 >
-                  {loading ? "Connecting..." : "Connect"}
+                  {testStatus === "testing" && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                  {testStatus === "ok" ? "Connected" : testStatus === "testing" ? "Testing..." : loading ? "Saving..." : "Connect"}
                 </button>
               </div>
             </form>
