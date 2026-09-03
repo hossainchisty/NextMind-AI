@@ -177,6 +177,9 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
                                   <span className={`text-[13px] font-medium ${activeProvider === pm.provider.value && activeModel === m.id ? "text-primary" : "text-text-primary"}`}>
                                     {m.name}
                                   </span>
+                                  {activeProvider === pm.provider.value && activeModel === m.id && (
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-primary/10 text-primary">Active</span>
+                                  )}
                                   {m.pricing_type === "free" && (
                                     <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-600">FREE</span>
                                   )}
