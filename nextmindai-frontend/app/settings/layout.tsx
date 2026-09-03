@@ -14,7 +14,19 @@ const iconMap: Record<string, React.ElementType> = {
   data: Database,
 };
 
-const sections = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+  badge?: string;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const sections: NavSection[] = [
   {
     title: "Account",
     items: [
@@ -27,7 +39,7 @@ const sections = [
   {
     title: "Provider",
     items: [
-      { label: "Connected Providers", href: "/settings/providers", icon: "key" },
+      { label: "Connected Providers", href: "/settings/providers", icon: "key", badge: "Active" },
     ],
   },
   {

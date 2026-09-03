@@ -3,18 +3,13 @@
 import { renderMarkdown } from "@/components/ui/Markdown";
 import type { Msg } from "@/lib/types";
 import { useState, useRef, useEffect } from "react";
+import { BrainNodeIcon, EditIcon, CheckIcon, XIcon } from "@/components/ui/Icons";
 
 interface Props {
   messages: Msg[];
   retrieving: boolean;
   onEdit?: (messageId: string, newContent: string) => void;
 }
-
-function IBrain() { return (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1" /><circle cx="6" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1" /><circle cx="18" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1" /><circle cx="12" cy="20" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".15" /><line x1="12" y1="8.5" x2="7.5" y2="12" stroke="currentColor" strokeWidth="1.5" opacity=".4" /><line x1="12" y1="8.5" x2="16.5" y2="12" stroke="currentColor" strokeWidth="1.5" opacity=".4" /><line x1="6" y1="16.5" x2="10.5" y2="19" stroke="currentColor" strokeWidth="1.5" opacity=".4" /><line x1="18" y1="16.5" x2="13.5" y2="19" stroke="currentColor" strokeWidth="1.5" opacity=".4" /></svg>); }
-
-function EditIcon() { return <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>; }
-function CheckIcon() { return <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>; }
-function XIcon() { return <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>; }
 
 export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -78,10 +73,10 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                 </div>
                 <div className="flex items-center gap-2 mt-2 justify-end">
                   <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
-                    <XIcon /> Cancel
+                    <XIcon className="w-3.5 h-3.5" /> Cancel
                   </button>
                   <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
-                    <CheckIcon /> Save & Send
+                    <CheckIcon className="w-3.5 h-3.5" /> Save & Send
                   </button>
                 </div>
               </div>
@@ -99,7 +94,9 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
             )
           ) : (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-[10px] bg-primary/5 border border-primary/10 flex items-center justify-center shrink-0 mt-0.5"><IBrain /></div>
+              <div className="w-8 h-8 rounded-[10px] bg-primary/5 border border-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                <BrainNodeIcon className="w-5 h-5" />
+              </div>
               <div className="flex-1 min-w-0 pt-0.5">
                 <div className="text-[13px] font-medium text-primary mb-2">NextMind AI</div>
                 <div>{renderMarkdown(m.content)}</div>

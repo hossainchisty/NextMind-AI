@@ -2,37 +2,16 @@
 
 import { useState, useRef, useEffect } from "react";
 import { api } from "@/lib/api";
-
-interface ModelInfo {
-  id: string;
-  name: string;
-  context: string;
-  input_price: string;
-  output_price: string;
-  pricing_type: "free" | "freemium" | "paid";
-  capabilities: string[];
-  description: string;
-}
-
-interface ProviderModel {
-  provider: { value: string; label: string; color: string; logo_url: string | null };
-  models: ModelInfo[];
-}
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { SendIcon, AttachIcon, ChevronIcon, ProviderLogo } from "@/components/ui/Icons";
+import { ProviderLogo as ProviderLogoType } from "@/components/ui/Icons";
+import type { ProviderModel } from "@/lib/types";
 
 interface Props {
   onSend: (text: string, provider?: string, model?: string) => void;
   selectedProvider?: string;
   selectedModel?: string;
   onModelChange?: (provider: string, model: string) => void;
-}
-
-function ISend() { return (<svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>); }
-
-function IAttach() { return (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>); }
-
-function ProviderLogo({ logo_url, color, label }: { logo_url: string | null; color: string; label: string }) {
-  if (logo_url) return <img src={logo_url} className="w-4 h-4 rounded" alt="" />;
-  return <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] font-bold text-white" style={{ backgroundColor: color }}>{label[0]}</span>;
 }
 
 const CAPABILITY_LABELS: Record<string, string> = {
@@ -53,7 +32,6 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
   const [localProvider, setLocalProvider] = useState<string>("");
   const [localModel, setLocalModel] = useState<string>("");
   const [showModelPicker, setShowModelPicker] = useState(false);
-  const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const [pricingFilter, setPricingFilter] = useState<"all" | "free" | "paid">("all");
   const ref = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -73,15 +51,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
     }).catch(() => {});
   }, [selectedProvider]);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setShowModelPicker(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+  useClickOutside(pickerRef, () => setShowModelPicker(false));
 
   function send() {
     const v = value.trim();
@@ -112,7 +82,9 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
         />
         <div className="flex items-center justify-between px-3 pb-3">
           <div className="flex items-center gap-1">
-            <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors"><IAttach/></button>
+            <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
+              <AttachIcon />
+            </button>
           </div>
           <div className="flex items-center gap-1">
             {providers.length > 0 && (
@@ -125,7 +97,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
                     <ProviderLogo logo_url={currentProvider.provider.logo_url} color={currentProvider.provider.color} label={currentProvider.provider.label} />
                   )}
                   <span className="max-w-[120px] truncate">{currentModel?.name || "Select model"}</span>
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  <ChevronIcon direction="down" className="w-3 h-3" />
                 </button>
                 {showModelPicker && (
                   <div className="absolute bottom-full right-0 mb-2 w-[380px] bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-50 max-h-[480px] overflow-y-auto">
@@ -220,7 +192,9 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
               onClick={send}
               disabled={!value.trim()}
               className="p-2.5 rounded-[10px] bg-primary text-white disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
-            ><ISend/></button>
+            >
+              <SendIcon className="w-4 h-4 text-white" />
+            </button>
           </div>
         </div>
       </div>
