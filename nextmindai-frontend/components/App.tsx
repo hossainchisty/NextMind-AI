@@ -20,7 +20,20 @@ export default function App() {
   const [srcs, setSrcs] = useState<Source[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState<{ provider: string; model: string } | null>(null);
+  const [modelByChat, setModelByChat] = useState<Record<string, { provider: string; model: string }>>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return JSON.parse(localStorage.getItem("modelByChat") || "{}");
+      } catch { return {}; }
+    }
+    return {};
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  function persistModelByChat(next: Record<string, { provider: string; model: string }>) {
+    setModelByChat(next);
+    try { localStorage.setItem("modelByChat", JSON.stringify(next)); } catch {}
+  }
 
   const active = chats.find((c) => c.id === activeId);
 
@@ -56,6 +69,9 @@ export default function App() {
   async function open(id: string) {
     setActiveId(id);
     setRetrieving(false);
+    if (modelByChat[id]) {
+      setSelectedModel(modelByChat[id]);
+    }
     try {
       const res = await api<{ data: { messages: Array<{ id: string; role: string; content: string; metadata?: Record<string, unknown>; created_at: string }> } }>(
         `/conversations/${id}/`,
@@ -123,6 +139,15 @@ export default function App() {
     const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setMessages((p) => [...p, { id: "u-" + Date.now(), role: "user", content: text, timestamp: ts }]);
     setRetrieving(true);
+    const usedProvider = provider || selectedModel?.provider;
+    const usedModel = model || selectedModel?.model;
+    if (usedProvider && usedModel) {
+      const cid = activeId;
+      if (cid) {
+        const next = { ...modelByChat, [cid]: { provider: usedProvider, model: usedModel } };
+        persistModelByChat(next);
+      }
+    }
 
     try {
       const res = await api<{
@@ -164,7 +189,18 @@ export default function App() {
 
       if (!activeId && res.data.conversation_id) {
         setActiveId(res.data.conversation_id);
+        if (usedProvider && usedModel) {
+          const next = { ...modelByChat, [res.data.conversation_id]: { provider: usedProvider, model: usedModel } };
+          persistModelByChat(next);
+        }
         loadChats();
+      } else if (activeId && usedProvider && usedModel) {
+        // ensure mapping is saved for existing chat even if activeId was already set
+        const next = { ...modelByChat, [activeId]: { provider: usedProvider, model: usedModel } };
+        // avoid redundant write if already same
+        if (modelByChat[activeId]?.provider !== usedProvider || modelByChat[activeId]?.model !== usedModel) {
+          persistModelByChat(next);
+        }
       }
     } catch {
       setMessages((p) => [
@@ -190,7 +226,7 @@ export default function App() {
     setSrcs([]);
     setShowSrc(false);
 
-    setTimeout(() => ask(newContent), 50);
+    setTimeout(() => ask(newContent, selectedModel?.provider, selectedModel?.model), 50);
   }
 
   return (
@@ -219,7 +255,14 @@ export default function App() {
             onSend={ask}
             selectedProvider={selectedModel?.provider}
             selectedModel={selectedModel?.model}
-            onModelChange={(provider, model) => setSelectedModel({ provider, model })}
+            onModelChange={(provider, model) => {
+              const nextSel = { provider, model };
+              setSelectedModel(nextSel);
+              if (activeId) {
+                const next = { ...modelByChat, [activeId]: nextSel };
+                persistModelByChat(next);
+              }
+            }}
           />
         </div>
         {showSrc && srcs.length > 0 && <SourcesPanel sources={srcs} />}

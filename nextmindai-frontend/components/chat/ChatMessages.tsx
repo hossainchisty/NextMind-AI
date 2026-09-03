@@ -25,9 +25,9 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
     if (editingId && textareaRef.current) {
       const t = textareaRef.current;
       t.style.height = 'auto';
-      t.style.height = t.scrollHeight + 'px';
+      t.style.height = Math.min(t.scrollHeight, 200) + 'px';
     }
-  }, [editingId]);
+  }, [editingId, editText]);
 
   function startEdit(msg: Msg) {
     setEditingId(msg.id);
@@ -53,34 +53,37 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
         <div key={m.id} className={`animate-fade-in group ${m.role === "user" ? "flex justify-end" : ""}`}>
           {m.role === "user" ? (
             editingId === m.id ? (
-              <div className="max-w-[65%] relative group/msg">
-                <textarea
-                  ref={textareaRef}
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  className="w-full px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed resize-none focus:outline-none min-h-[44px] max-h-[200px] overflow-auto"
-                  autoFocus
-                  rows={1}
-                  onInput={(e) => {
-                    const t = e.target as HTMLTextAreaElement;
-                    t.style.height = 'auto';
-                    t.style.height = Math.min(t.scrollHeight, 200) + 'px';
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      saveEdit(m.id);
-                    }
-                    if (e.key === "Escape") cancelEdit();
-                  }}
-                />
-                <button
-                  className="absolute -left-10 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-secondary/50 hover:text-text-primary hover:bg-bg transition-all opacity-0 group-hover/msg:opacity-100"
-                  title="Cancel edit"
-                  onClick={cancelEdit}
-                >
-                  <XIcon />
-                </button>
+              <div className="max-w-[65%]">
+                <div className="px-4 py-3 rounded-[14px] bg-primary text-white">
+                  <textarea
+                    ref={textareaRef}
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    className="w-full bg-transparent text-[14px] leading-relaxed resize-none focus:outline-none min-h-[24px] max-h-[200px] overflow-auto placeholder:text-white/60"
+                    autoFocus
+                    rows={1}
+                    onInput={(e) => {
+                      const t = e.target as HTMLTextAreaElement;
+                      t.style.height = 'auto';
+                      t.style.height = Math.min(t.scrollHeight, 200) + 'px';
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        saveEdit(m.id);
+                      }
+                      if (e.key === "Escape") cancelEdit();
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-2 mt-2 justify-end">
+                  <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
+                    <XIcon /> Cancel
+                  </button>
+                  <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
+                    <CheckIcon /> Save & Send
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="max-w-[65%] relative group/msg">

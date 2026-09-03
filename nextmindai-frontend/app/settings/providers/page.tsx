@@ -119,7 +119,7 @@ export default function ProvidersPage() {
           {unconnectedProviders.length > 0 && (
             <button
               onClick={() => { setConnectModal(unconnectedProviders[0]); setTestStatus("idle"); }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
             >
               <PlusIcon /> Add provider key
             </button>
@@ -205,78 +205,125 @@ export default function ProvidersPage() {
       </div>
 
       {/* Add Another Provider */}
-      {unconnectedProviders.length > 0 && (
+      {keys.length > 0 ? (
         <div>
           <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
           <div className="grid grid-cols-2 gap-2">
-            {unconnectedProviders.map((p) => (
-              <button
-                key={p.value}
-                onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
-              >
-                <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
-                <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
-              </button>
-            ))}
+            {providers.map((p) => {
+              const isConnected = connectedMap.has(p.value);
+              return (
+                <button
+                  key={p.value}
+                  onClick={() => { if (!isConnected) { setConnectModal(p); setTestStatus("idle"); } }}
+                  disabled={isConnected}
+                  className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                    isConnected
+                      ? "bg-bg border-border opacity-60 cursor-not-allowed"
+                      : "bg-surface border-border hover:border-primary/20 hover:bg-primary/5"
+                  }`}
+                >
+                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                  <span className="text-[13px] font-medium flex-1 text-text-primary">{p.label}</span>
+                  {isConnected && <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent-green/10 text-accent-green">Connected</span>}
+                </button>
+              );
+            })}
           </div>
         </div>
+      ) : (
+        unconnectedProviders.length > 0 && (
+          <div>
+            <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Add another provider</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {unconnectedProviders.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => { setConnectModal(p); setTestStatus("idle"); }}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-primary/20 hover:bg-primary/5 transition-all text-left"
+                >
+                  <ProviderLogo logo_url={p.logo_url} color={p.color} label={p.label} />
+                  <span className="text-[13px] text-text-primary font-medium">{p.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )
       )}
 
       {/* Connect Modal */}
       {connectModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-surface border border-border rounded-2xl w-full max-w-[420px] p-6 animate-fade-in">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <ProviderLogo logo_url={connectModal.logo_url} color={connectModal.color} label={connectModal.label} size="lg" />
-                <div>
-                  <h2 className="text-[16px] font-semibold text-text-primary">{connectModal.label}</h2>
-                  <p className="text-[12px] font-mono text-text-secondary">{connectModal.endpoint.replace("https://", "")}</p>
-                </div>
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+          onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
+        >
+          <div
+            className="bg-surface border border-border rounded-2xl w-full max-w-[440px] shadow-xl overflow-hidden animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center gap-4 px-6 pt-6 pb-5">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${connectModal.color}12` }}>
+                <ProviderLogo logo_url={connectModal.logo_url} color={connectModal.color} label={connectModal.label} size="md" />
               </div>
-              <button onClick={() => { setConnectModal(null); setTestStatus("idle"); }} className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-[15px] font-semibold text-text-primary leading-tight">Connect {connectModal.label}</h2>
+                <p className="text-[12px] font-mono text-text-secondary truncate">{connectModal.endpoint.replace("https://", "")}</p>
+              </div>
+              <button
+                onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
+                className="w-8 h-8 rounded-full bg-bg border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/20 transition-colors shrink-0"
+              >
                 <XIcon />
               </button>
             </div>
 
-            <form onSubmit={handleConnect} className="space-y-4">
+            <div className="h-px bg-border" />
+
+            <form onSubmit={handleConnect} className="px-6 py-5 space-y-4">
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-2 uppercase tracking-wider">API Key</label>
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => { setApiKey(e.target.value); setTestStatus("idle"); }}
-                  placeholder={connectModal.placeholder}
-                  required
-                  className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[13px] font-mono text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
-                  autoFocus
-                />
+                <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">API Key</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => { setApiKey(e.target.value); setTestStatus("idle"); }}
+                    placeholder={connectModal.placeholder}
+                    required
+                    className="w-full px-4 py-3 pr-4 rounded-xl bg-bg border border-border text-[13px] font-mono text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                    autoFocus
+                  />
+                </div>
+                <p className="text-[11px] text-text-secondary mt-2">Find your key in the {connectModal.label} dashboard.</p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 py-1">
                 <button
                   type="button"
                   onClick={handleTest}
                   disabled={!apiKey.trim() || testStatus === "testing"}
-                  className="px-4 py-2.5 rounded-xl border border-border text-[12px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 transition-colors disabled:opacity-40"
+                  className="px-3.5 py-2 rounded-lg border border-border bg-bg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:border-primary/30 hover:bg-surface transition-colors disabled:opacity-40 flex items-center gap-1.5"
                 >
-                  {testStatus === "testing" ? "..." : "Test Connection"}
+                  {testStatus === "testing" ? <span className="w-3 h-3 border-2 border-text-secondary/30 border-t-text-secondary rounded-full animate-spin" /> : null}
+                  {testStatus === "testing" ? "Testing..." : "Test connection"}
                 </button>
-                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] text-accent-green"><CheckIcon /> Success</span>}
+                {testStatus === "ok" && <span className="flex items-center gap-1 text-[12px] font-medium text-accent-green"><CheckIcon /> Connected</span>}
                 {testStatus === "error" && <span className="text-[12px] text-red-500">{testError}</span>}
               </div>
 
               <div className="flex items-center gap-3 pt-2">
                 <button
+                  type="button"
+                  onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-bg text-[13px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
                   type="submit"
                   disabled={loading || !apiKey.trim()}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors shadow-sm"
                 >
                   {loading ? "Connecting..." : "Connect"}
-                </button>
-                <button type="button" onClick={() => { setConnectModal(null); setTestStatus("idle"); }} className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors">
-                  Cancel
                 </button>
               </div>
             </form>
