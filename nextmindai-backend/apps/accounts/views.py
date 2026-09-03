@@ -285,7 +285,7 @@ class APIKeyTestView(APIView):
             headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01"}
             url = provider_obj.endpoint.rstrip("/") + "/v1/models"
         elif provider == "gemini":
-            url = f"{provider_obj.endpoint}/v1beta/models?key={api_key}"
+            url = f"{provider_obj.endpoint.rstrip('/')}/models?key={api_key}"
         elif provider == "cohere":
             headers = {"Authorization": f"Bearer {api_key}"}
             url = provider_obj.endpoint.rstrip("/") + "/models"
