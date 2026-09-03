@@ -253,7 +253,7 @@ export default function ProvidersPage() {
       {/* Connect Modal */}
       {connectModal && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+          className="fixed inset-0 flex items-start justify-center z-50 p-4 pt-12 overflow-y-auto animate-fade-in"
           onClick={() => { setConnectModal(null); setTestStatus("idle"); }}
         >
           <div
