@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { useToast } from "@/components/ui/Toast";
 
 interface Provider {
   id: string;
@@ -39,6 +40,7 @@ function KeyIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="n
 function CheckIcon() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>; }
 
 export default function ProvidersPage() {
+  const { toast } = useToast();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [keys, setKeys] = useState<APIKey[]>([]);
   const [connectModal, setConnectModal] = useState<Provider | null>(null);
@@ -73,6 +75,7 @@ export default function ProvidersPage() {
       });
       setKeys((prev) => [res.data, ...prev]);
       setApiKey("");
+      toast(`${connectModal.label} connected`, "success");
       setTimeout(() => { setConnectModal(null); setTestStatus("idle"); }, 800);
     } catch (err: any) {
       setTestStatus("error");
@@ -88,7 +91,10 @@ export default function ProvidersPage() {
       await api(`auth/api-keys/${id}`, { method: "DELETE" });
       setKeys((prev) => prev.filter((k) => k.id !== id));
       setMenuOpen(null);
-    } catch { alert("Failed to delete"); }
+      toast("Provider key removed", "success");
+    } catch {
+      toast("Failed to remove key", "error");
+    }
   }
 
   
