@@ -35,7 +35,7 @@ export default function Sidebar({}: SidebarProps) {
           <BrainNodeIcon className="w-5 h-5" />
         </div>
         <span className="text-[15px] font-semibold tracking-tight text-text-primary">
-          NextMind AI
+          NextMind
         </span>
       </div>
 
