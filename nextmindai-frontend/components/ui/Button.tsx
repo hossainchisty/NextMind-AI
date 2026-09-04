@@ -12,7 +12,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<Variant, string> = {
-  primary: "bg-primary text-white hover:bg-primary-light shadow-sm",
+  primary: "bg-btn text-btn-text hover:bg-btn-hover shadow-sm",
   secondary: "border border-border bg-bg text-text-primary hover:bg-surface hover:border-primary/20",
   ghost: "text-text-secondary hover:text-text-primary hover:bg-bg",
   danger: "bg-red-500 text-white hover:bg-red-600",

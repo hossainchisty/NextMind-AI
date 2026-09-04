@@ -191,7 +191,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
             <button
               onClick={send}
               disabled={!value.trim()}
-              className="p-2.5 rounded-[10px] bg-primary text-white disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
+              className="p-2.5 rounded-[10px] bg-btn text-btn-text disabled:text-text-secondary/40 disabled:cursor-not-allowed transition-colors"
             >
               <Send className="w-4 h-4 text-white" />
             </button>

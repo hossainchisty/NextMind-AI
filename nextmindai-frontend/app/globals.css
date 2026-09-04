@@ -15,6 +15,9 @@
   --color-accent-green: var(--c-accent-green);
   --color-citation-bg: var(--c-citation-bg);
   --color-highlight: var(--c-highlight);
+  --color-btn: var(--c-btn);
+  --color-btn-hover: var(--c-btn-hover);
+  --color-btn-text: var(--c-btn-text);
 }
 
 :root {
@@ -30,6 +33,9 @@
   --c-accent-green: #2A7D5F;
   --c-citation-bg: #E8F5E9;
   --c-highlight: #D4F53C;
+  --c-btn: #0D2B22;
+  --c-btn-hover: #1A4435;
+  --c-btn-text: #FFFFFF;
 }
 
 .dark {
@@ -45,6 +51,9 @@
   --c-accent-green: #D4F53C;
   --c-citation-bg: #1A3A30;
   --c-highlight: #D4F53C;
+  --c-btn: #1A3A30;
+  --c-btn-hover: #245040;
+  --c-btn-text: #D4F53C;
 }
 
 * {

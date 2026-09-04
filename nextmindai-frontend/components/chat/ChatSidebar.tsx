@@ -147,7 +147,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
       )}
 
       <div className={`px-3 mb-2 ${collapsed ? "flex justify-center" : ""}`}>
-        <button onClick={onNew} className={`${collapsed ? "w-10 h-10 p-0 justify-center" : "w-full px-4 py-2.5"} flex items-center gap-2 rounded-[10px] bg-primary text-white text-[13px] font-medium hover:bg-primary-light transition-colors`}>
+        <button onClick={onNew} className={`${collapsed ? "w-10 h-10 p-0 justify-center" : "w-full px-4 py-2.5"} flex items-center gap-2 rounded-[10px] bg-btn text-btn-text text-[13px] font-medium hover:bg-btn-hover transition-colors`}>
           <Plus className="w-4 h-4" /> {!collapsed && "New Chat"}
         </button>
       </div>
