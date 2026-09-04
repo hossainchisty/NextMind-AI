@@ -50,12 +50,12 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
           {m.role === "user" ? (
             editingId === m.id ? (
               <div className="max-w-[65%]">
-                <div className="px-4 py-3 rounded-[14px] bg-primary text-white">
+                <div className="px-4 py-3 rounded-[14px] bg-btn text-btn-text">
                   <textarea
                     ref={textareaRef}
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
-                    className="w-full bg-transparent text-[14px] leading-relaxed resize-none focus:outline-none min-h-[24px] max-h-[200px] overflow-auto placeholder:text-white/60"
+                    className="w-full bg-transparent text-[14px] leading-relaxed resize-none focus:outline-none min-h-[24px] max-h-[200px] overflow-auto placeholder:text-btn-text/60"
                     autoFocus
                     rows={1}
                     onInput={(e) => {
@@ -83,7 +83,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
               </div>
             ) : (
               <div className="max-w-[65%] relative group/msg">
-                <div className="px-4 py-3 rounded-[14px] bg-primary text-white text-[14px] leading-relaxed">{m.content}</div>
+                <div className="px-4 py-3 rounded-[14px] bg-btn text-btn-text text-[14px] leading-relaxed">{m.content}</div>
                 <button
                   onClick={() => startEdit(m)}
                   className="absolute -left-10 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-secondary/50 hover:text-text-primary hover:bg-bg transition-all opacity-0 group-hover/msg:opacity-100"
