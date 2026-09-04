@@ -55,6 +55,8 @@ export default function CollectionsPage() {
   const [saving, setSaving] = useState(false);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [docSearch, setDocSearch] = useState("");
+  const [docSearching, setDocSearching] = useState(false);
+  const [docSearchDone, setDocSearchDone] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [allDocs, setAllDocs] = useState<Document[]>([]);
 
@@ -170,14 +172,21 @@ export default function CollectionsPage() {
     }
   }
 
-  async function searchDocs() {
-    if (!docSearch.trim()) { setAllDocs([]); return; }
+  async function searchDocs(query: string) {
+    if (!query.trim()) { setAllDocs([]); setDocSearchDone(false); return; }
+    setDocSearching(true);
+    setDocSearchDone(false);
     try {
-      const res = await api<{ data: Document[] }>(`/documents/?search=${encodeURIComponent(docSearch)}`, {});
+      const res = await api<{ data: Document[] }>(`/documents/?search=${encodeURIComponent(query)}`, {});
       const assigned = selected?.documents.map(d => d.id) || [];
-      setAllDocs((res.data || []).filter(d => !assigned.includes(d.id)));
+      const filtered = (res.data || []).filter(d => !assigned.includes(d.id));
+      setAllDocs(filtered);
+      setDocSearchDone(true);
     } catch {
-      /* empty */
+      setAllDocs([]);
+      setDocSearchDone(true);
+    } finally {
+      setDocSearching(false);
     }
   }
 
@@ -215,14 +224,14 @@ export default function CollectionsPage() {
 
               <div className="grid grid-cols-2 gap-4 animate-fade-in" style={{ animationDelay: "50ms" }}>
                 {collections.map((col, i) => (
-                  <div
-                    key={col.id}
-                    className="relative p-5 rounded-[12px] bg-surface border border-border hover:border-primary/20 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all duration-200 cursor-pointer group"
-                    style={{ animationDelay: `${i * 50}ms` }}
-                    onClick={() => loadDetail(col.id)}
-                  >
+                <div
+                  key={col.id}
+                  className="relative p-5 rounded-[16px] bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 hover:border-primary/30 hover:bg-white/80 dark:hover:bg-white/10 hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer group"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                  onClick={() => loadDetail(col.id)}
+                >
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getCollectionColor(col.name)}`}>
+                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-sm ${getCollectionColor(col.name)}`}>
                         <Folder className="w-5 h-5" />
                       </div>
                       <div className="flex items-center gap-2">
@@ -270,7 +279,7 @@ export default function CollectionsPage() {
                   </div>
                 ))}
                 {collections.length === 0 && (
-                  <div className="col-span-2 py-16 text-center text-[14px] text-text-secondary">
+                  <div className="col-span-2 py-16 text-center text-[14px] text-text-secondary bg-white/40 dark:bg-white/5 backdrop-blur-xl rounded-[16px] border border-white/30 dark:border-white/10">
                     No collections yet. Create one to organize your documents.
                   </div>
                 )}
@@ -315,11 +324,19 @@ export default function CollectionsPage() {
                   <input
                     type="text"
                     value={docSearch}
-                    onChange={(e) => { setDocSearch(e.target.value); searchDocs(); }}
-                    placeholder="Search documents to add..."
+                    onChange={(e) => { setDocSearch(e.target.value); searchDocs(e.target.value); }}
+                    placeholder="Type to search documents..."
                     className="flex-1 h-9 px-3 rounded-lg bg-surface border border-border text-[13px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/30 transition-all"
                   />
+                  {docSearching && (
+                    <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  )}
                 </div>
+                {docSearch.trim() && docSearchDone && allDocs.length === 0 && (
+                  <div className="text-[12px] text-text-secondary py-3 text-center bg-surface/50 rounded-lg border border-border/50">
+                    No documents found matching &ldquo;{docSearch}&rdquo;
+                  </div>
+                )}
                 {allDocs.length > 0 && (
                   <div className="bg-surface border border-border rounded-[10px] max-h-48 overflow-y-auto">
                     {allDocs.map(doc => (

@@ -2,6 +2,7 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/
 
 function ensureSlash(path: string): string {
   let p = path.startsWith("/") ? path : "/" + path;
+  if (p.includes("?")) return p;
   return p.endsWith("/") ? p : p + "/";
 }
 
