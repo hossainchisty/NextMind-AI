@@ -34,7 +34,15 @@ def generate(messages: List[Dict], temperature: float = 0.3, max_tokens: int = 2
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    return response.choices[0].message.content
+    if not response.choices:
+        raise ValueError(f"No choices returned. Response: {response}")
+    choice = response.choices[0]
+    if choice is None or choice.message is None:
+        raise ValueError(f"Empty choice returned. Response: {response}")
+    content = choice.message.content
+    if content is None:
+        raise ValueError(f"No content in response. Finish reason: {choice.finish_reason}")
+    return content
 
 
 def get_llm_provider(user=None, provider_value=None, model=None):
@@ -78,4 +86,12 @@ class _ProviderStub:
             temperature=temperature,
             max_tokens=max_tokens,
         )
-        return response.choices[0].message.content
+        if not response.choices:
+            raise ValueError(f"No choices returned from {self._model}. Response: {response}")
+        choice = response.choices[0]
+        if choice is None or choice.message is None:
+            raise ValueError(f"Empty choice returned from {self._model}. Response: {response}")
+        content = choice.message.content
+        if content is None:
+            raise ValueError(f"No content in response from {self._model}. Finish reason: {choice.finish_reason}")
+        return content
