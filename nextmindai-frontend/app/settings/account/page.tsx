@@ -140,7 +140,7 @@ export default function AccountPage() {
                 <button
                   onClick={handleSaveName}
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-primary text-white text-[13px] font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-btn text-btn-text text-[13px] font-medium disabled:opacity-50 hover:bg-btn-hover transition-colors"
                 >
                   {saving ? "Saving..." : "Save"}
                 </button>

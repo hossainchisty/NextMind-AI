@@ -15,7 +15,7 @@ export default function BillingPage() {
           <p className="text-[13px] text-text-secondary mb-4">
             You are on the free plan. Add your own API keys to use AI features.
           </p>
-          <button className="px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-colors">
+          <button className="px-5 py-2.5 rounded-lg bg-btn text-btn-text text-[13px] font-medium hover:bg-btn-hover transition-colors">
             Upgrade Plan
           </button>
         </div>

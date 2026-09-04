@@ -108,7 +108,7 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
                           onClick={() => setPricingFilter(f)}
                           className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
                             pricingFilter === f
-                              ? "bg-primary text-white"
+                              ? "bg-btn text-btn-text"
                               : "text-text-secondary hover:bg-bg"
                           }`}
                         >

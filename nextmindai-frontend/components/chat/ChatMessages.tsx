@@ -76,7 +76,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                   <button onClick={cancelEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-bg transition-colors">
                     <X className="w-3.5 h-3.5" /> Cancel
                   </button>
-                  <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-primary text-white hover:bg-primary/90 transition-colors">
+                  <button onClick={() => saveEdit(m.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-btn text-btn-text hover:bg-btn-hover transition-colors">
                     <Check className="w-3.5 h-3.5" /> Save & Send
                   </button>
                 </div>
