@@ -17,6 +17,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
+.dark {
+  --color-primary: #3EEAAE;
+  --color-primary-light: #2DD4A0;
+  --color-primary-dark: #5EF4C4;
+  --color-bg: #0A0F0D;
+  --color-surface: #111916;
+  --color-text-primary: #E8EDE9;
+  --color-text-secondary: #8A9490;
+  --color-border: #1E2A24;
+  --color-soft-accent: #1A2E24;
+  --color-accent-green: #3EEAAE;
+  --color-citation-bg: #1A2E24;
+  --color-highlight: #1A3A2C;
+}
+
 * {
   box-sizing: border-box;
 }

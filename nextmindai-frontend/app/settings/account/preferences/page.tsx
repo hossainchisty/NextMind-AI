@@ -1,6 +1,10 @@
 "use client";
 
+import { useTheme } from "@/lib/theme";
+
 export default function PreferencesPage() {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="animate-fade-in">
       <h1 className="text-[22px] font-semibold text-text-primary mb-1">Preferences</h1>
@@ -15,10 +19,14 @@ export default function PreferencesPage() {
                 <p className="text-[13px] font-medium text-text-primary">Theme</p>
                 <p className="text-[12px] text-text-secondary">Select your preferred theme</p>
               </div>
-              <select className="px-3 py-2 rounded-lg bg-bg border border-border text-[13px] text-text-primary focus:outline-none focus:border-primary/40">
-                <option>System</option>
-                <option>Light</option>
-                <option>Dark</option>
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as "light" | "dark" | "system")}
+                className="px-3 py-2 rounded-lg bg-bg border border-border text-[13px] text-text-primary focus:outline-none focus:border-primary/40"
+              >
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
               </select>
             </div>
           </div>

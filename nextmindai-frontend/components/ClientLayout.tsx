@@ -2,6 +2,7 @@
 
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ToastProvider } from "@/components/ui/Toast";
+import { ThemeProvider } from "@/lib/theme";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -34,10 +35,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AuthGate>{children}</AuthGate>
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <AuthGate>{children}</AuthGate>
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

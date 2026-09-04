@@ -148,8 +148,8 @@ export default function AddProviderModal({ unconnectedProviders, onConnected, in
 
           {/* Error */}
           {testStatus === "error" && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
-              <span className="text-[12px] text-red-600">{testError}</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+              <span className="text-[12px] text-red-600 dark:text-red-400">{testError}</span>
             </div>
           )}
 

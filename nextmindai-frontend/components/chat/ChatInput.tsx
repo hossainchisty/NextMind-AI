@@ -153,10 +153,10 @@ export default function ChatInput({ onSend, selectedProvider, selectedModel, onM
                                     <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-primary/10 text-primary">Active</span>
                                   )}
                                   {m.pricing_type === "free" && (
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-600">FREE</span>
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">FREE</span>
                                   )}
                                   {m.pricing_type === "freemium" && (
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-500/10 text-amber-600">FREE TIER</span>
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400">FREE TIER</span>
                                   )}
                                 </div>
                                 <span className="text-[11px] text-text-secondary font-mono">{m.context}</span>

@@ -100,7 +100,7 @@ export default function ProvidersPage() {
                             <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-10">
                               <button
                                 onClick={() => handleDelete(k.id)}
-                                className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
+                                className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" /> Remove
                               </button>

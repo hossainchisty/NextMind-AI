@@ -25,11 +25,11 @@ import type { Collection, CollectionDetail, Document } from "@/lib/types";
 
 const COLORS = [
   "bg-primary/10 text-primary",
-  "bg-blue-50 text-blue-600",
-  "bg-purple-50 text-purple-600",
-  "bg-amber-50 text-amber-600",
-  "bg-emerald-50 text-emerald-600",
-  "bg-rose-50 text-rose-600",
+  "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400",
+  "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400",
 ];
 
 function getCollectionColor(name: string): string {
@@ -255,7 +255,7 @@ export default function CollectionsPage() {
                               </button>
                               <button
                                 onClick={() => handleDelete(col)}
-                                className="w-full text-left px-3.5 py-2 text-[13px] text-red-500 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                                className="w-full text-left px-3.5 py-2 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2 transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" /> Delete
                               </button>
@@ -389,7 +389,7 @@ export default function CollectionsPage() {
                     <div className="flex justify-end">
                       <button
                         onClick={() => handleRemoveDoc(doc.id)}
-                        className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                        className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
                         title="Remove from collection"
                       >
                         <X className="w-4 h-4" />

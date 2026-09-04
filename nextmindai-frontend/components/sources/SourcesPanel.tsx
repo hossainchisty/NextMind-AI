@@ -26,7 +26,7 @@ export default function SourcesPanel({ sources }: Props) {
             </div>
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-[11px] text-text-secondary">Page {s.page}</span>
-              <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${s.relevance === "High" ? "text-accent-green bg-accent-green/10" : "text-yellow-600 bg-yellow-50"}`}>{s.relevance}</span>
+              <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${s.relevance === "High" ? "text-accent-green bg-accent-green/10" : "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10"}`}>{s.relevance}</span>
             </div>
             <p className="text-[12px] text-text-secondary/80 leading-relaxed line-clamp-2">&ldquo;{s.preview}&rdquo;</p>
           </div>

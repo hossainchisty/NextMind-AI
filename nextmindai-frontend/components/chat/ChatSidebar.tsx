@@ -81,7 +81,7 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
               className="flex-1 min-w-0 px-1.5 py-0.5 rounded bg-bg border border-primary/30 text-text-primary text-[13px] outline-none"
               onClick={(e) => e.stopPropagation()} />
             <button onClick={(e) => { e.stopPropagation(); saveRename(); }} className="p-0.5 rounded hover:bg-primary/10 text-primary shrink-0"><Check className="w-3.5 h-3.5" /></button>
-            <button onClick={(e) => { e.stopPropagation(); setEditing(false); setEditVal(chat.title); setMenuOpen(false); }} className="p-0.5 rounded hover:bg-red-50 text-text-secondary shrink-0"><X className="w-3.5 h-3.5" /></button>
+            <button onClick={(e) => { e.stopPropagation(); setEditing(false); setEditVal(chat.title); setMenuOpen(false); }} className="p-0.5 rounded hover:bg-red-50 dark:hover:bg-red-500/10 text-text-secondary shrink-0"><X className="w-3.5 h-3.5" /></button>
           </div>
         ) : (
           <span className="line-clamp-1 flex-1 min-w-0">{chat.title}</span>
@@ -104,7 +104,7 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
                 setMenuOpen(false);
                 confirm("Delete this chat permanently?", () => onDelete(), { confirmLabel: "Delete", type: "danger" });
               }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-red-500 hover:bg-red-50 transition-colors">
+                className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
                 <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
             </div>
@@ -205,7 +205,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
             </div>
             <button
               onClick={() => confirm("Sign out of your account?", () => { logout(); window.location.href = "/login"; }, { confirmLabel: "Sign out", type: "danger" })}
-              className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+              className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
               title="Sign out"
             >
               <LogOut className="w-4 h-4" />
@@ -216,7 +216,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
           <div className="flex justify-center" title={`${user.name} - Sign out`}>
             <button
               onClick={() => confirm("Sign out?", () => { logout(); window.location.href = "/login"; }, { confirmLabel: "Sign out", type: "danger" })}
-              className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold hover:bg-red-50 hover:text-red-500 transition-colors"
+              className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 transition-colors"
             >
               {initials}
             </button>

@@ -118,7 +118,7 @@ export default function Sidebar({}: SidebarProps) {
             </div>
             <button
               onClick={() => confirm("Sign out of your account?", () => { logout(); router.push("/login"); }, { confirmLabel: "Sign out", type: "danger" })}
-              className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+              className="p-1.5 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
               title="Sign out"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>

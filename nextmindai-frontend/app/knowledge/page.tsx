@@ -222,11 +222,11 @@ export default function KnowledgePage() {
                       Indexed
                     </span>
                   ) : doc.status === "failed" ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 text-red-600 text-[11px] font-medium">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-[11px] font-medium">
                       Failed
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-yellow-50 text-yellow-600 text-[11px] font-medium">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-yellow-50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-[11px] font-medium">
                       <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
                       {doc.status === "processing" ? "Processing" : "Pending"}
                     </span>
@@ -236,7 +236,7 @@ export default function KnowledgePage() {
                 <div className="flex justify-end">
                   <button
                     onClick={(e) => { e.stopPropagation(); confirm("Delete this document permanently?", () => deleteDoc(doc.id), { confirmLabel: "Delete", type: "danger" }); }}
-                    className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                    className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
                     title="Delete document"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
