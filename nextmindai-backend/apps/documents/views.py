@@ -24,6 +24,9 @@ class DocumentListCreateView(generics.ListCreateAPIView):
         collection_id = self.request.query_params.get("collection")
         if collection_id:
             qs = qs.filter(collection_id=collection_id)
+        search = self.request.query_params.get("search")
+        if search:
+            qs = qs.filter(name__icontains=search)
         return qs
 
     def perform_create(self, serializer):
@@ -51,7 +54,7 @@ class DocumentListCreateView(generics.ListCreateAPIView):
         )
 
 
-class DocumentDetailView(generics.RetrieveDestroyAPIView):
+class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
@@ -62,6 +65,13 @@ class DocumentDetailView(generics.RetrieveDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        return Response(success_response(data=serializer.data))
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(success_response(data=serializer.data))
 
     def destroy(self, request, *args, **kwargs):

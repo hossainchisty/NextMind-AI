@@ -7,21 +7,27 @@ export interface Msg { id: string; role: "user" | "assistant"; content: string; 
 export interface Document {
   id: string;
   name: string;
-  type: string;
-  pages: number;
-  chunks: number;
-  indexed: boolean;
-  collection: string;
-  updatedAt: string;
-  size: string;
+  file_type: string;
+  file_size: number;
+  page_count: number;
+  status: string;
+  collection: string | null;
+  file_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Collection {
   id: string;
   name: string;
-  documentCount: number;
-  totalSize: string;
-  updatedAt: string;
+  description: string;
+  document_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CollectionDetail extends Collection {
+  documents: Document[];
 }
 
 // Provider types
