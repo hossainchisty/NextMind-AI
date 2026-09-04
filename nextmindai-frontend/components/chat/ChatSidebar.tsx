@@ -126,7 +126,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
     <aside className={`${collapsed ? "w-[68px]" : "w-[260px]"} h-full flex flex-col bg-surface border-r border-border overflow-hidden shrink-0 transition-all duration-300 ease-in-out`}>
       <div className={`px-4 py-4 flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[10px] bg-primary flex items-center justify-center text-white shrink-0">
+          <div className="w-8 h-8 rounded-[10px] bg-btn text-btn-text flex items-center justify-center shrink-0">
             <BrainNodeIcon className="w-5 h-5" />
           </div>
           {!collapsed && <span className="text-[15px] font-semibold tracking-tight text-text-primary whitespace-nowrap">NextMind AI</span>}

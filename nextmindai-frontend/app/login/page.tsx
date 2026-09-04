@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="flex h-screen bg-bg items-center justify-center">
       <div className="w-full max-w-[380px] px-6">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white mx-auto mb-4">
+          <div className="w-12 h-12 rounded-xl bg-btn text-btn-text flex items-center justify-center mx-auto mb-4">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="6" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/><circle cx="18" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity=".1"/></svg>
           </div>
           <h1 className="text-[22px] font-semibold text-text-primary">Welcome back</h1>

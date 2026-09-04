@@ -31,7 +31,7 @@ export default function Sidebar({}: SidebarProps) {
     <aside className="w-[260px] h-full flex flex-col bg-surface border-r border-border overflow-hidden">
       {/* Logo */}
       <div className="px-5 py-5 flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-[10px] bg-primary flex items-center justify-center text-white">
+        <div className="w-8 h-8 rounded-[10px] bg-btn text-btn-text flex items-center justify-center">
           <BrainNodeIcon className="w-5 h-5" />
         </div>
         <span className="text-[15px] font-semibold tracking-tight text-text-primary">
