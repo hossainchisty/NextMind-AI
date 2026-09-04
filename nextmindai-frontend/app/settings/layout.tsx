@@ -45,7 +45,7 @@ const sections: NavSection[] = [
   {
     title: "Advanced",
     items: [
-      { label: "Data & Export", href: "/settings/advanced", icon: "data" },
+      { label: "Data & Privacy", href: "/settings/advanced", icon: "data" },
     ],
   },
 ];
