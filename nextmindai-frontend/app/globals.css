@@ -18,33 +18,33 @@
 }
 
 :root {
-  --c-primary: #0D2B23;
-  --c-primary-light: #164235;
-  --c-primary-dark: #071A15;
-  --c-bg: #F7F8F5;
+  --c-primary: #0D2B22;
+  --c-primary-light: #1A4435;
+  --c-primary-dark: #091E18;
+  --c-bg: #F2FFEE;
   --c-surface: #FFFFFF;
-  --c-text-primary: #12201B;
-  --c-text-secondary: #66706C;
-  --c-border: #E5E8E4;
-  --c-soft-accent: #DCE8D7;
+  --c-text-primary: #0D2B22;
+  --c-text-secondary: #5A7A6E;
+  --c-border: #E8EDE6;
+  --c-soft-accent: #D4EDDA;
   --c-accent-green: #2A7D5F;
-  --c-citation-bg: #EDF5ED;
-  --c-highlight: #D4EDDA;
+  --c-citation-bg: #E8F5E9;
+  --c-highlight: #D4F53C;
 }
 
 .dark {
-  --c-primary: #3EEAAE;
-  --c-primary-light: #2DD4A0;
-  --c-primary-dark: #5EF4C4;
-  --c-bg: #0A0F0D;
-  --c-surface: #111916;
-  --c-text-primary: #E8EDE9;
-  --c-text-secondary: #8A9490;
-  --c-border: #1E2A24;
-  --c-soft-accent: #1A2E24;
-  --c-accent-green: #3EEAAE;
-  --c-citation-bg: #1A2E24;
-  --c-highlight: #1A3A2C;
+  --c-primary: #D4F53C;
+  --c-primary-light: #E0FF52;
+  --c-primary-dark: #B8E030;
+  --c-bg: #060F0C;
+  --c-surface: #0D1A15;
+  --c-text-primary: #F2FFEE;
+  --c-text-secondary: #9FCEBE;
+  --c-border: #1A3A30;
+  --c-soft-accent: #1A3A30;
+  --c-accent-green: #D4F53C;
+  --c-citation-bg: #1A3A30;
+  --c-highlight: #D4F53C;
 }
 
 * {
