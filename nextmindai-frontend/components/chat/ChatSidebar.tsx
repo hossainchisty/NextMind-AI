@@ -129,7 +129,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
           <div className="w-8 h-8 rounded-[10px] bg-btn text-btn-text flex items-center justify-center shrink-0">
             <BrainNodeIcon className="w-5 h-5" />
           </div>
-          {!collapsed && <span className="text-[15px] font-semibold tracking-tight text-text-primary whitespace-nowrap">NextMind</span>}
+          {!collapsed && <span className="text-[15px] font-semibold tracking-tight whitespace-nowrap"><span className="text-text-primary">Next</span><span className="text-btn-text">Mind</span></span>}
         </div>
         {!collapsed && (
           <button onClick={onToggle} className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg transition-colors" title="Collapse sidebar">

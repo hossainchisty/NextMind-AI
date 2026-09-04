@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NextMind AI — Private AI Knowledge Workspace",
+  title: "NextMind — Private AI Knowledge Workspace",
   description:
     "A privacy-first, offline-first AI workspace for chatting with your personal documents.",
 };
