@@ -99,7 +99,7 @@ export default function ChatMessages({ messages, retrieving, onEdit }: Props) {
                 <BrainNodeIcon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0 pt-0.5">
-                <div className="text-[13px] font-medium mb-2"><span className="text-text-primary">Next</span><span className="text-btn-text">Mind</span></div>
+                <div className="text-[13px] font-medium text-primary mb-2">NextMind</div>
                 <div>{renderMarkdown(m.content)}</div>
               </div>
             </div>
