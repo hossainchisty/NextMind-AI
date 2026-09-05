@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import SitePage from "@/components/landing/SitePage";
 
 const rights = [
@@ -79,7 +79,13 @@ export default function GdprPage() {
           <h1 className="text-[36px] md:text-[44px] font-semibold tracking-tight text-[#0D2B22] mb-3">
             Your rights, honored in the product
           </h1>
-          <p className="text-[13px] text-[#0D2B22]/55">Last updated: September 2026</p>
+          <div className="inline-flex items-center gap-2.5 rounded-2xl bg-[#0D2B22] pl-1.5 pr-5 py-1.5 mt-4">
+            <span className="w-9 h-9 rounded-xl bg-[#D4F53C] text-[#060F0C] flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5" strokeWidth={2} />
+            </span>
+            <span className="text-[14px] font-semibold text-[#F2FFEE]">GDPR Ready</span>
+          </div>
+          <p className="text-[13px] text-[#0D2B22]/55 mt-4">Last updated: September 2026</p>
         </div>
       </section>
 

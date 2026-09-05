@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, KeyRound, UserCheck, Cpu, Trash2 } from "lucide-react";
+import { ArrowRight, KeyRound, UserCheck, Cpu, Trash2, ShieldCheck } from "lucide-react";
 
 const items = [
   {
@@ -61,6 +61,23 @@ export default function Security() {
             </div>
           ))}
         </div>
+        <Link
+          href="/gdpr"
+          className="group mt-4 flex items-center gap-4 rounded-2xl border border-[#D4F53C]/25 bg-[#D4F53C]/[0.06] backdrop-blur-xl px-6 py-5 hover:bg-[#D4F53C]/[0.1] transition-all"
+        >
+          <span className="w-12 h-12 rounded-2xl bg-[#D4F53C] text-[#060F0C] flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(212,245,60,0.25)] ring-1 ring-white/20">
+            <ShieldCheck className="w-6 h-6" strokeWidth={2} />
+          </span>
+          <span className="flex-1">
+            <span className="block text-[15px] font-semibold text-[#F2FFEE]">
+              GDPR Ready
+            </span>
+            <span className="block text-[13px] text-[#9FCEBE]">
+              Data rights, self-serve export &amp; deletion, and a documented compliance program.
+            </span>
+          </span>
+          <ArrowRight className="w-5 h-5 text-[#D4F53C] shrink-0 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </section>
   );
