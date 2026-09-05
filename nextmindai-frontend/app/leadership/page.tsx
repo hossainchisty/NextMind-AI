@@ -4,8 +4,8 @@ import { Mail, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import SitePage from "@/components/landing/SitePage";
 
-// TODO: replace with Hossain's real LinkedIn profile URL.
-const FOUNDER_LINKEDIN_URL = "https://www.linkedin.com/";
+// Founder's LinkedIn profile.
+const FOUNDER_LINKEDIN_URL = "https://www.linkedin.com/in/hossainchisty/";
 
 function LinkedinIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
