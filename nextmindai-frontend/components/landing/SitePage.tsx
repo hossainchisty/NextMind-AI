@@ -6,7 +6,7 @@ import MegaFooter from "@/components/landing/MegaFooter";
 
 export default function SitePage({ children }: { children: ReactNode }) {
   return (
-    <div className="h-screen overflow-y-auto bg-[#F2FFEE] antialiased scroll-smooth">
+    <div className="h-screen overflow-y-auto overscroll-none bg-[#F2FFEE] antialiased scroll-smooth">
       <Navbar />
       <main>{children}</main>
       <MegaFooter />
