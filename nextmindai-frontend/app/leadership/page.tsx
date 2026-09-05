@@ -36,7 +36,7 @@ export default function LeadershipPage() {
             {/* Founder photo */}
             <div className="rounded-3xl overflow-hidden border border-[#0D2B22]/10 min-h-[380px] relative bg-white/50">
               <img
-                src="/leadership/Hossain%20Chisty.jpg"
+                src="/leadership/hossain-chisty.jpg"
                 alt="Hossain Chisty, Founder of NextMind"
                 className="absolute inset-0 w-full h-full object-cover"
               />

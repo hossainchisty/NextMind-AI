@@ -64,7 +64,7 @@ export default function SecurityPage() {
           </p>
           <div className="flex items-center gap-4 mt-6 rounded-2xl border border-[#0D2B22]/10 bg-white/70 backdrop-blur-xl px-5 py-4 max-w-[560px]">
             <img
-              src="/iso-27001-certified.png"
+              src="/badges/iso-27001-certified.png"
               alt="ISO/IEC 27001 Certified badge"
               className="w-14 h-14 rounded-full object-cover ring-1 ring-black/10 shrink-0"
             />
