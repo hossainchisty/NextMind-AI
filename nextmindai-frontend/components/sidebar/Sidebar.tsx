@@ -63,7 +63,7 @@ export default function Sidebar({}: SidebarProps) {
             onClick={() => setKnowledgeExpanded(!knowledgeExpanded)}
             className="flex items-center gap-1.5 w-full px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase hover:text-text-primary transition-colors"
           >
-            Knowledge
+            Knowledge Base
           </button>
           {knowledgeExpanded && (
             <div className="mt-0.5 space-y-0.5">
