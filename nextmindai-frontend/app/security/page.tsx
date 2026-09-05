@@ -62,13 +62,6 @@ export default function SecurityPage() {
             What we do to protect your files, keys, and account — in concrete terms,
             not marketing terms.
           </p>
-          <div className="flex items-center gap-3 mt-6 rounded-2xl border border-[#2A7D5F]/30 bg-[#2A7D5F]/5 px-5 py-4 max-w-[560px]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#2A7D5F] animate-pulse-dot shrink-0" />
-            <p className="text-[13px] text-[#0D2B22]/75">
-              <strong className="font-semibold text-[#0D2B22]">SOC 2 Type II audit in progress</strong>{" "}
-              with an independent licensed auditor. The controls below are live in production today.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -86,33 +79,6 @@ export default function SecurityPage() {
               <p className="text-[13px] leading-relaxed text-[#0D2B22]/65">{body}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="pb-16">
-        <div className="mx-auto max-w-[1120px] px-5">
-          <h2 className="text-[26px] font-semibold tracking-tight text-[#0D2B22] mb-3">
-            Mapped to SOC 2 Trust Services Criteria
-          </h2>
-          <p className="text-[14px] text-[#0D2B22]/65 mb-8 max-w-[600px]">
-            How our implemented controls line up with the Security category criteria
-            under review in our audit.
-          </p>
-          <div className="rounded-2xl border border-[#0D2B22]/10 bg-white/70 backdrop-blur-xl overflow-hidden">
-            {[
-              { id: "CC6.1", name: "Logical access security", body: "Every document, collection, conversation, and key query is filtered to its owner; sessions use 30-minute rotating tokens." },
-              { id: "CC6.2", name: "Credential management", body: "Salted password hashing with strength rules; provider keys encrypted at rest and masked everywhere they surface." },
-              { id: "CC6.3", name: "Encryption", body: "Secrets encrypted at rest (Fernet), traffic encrypted in transit, and files served only through expiring signed URLs." },
-              { id: "CC6.6", name: "System boundaries", body: "Storage buckets are private with no public links; indexing and embeddings run on our own infrastructure." },
-              { id: "CC7.2", name: "Monitoring", body: "Authentication, upload, deletion, and account-lifecycle events are logged for review and incident response." },
-            ].map((row, i, arr) => (
-              <div key={row.id} className={`grid sm:grid-cols-[110px_1fr_2fr] gap-2 sm:gap-4 px-6 py-5 ${i < arr.length - 1 ? "border-b border-[#0D2B22]/10" : ""}`}>
-                <span className="text-[13px] font-bold text-[#2A7D5F] font-mono">{row.id}</span>
-                <span className="text-[14px] font-semibold text-[#0D2B22]">{row.name}</span>
-                <span className="text-[13px] leading-relaxed text-[#0D2B22]/65">{row.body}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
