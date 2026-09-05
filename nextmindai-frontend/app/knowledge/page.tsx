@@ -5,7 +5,6 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import { api, apiUpload, apiReupload } from "@/lib/api";
 import {
   UPLOAD_ACCEPT,
-  UPLOAD_LIMITS_TEXT,
   SUPPORTED_TYPES_LABEL,
   MAX_BATCH_SIZE,
   validateFiles,
@@ -28,7 +27,6 @@ import {
   CircleCheck,
   Loader,
   TriangleAlert,
-  HardDrive,
   Trash2,
 } from "lucide-react";
 import type { Document, Collection } from "@/lib/types";
@@ -687,10 +685,6 @@ export default function KnowledgePage() {
             )}
           </div>
 
-          <p className="text-[11px] text-text-secondary mt-4 flex items-center gap-1.5">
-            <HardDrive className="w-3.5 h-3.5" />
-            {UPLOAD_LIMITS_TEXT}
-          </p>
         </div>
       </main>
 
