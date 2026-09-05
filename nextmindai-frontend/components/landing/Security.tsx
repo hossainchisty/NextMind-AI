@@ -61,9 +61,10 @@ export default function Security() {
             </div>
           ))}
         </div>
+        <div className="grid sm:grid-cols-2 gap-4 mt-4">
         <Link
           href="/gdpr"
-          className="group mt-4 flex items-center gap-4 rounded-2xl border border-[#D4F53C]/25 bg-[#D4F53C]/[0.06] backdrop-blur-xl px-6 py-5 hover:bg-[#D4F53C]/[0.1] transition-all"
+          className="group flex items-center gap-4 rounded-2xl border border-[#D4F53C]/25 bg-[#D4F53C]/[0.06] backdrop-blur-xl px-6 py-5 hover:bg-[#D4F53C]/[0.1] transition-all"
         >
           <span className="w-12 h-12 rounded-2xl bg-[#D4F53C] text-[#060F0C] flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(212,245,60,0.25)] ring-1 ring-white/20">
             <ShieldCheck className="w-6 h-6" strokeWidth={2} />
@@ -78,6 +79,27 @@ export default function Security() {
           </span>
           <ArrowRight className="w-5 h-5 text-[#D4F53C] shrink-0 group-hover:translate-x-1 transition-transform" />
         </Link>
+        <Link
+          href="/security"
+          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl px-6 py-5 hover:bg-white/[0.07] transition-all"
+        >
+          <img
+            src="/iso-27001-certified.png"
+            alt="ISO/IEC 27001 Certified badge"
+            loading="lazy"
+            className="w-12 h-12 rounded-full object-cover ring-1 ring-white/20 shrink-0 bg-white"
+          />
+          <span className="flex-1">
+            <span className="block text-[15px] font-semibold text-[#F2FFEE]">
+              ISO/IEC 27001 Certified
+            </span>
+            <span className="block text-[13px] text-[#9FCEBE]">
+              Information security management, independently certified.
+            </span>
+          </span>
+          <ArrowRight className="w-5 h-5 text-[#D4F53C] shrink-0 group-hover:translate-x-1 transition-transform" />
+        </Link>
+        </div>
       </div>
     </section>
   );
