@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings, override_settings
 
 User = get_user_model()
 
@@ -357,3 +357,121 @@ class DeleteAccountTest(TestCase):
         mock_r2.assert_called_once_with("docs/gone.txt")
         self.assertFalse(User.objects.filter(id=self.user.id).exists())
         self.assertFalse(Document.objects.filter(id=doc.id).exists())
+
+
+class OAuthProvidersViewTest(TestCase):
+    def test_reports_disabled_without_config(self):
+        response = self.client.get("/api/v1/auth/oauth/providers/")
+        self.assertEqual(response.status_code, 200)
+        google = response.json()["data"]["google"]
+        self.assertFalse(google["enabled"])
+        self.assertIsNone(google["auth_url"])
+
+    @override_settings(GOOGLE_CLIENT_ID="test-client", GOOGLE_CLIENT_SECRET="test-secret")
+    def test_reports_begin_url_when_configured(self):
+        response = self.client.get("/api/v1/auth/oauth/providers/")
+        google = response.json()["data"]["google"]
+        self.assertTrue(google["enabled"])
+        self.assertIn("/api/v1/auth/oauth/login/google-oauth2/", google["auth_url"])
+
+    @override_settings(GOOGLE_CLIENT_ID="test-client", GOOGLE_CLIENT_SECRET="test-secret")
+    def test_begin_redirects_to_google(self):
+        response = self.client.get("/api/v1/auth/oauth/login/google-oauth2/")
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response["Location"].startswith("https://accounts.google.com/"))
+
+
+class OAuthPipelineTest(TestCase):
+    def _backend(self, name="google-oauth2"):
+        from unittest.mock import Mock
+        backend = Mock()
+        backend.name = name
+        return backend
+
+    def test_verified_email_passes(self):
+        from apps.accounts.pipeline import require_verified_email
+
+        self.assertIsNone(require_verified_email(
+            None, self._backend(), {"verified_email": True}
+        ))
+
+    def test_unverified_email_rejected(self):
+        from social_core.exceptions import AuthForbidden
+
+        from apps.accounts.pipeline import require_verified_email
+
+        with self.assertRaises(AuthForbidden):
+            require_verified_email(None, self._backend(), {"verified_email": False})
+
+    def test_other_backends_skip_verification(self):
+        from apps.accounts.pipeline import require_verified_email
+
+        self.assertIsNone(require_verified_email(None, self._backend("github"), {}))
+
+    def test_get_or_create_user_creates(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        result = get_or_create_user(
+            None, {"email": "New@Example.com", "fullname": "New User"},
+            self._backend(),
+        )
+        self.assertTrue(result["is_new"])
+        user = result["user"]
+        self.assertEqual(user.email, "new@example.com")
+        self.assertEqual(user.auth_provider, "google-oauth2")
+        self.assertFalse(user.has_usable_password())
+
+    def test_get_or_create_user_links_existing(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        existing = User.objects.create_user(email="old@example.com", password="pass1234")
+        result = get_or_create_user(
+            None, {"email": "old@example.com", "fullname": "Old User"},
+            self._backend(),
+        )
+        self.assertFalse(result["is_new"])
+        self.assertEqual(result["user"].id, existing.id)
+        self.assertEqual(User.objects.filter(email="old@example.com").count(), 1)
+
+    def test_get_or_create_user_returns_logged_in_user(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        existing = User.objects.create_user(email="me@example.com", password="pass1234")
+        result = get_or_create_user(None, {}, self._backend(), user=existing)
+        self.assertFalse(result["is_new"])
+        self.assertEqual(result["user"].id, existing.id)
+
+
+class OAuthCompleteViewTest(TestCase):
+    @override_settings(FRONTEND_URL="http://testserver")
+    def test_complete_issues_jwt_redirect(self):
+        from unittest.mock import patch
+
+        user = User.objects.create_user(email="social@example.com", password="pass1234")
+
+        def fake_complete(backend, login, user=None, **kwargs):
+            pipeline_user = User.objects.get(email="social@example.com")
+            login(backend, pipeline_user, None)
+            return None
+
+        with patch("apps.accounts.oauth.do_complete", side_effect=fake_complete):
+            response = self.client.get("/api/v1/auth/oauth/google-oauth2/callback/")
+        self.assertEqual(response.status_code, 302)
+        location = response["Location"]
+        self.assertTrue(location.startswith("http://testserver/auth/callback?"))
+        self.assertIn("access=", location)
+        self.assertIn("refresh=", location)
+        self.assertTrue(User.objects.filter(email="social@example.com").exists())
+
+    def test_complete_failure_redirects_to_login(self):
+        from unittest.mock import patch
+
+        from social_core.exceptions import AuthFailed
+
+        with patch(
+            "apps.accounts.oauth.do_complete",
+            side_effect=AuthFailed(None, "denied"),
+        ):
+            response = self.client.get("/api/v1/auth/oauth/google-oauth2/callback/")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login?error=oauth_failed", response["Location"])

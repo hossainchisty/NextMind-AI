@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowLeft, Quote, Check } from "lucide-react";
 import { BrainNodeIcon } from "@/components/ui/Icons";
 import Button from "@/components/ui/Button";
+import GoogleButton from "@/components/auth/GoogleButton";
 
 function passwordScore(pw: string): number {
   let score = 0;
@@ -111,7 +112,15 @@ export default function RegisterPage() {
             <ArrowLeft className="w-4 h-4" /> Back to home
           </Link>
           <h1 className="text-[26px] font-semibold tracking-tight text-text-primary">Create account</h1>
-          <p className="text-[14px] text-text-secondary mt-1.5 mb-8">Start your private AI workspace</p>
+          <p className="text-[14px] text-text-secondary mt-1.5 mb-6">Start your private AI workspace</p>
+
+          <GoogleButton onError={(msg) => setError(msg)} />
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-[11px] text-text-secondary">or continue with email</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (

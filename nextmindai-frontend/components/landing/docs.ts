@@ -30,6 +30,26 @@ export const docs: DocArticle[] = [
     ],
   },
   {
+    slug: "sign-in-with-google",
+    title: "Sign in with Google",
+    excerpt: "One-click SSO with your Google account — no password to remember.",
+    category: "Getting started",
+    body: [
+      {
+        paragraphs: [
+          "On the sign-in or signup page, choose Continue with Google. You'll approve access on Google's site, then land straight in your workspace — account created automatically on first use.",
+          "If you already registered with the same email address, Google sign-in links to that account: same workspace, same documents, new way in. Password login keeps working alongside it.",
+        ],
+      },
+      {
+        heading: "For workspace admins",
+        paragraphs: [
+          "Google SSO runs on social-auth and is enabled with two server settings: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET from a Google Cloud OAuth client (web application type). Register this redirect URI in Google Cloud Console: <backend-origin>/api/v1/auth/oauth/google-oauth2/callback/. FRONTEND_URL must match your app's public address. Leave the client ID empty to hide the Google button entirely. Adding more providers later (GitHub, Microsoft) needs only their backend keys — the login, callback, and account-linking flow is shared.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "uploading-files",
     title: "Uploading files & limits",
     excerpt: "Supported types, size caps, batch uploads, and progress tracking.",

@@ -148,6 +148,7 @@ class ExportView(APIView):
                 "id": str(user.id),
                 "email": user.email,
                 "name": user.name,
+                "auth_provider": user.auth_provider,
                 "created_at": user.created_at.isoformat() if user.created_at else None,
             },
             "collections": [

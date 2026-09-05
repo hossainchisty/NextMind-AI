@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowLeft, Quote } from "lucide-react";
 import { BrainNodeIcon } from "@/components/ui/Icons";
 import Button from "@/components/ui/Button";
+import GoogleButton from "@/components/auth/GoogleButton";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -84,7 +85,15 @@ export default function LoginPage() {
             <ArrowLeft className="w-4 h-4" /> Back to home
           </Link>
           <h1 className="text-[26px] font-semibold tracking-tight text-text-primary">Welcome back</h1>
-          <p className="text-[14px] text-text-secondary mt-1.5 mb-8">Sign in to your knowledge workspace</p>
+          <p className="text-[14px] text-text-secondary mt-1.5 mb-6">Sign in to your knowledge workspace</p>
+
+          <GoogleButton onError={(msg) => setError(msg)} />
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-[11px] text-text-secondary">or continue with email</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (

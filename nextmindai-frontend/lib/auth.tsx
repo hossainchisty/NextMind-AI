@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, name: string, password: string, passwordConfirm: string) => Promise<void>;
+  oauthLogin: (access: string, refresh: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -69,6 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.data.user);
   }
 
+  async function oauthLogin(access: string, refresh: string) {
+    setTokens(access, refresh);
+    await fetchUser();
+  }
+
   function logout() {
     const refresh =
       typeof window === "undefined" ? null : localStorage.getItem("refresh_token");
@@ -82,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, oauthLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

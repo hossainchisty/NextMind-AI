@@ -1,11 +1,14 @@
 from django.urls import path
 
-from . import views
+from . import oauth, views
 
 urlpatterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("oauth/providers/", oauth.OAuthProvidersView.as_view(), name="oauth_providers"),
+    path("oauth/login/<str:backend>/", oauth.oauth_begin, name="oauth_begin"),
+    path("oauth/<str:backend>/callback/", oauth.oauth_complete, name="oauth_complete"),
     path("token/refresh/", views.TokenRefreshView.as_view(), name="token_refresh"),
     path("me/", views.MeView.as_view(), name="me"),
     path("me/export/", views.ExportView.as_view(), name="export"),
