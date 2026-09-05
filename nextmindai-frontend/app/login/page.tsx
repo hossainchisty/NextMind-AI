@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/");
+      router.push("/chat");
     } catch (err: unknown) {
       const msg = err && typeof err === "object" && "message" in err ? (err as { message: string }).message : "Login failed";
       setError(msg);

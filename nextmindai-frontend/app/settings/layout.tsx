@@ -59,7 +59,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
       <aside className="w-[240px] bg-surface border-r border-border flex flex-col shrink-0">
         <div className="px-4 py-5 border-b border-border">
           <Link
-            href="/"
+            href="/chat"
             className="flex items-center gap-2 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

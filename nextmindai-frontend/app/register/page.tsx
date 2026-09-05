@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(email, name, password, passwordConfirm);
-      router.push("/");
+      router.push("/chat");
     } catch (err: unknown) {
       const msg = err && typeof err === "object" && "message" in err ? (err as { message: string }).message : "Registration failed";
       setError(msg);
