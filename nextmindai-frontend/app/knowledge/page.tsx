@@ -686,14 +686,14 @@ export default function KnowledgePage() {
                 <div className="flex justify-end gap-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); openReupload(doc.id); }}
-                    className="p-1.5 rounded-lg text-text-secondary/40 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+                    className="p-1.5 rounded-lg text-text-secondary/60 hover:text-primary hover:bg-primary/10 transition-all"
                     title="Re-upload file (use when the source file changes)"
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); confirm("Delete this document permanently?", () => deleteDoc(doc.id), { confirmLabel: "Delete", type: "danger" }); }}
-                    className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                    className="p-1.5 rounded-lg text-text-secondary/60 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
                     title="Delete document"
                   >
                     <Trash2 className="w-4 h-4" />
