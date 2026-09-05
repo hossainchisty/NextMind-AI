@@ -11,6 +11,7 @@ export interface Document {
   file_size: number;
   page_count: number;
   status: string;
+  error_message: string;
   collection: string | null;
   file_url: string | null;
   created_at: string;
