@@ -63,11 +63,11 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Company",
     links: [
-      { label: "About", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Contact", href: "#" },
-      { label: "Privacy policy", href: "#" },
-      { label: "Terms of service", href: "#" },
+      { label: "About", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy policy", href: "/privacy" },
+      { label: "Terms of service", href: "/terms" },
     ],
   },
 ];
@@ -191,9 +191,9 @@ export default function MegaFooter() {
             All systems operational
           </div>
           <div className="flex items-center gap-5 text-[12px]">
-            <a href="#" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Privacy</a>
-            <a href="#" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Terms</a>
-            <a href="#" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Security</a>
+            <Link href="/privacy" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Terms</Link>
+            <Link href="/privacy#security" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Security</Link>
           </div>
         </div>
       </div>

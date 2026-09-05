@@ -11,8 +11,8 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const publicPaths = ["/", "/login", "/register"];
-  const isPublic = publicPaths.includes(pathname);
+  const publicPaths = ["/", "/login", "/register", "/about", "/blog", "/contact", "/privacy", "/terms"];
+  const isPublic = publicPaths.includes(pathname) || pathname.startsWith("/blog/");
 
   useEffect(() => {
     if (!loading && !user && !isPublic) {
