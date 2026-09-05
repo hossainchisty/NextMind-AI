@@ -176,7 +176,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
         <div>
           {!collapsed && (
             <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
-              <ChevronRight className="w-3 h-3" /> Knowledge
+              <ChevronRight className="w-3 h-3" /> Knowledge Base
             </div>
           )}
           <div className="mt-0.5 space-y-0.5">
