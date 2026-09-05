@@ -88,9 +88,17 @@ export async function api<T = unknown>(
 }
 
 export function apiUpload(path: string, file: File | File[], extra?: Record<string, string>): Promise<unknown> {
-  const { access } = getTokens();
-  const form = new FormData();
+  return apiUploadProgress(path, file, extra);
+}
+
+export function apiUploadProgress(
+  path: string,
+  file: File | File[],
+  extra?: Record<string, string>,
+  onProgress?: (pct: number) => void
+): Promise<unknown> {
   const files = Array.isArray(file) ? file : [file];
+  const form = new FormData();
   if (files.length === 1 && !Array.isArray(file)) {
     form.append("file", files[0]);
     form.append("name", files[0].name);
@@ -102,13 +110,47 @@ export function apiUpload(path: string, file: File | File[], extra?: Record<stri
       if (v) form.append(k, v);
     });
   }
-  return fetch(`${API_BASE}${ensureSlash(path)}`, {
-    method: "POST",
-    headers: access ? { Authorization: `Bearer ${access}` } : undefined,
-    body: form,
-  }).then(async (res) => {
-    if (!res.ok) throw await res.json();
-    return res.json();
+
+  const send = (token: string | null) =>
+    new Promise<unknown>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_BASE}${ensureSlash(path)}`);
+      if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch {
+            resolve({});
+          }
+        } else {
+          try {
+            reject({ status: xhr.status, ...JSON.parse(xhr.responseText) });
+          } catch {
+            reject({ status: xhr.status });
+          }
+        }
+      };
+      xhr.onerror = () => reject({ status: 0, message: "Network error" });
+      xhr.send(form);
+    });
+
+  const { access } = getTokens();
+  return send(access).catch(async (err) => {
+    const status = (err as { status?: number })?.status;
+    if (status === 401 && getTokens().refresh) {
+      const newAccess = await refreshAccessToken();
+      if (newAccess) {
+        if (onProgress) onProgress(0);
+        return send(newAccess);
+      }
+    }
+    throw err;
   });
 }
 

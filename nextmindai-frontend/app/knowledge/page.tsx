@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
-import { api, apiUpload, apiReupload } from "@/lib/api";
+import { api, apiUploadProgress, apiReupload } from "@/lib/api";
 import {
   UPLOAD_ACCEPT,
   UPLOAD_LIMITS_TEXT,
@@ -92,6 +92,7 @@ export default function KnowledgePage() {
   const [bulkWorking, setBulkWorking] = useState(false);
 
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [showUpload, setShowUpload] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadName, setUploadName] = useState("");
@@ -246,6 +247,7 @@ export default function KnowledgePage() {
     setUploadFiles([]);
     setUploadIssues([]);
     setServerErrors([]);
+    setUploadProgress(null);
   }
 
   function uploadErrorFor(filename: string): string | undefined {
@@ -265,6 +267,7 @@ export default function KnowledgePage() {
     );
     if (!validFiles.length) return;
     setUploading(true);
+    setUploadProgress(0);
     setServerErrors([]);
     try {
       const extra: Record<string, string> = {};
@@ -272,7 +275,7 @@ export default function KnowledgePage() {
       if (validFiles.length === 1 && uploadName.trim() && uploadName.trim() !== validFiles[0].name) {
         extra.name = uploadName.trim();
       }
-      const res = (await apiUpload("/documents/", validFiles, extra)) as {
+      const res = (await apiUploadProgress("/documents/", validFiles, extra, setUploadProgress)) as {
         data: BatchUploadData;
       };
       const uploadedDocs = res.data?.documents || [];
@@ -280,6 +283,8 @@ export default function KnowledgePage() {
       setServerErrors(errs);
       await loadDocs();
       if (uploadedDocs.length > 0 && errs.length === 0) {
+        setUploading(false);
+        setUploadProgress(null);
         closeUpload();
         toast(
           uploadedDocs.length === 1 ? "Document uploaded" : `${uploadedDocs.length} documents uploaded`,
@@ -298,6 +303,7 @@ export default function KnowledgePage() {
       toast(msg, "error");
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   }
 
@@ -793,7 +799,8 @@ export default function KnowledgePage() {
                         </span>
                         <button
                           onClick={() => removeUploadFile(i)}
-                          className="p-1 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
+                          disabled={uploading}
+                          className="p-1 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0 disabled:opacity-40"
                           title="Remove file"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -836,6 +843,22 @@ export default function KnowledgePage() {
             </select>
           </div>
         </div>
+        {uploading && uploadProgress !== null && (
+          <div className="px-6 pb-1">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] font-medium text-text-secondary">
+                {uploadProgress < 100 ? "Uploading…" : "Processing…"}
+              </span>
+              <span className="text-[11px] font-mono text-text-secondary">{uploadProgress}%</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-bg overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-200"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
         <div className="flex justify-end gap-2 px-6 py-4 border-t border-border">
           <Button variant="secondary" onClick={closeUpload}>Cancel</Button>
           <Button loading={uploading} disabled={!uploadFiles.length} onClick={handleUpload}>
