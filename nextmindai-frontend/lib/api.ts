@@ -36,8 +36,10 @@ async function refreshAccessToken(): Promise<string | null> {
     if (!res.ok) return null;
     const data = await res.json();
     const newAccess = data.data?.access || data.access;
+    const newRefresh = data.data?.refresh || data.refresh;
     if (newAccess) {
       localStorage.setItem("access_token", newAccess);
+      if (newRefresh) localStorage.setItem("refresh_token", newRefresh);
       return newAccess;
     }
     return null;

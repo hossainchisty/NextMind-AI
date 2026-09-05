@@ -16,6 +16,7 @@ User = get_user_model()
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "register"
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -39,6 +40,7 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "login"
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -69,6 +71,7 @@ class LoginView(APIView):
 
 class TokenRefreshView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "refresh"
 
     def post(self, request):
         refresh_token = request.data.get("refresh")
@@ -92,6 +95,19 @@ class TokenRefreshView(APIView):
                 error_response("Invalid refresh token"),
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh", "")
+        if refresh_token:
+            try:
+                RefreshToken(refresh_token).blacklist()
+            except Exception:
+                pass
+        return Response(success_response(message="Logged out"))
 
 
 class MeView(generics.RetrieveUpdateAPIView):

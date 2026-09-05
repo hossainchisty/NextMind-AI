@@ -84,6 +84,8 @@ class RegisterViewTest(TestCase):
 
 class LoginViewTest(TestCase):
     def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass123"
         )
@@ -126,6 +128,76 @@ class MeViewTest(TestCase):
     def test_me_unauthenticated(self):
         response = self.client.get("/api/v1/auth/me/")
         self.assertEqual(response.status_code, 401)
+
+
+class LoginThrottleTest(TestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        User.objects.create_user(email="throttle@example.com", password="pass1234")
+
+    def test_login_throttled_after_budget(self):
+        # Dev budget is 10/minute; other tests in this process make at most
+        # a couple of login attempts, so the first is allowed and the 12th
+        # is always throttled regardless of ordering.
+        statuses = []
+        for _ in range(12):
+            response = self.client.post(
+                "/api/v1/auth/login/",
+                {"email": "throttle@example.com", "password": "wrong"},
+                content_type="application/json",
+            )
+            statuses.append(response.status_code)
+        self.assertEqual(statuses[0], 401)
+        self.assertEqual(statuses[-1], 429)
+
+
+class LogoutBlacklistTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="logout@example.com", password="pass1234")
+        from rest_framework_simplejwt.tokens import RefreshToken
+        self.refresh = str(RefreshToken.for_user(self.user))
+        self.access = str(RefreshToken.for_user(self.user).access_token)
+
+    def test_logout_blacklists_refresh_token(self):
+        response = self.client.post(
+            "/api/v1/auth/logout/",
+            {"refresh": self.refresh},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.access}",
+        )
+        self.assertEqual(response.status_code, 200)
+
+        reuse = self.client.post(
+            "/api/v1/auth/token/refresh/",
+            {"refresh": self.refresh},
+            content_type="application/json",
+        )
+        self.assertEqual(reuse.status_code, 401)
+
+    def test_logout_requires_auth(self):
+        response = self.client.post(
+            "/api/v1/auth/logout/",
+            {"refresh": "anything"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+
+
+class ProductionSettingsTest(TestCase):
+    def test_production_hardening_flags(self):
+        import importlib
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(os.environ, {"ALLOWED_HOSTS": "example.com"}):
+            mod = importlib.reload(importlib.import_module("config.settings.production"))
+        self.assertFalse(mod.DEBUG)
+        self.assertTrue(mod.SECURE_SSL_REDIRECT)
+        self.assertTrue(mod.SESSION_COOKIE_SECURE)
+        self.assertTrue(mod.CSRF_COOKIE_SECURE)
+        self.assertGreater(mod.SECURE_HSTS_SECONDS, 0)
+        self.assertFalse(mod.CORS_ALLOW_ALL_ORIGINS)
 
 
 class VaultTest(TestCase):

@@ -70,6 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
+    const refresh =
+      typeof window === "undefined" ? null : localStorage.getItem("refresh_token");
+    if (refresh) {
+      api("/auth/logout/", { method: "POST", json: { refresh } }).catch(() => {
+        /* token cleared locally regardless */
+      });
+    }
     clearTokens();
     setUser(null);
   }
