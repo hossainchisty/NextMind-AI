@@ -36,7 +36,7 @@ export default function Sidebar({}: SidebarProps) {
         </div>
         <span className="text-[15px] font-semibold tracking-tight">
           <span className="text-text-primary">Next</span>
-          <span className="text-btn-text">Mind</span>
+          <span className="text-accent-green">Mind</span>
         </span>
       </div>
 
