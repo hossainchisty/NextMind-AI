@@ -9,7 +9,7 @@ import MegaFooter from "@/components/landing/MegaFooter";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#060F0C] antialiased">
+    <div className="h-screen overflow-y-auto bg-[#060F0C] antialiased scroll-smooth">
       <Navbar />
       <main>
         <Hero />
