@@ -5,12 +5,20 @@ from apps.documents.parsers.pdf import PDFParser
 from apps.documents.parsers.docx_parser import DocxParser
 from apps.documents.parsers.txt import TXTParser
 from apps.documents.parsers.markdown import MarkdownParser
+from apps.documents.parsers.csv_parser import CSVParser
+from apps.documents.parsers.xlsx_parser import XLSXParser
+from apps.documents.parsers.json_parser import JSONParser
+from apps.documents.parsers.html_parser import HTMLTextParser
 
 PARSER_MAP = {
     "pdf": PDFParser(),
     "docx": DocxParser(),
     "txt": TXTParser(),
     "md": MarkdownParser(),
+    "csv": CSVParser(),
+    "xlsx": XLSXParser(),
+    "json": JSONParser(),
+    "html": HTMLTextParser(),
 }
 
 

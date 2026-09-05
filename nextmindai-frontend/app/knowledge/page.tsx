@@ -2,7 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
-import { api, apiUpload } from "@/lib/api";
+import { api, apiUpload, apiReupload } from "@/lib/api";
+import {
+  UPLOAD_ACCEPT,
+  UPLOAD_LIMITS_TEXT,
+  SUPPORTED_TYPES_LABEL,
+  MAX_BATCH_SIZE,
+  validateFiles,
+  type FileIssue,
+} from "@/lib/uploads";
 import { useToast } from "@/components/ui/Toast";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
@@ -15,10 +23,17 @@ import {
   ChevronRight,
   ChevronDown,
   Folder,
+  RefreshCw,
+  X,
 } from "lucide-react";
 import type { Document, Collection } from "@/lib/types";
 
 type Doc = Document;
+
+interface BatchUploadData {
+  documents: Doc[];
+  errors: FileIssue[];
+}
 
 export default function KnowledgePage() {
   const { toast, confirm } = useToast();
@@ -29,9 +44,11 @@ export default function KnowledgePage() {
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadName, setUploadName] = useState("");
   const [uploadCollection, setUploadCollection] = useState("");
+  const [uploadIssues, setUploadIssues] = useState<FileIssue[]>([]);
+  const [serverErrors, setServerErrors] = useState<FileIssue[]>([]);
 
   const loadDocs = useCallback(async () => {
     try {
@@ -59,34 +76,113 @@ export default function KnowledgePage() {
   function openUpload() {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = ".pdf,.docx,.txt,.md";
+    input.accept = UPLOAD_ACCEPT;
+    input.multiple = true;
     input.onchange = () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      setUploadFile(file);
-      setUploadName(file.name);
+      const files = Array.from(input.files || []).slice(0, MAX_BATCH_SIZE + 1);
+      if (!files.length) return;
+      setUploadFiles(files);
+      setUploadName(files.length === 1 ? files[0].name : "");
       setUploadCollection("");
+      setUploadIssues(validateFiles(files));
+      setServerErrors([]);
       setShowUpload(true);
     };
     input.click();
   }
 
+  function removeUploadFile(index: number) {
+    setUploadFiles((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setUploadIssues(validateFiles(next));
+      if (next.length === 1) setUploadName(next[0].name);
+      return next;
+    });
+  }
+
+  function closeUpload() {
+    setShowUpload(false);
+    setUploadFiles([]);
+    setUploadIssues([]);
+    setServerErrors([]);
+  }
+
+  function uploadErrorFor(filename: string): string | undefined {
+    return (
+      uploadIssues.find((i) => i.filename === filename)?.error ||
+      serverErrors.find((e) => e.filename === filename)?.error
+    );
+  }
+
   async function handleUpload() {
-    if (!uploadFile) return;
+    if (!uploadFiles.length || uploading) return;
+    const issues = validateFiles(uploadFiles);
+    setUploadIssues(issues);
+    if (issues.some((i) => !i.filename)) return; // blocking batch-level issue
+    const validFiles = uploadFiles.filter(
+      (f) => !issues.some((i) => i.filename === f.name)
+    );
+    if (!validFiles.length) return;
     setUploading(true);
+    setServerErrors([]);
     try {
       const extra: Record<string, string> = {};
-      if (uploadName) extra.name = uploadName;
       if (uploadCollection) extra.collection = uploadCollection;
-      await apiUpload("/documents/", uploadFile, extra);
-      setShowUpload(false);
-      setUploadFile(null);
+      if (validFiles.length === 1 && uploadName.trim() && uploadName.trim() !== validFiles[0].name) {
+        extra.name = uploadName.trim();
+      }
+      const res = (await apiUpload("/documents/", validFiles, extra)) as {
+        data: BatchUploadData;
+      };
+      const docs = res.data?.documents || [];
+      const errs = res.data?.errors || [];
+      setServerErrors(errs);
       await loadDocs();
-      toast("Document uploaded", "success");
-    } catch {
-      toast("Failed to upload document", "error");
+      if (docs.length > 0 && errs.length === 0) {
+        closeUpload();
+        toast(
+          docs.length === 1 ? "Document uploaded" : `${docs.length} documents uploaded`,
+          "success"
+        );
+      } else if (docs.length > 0) {
+        toast(`Uploaded ${docs.length} of ${validFiles.length} documents`, "success");
+      } else {
+        toast("Upload failed", "error");
+      }
+    } catch (err) {
+      const msg =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message: string }).message)
+          : "Failed to upload documents";
+      toast(msg, "error");
     } finally {
       setUploading(false);
+    }
+  }
+
+  function openReupload(id: string) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = UPLOAD_ACCEPT;
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) handleReupload(id, file);
+    };
+    input.click();
+  }
+
+  async function handleReupload(id: string, file: File) {
+    const issues = validateFiles([file]).filter((i) => i.filename);
+    if (issues.length) {
+      toast(issues[0].error, "error");
+      return;
+    }
+    try {
+      await apiReupload(`/documents/${id}/`, file);
+      await loadDocs();
+      toast("Document re-uploaded. It will be reprocessed.", "success");
+    } catch {
+      toast("Failed to re-upload document", "error");
     }
   }
 
@@ -182,8 +278,12 @@ export default function KnowledgePage() {
             </Button>
           </div>
 
+          <p className="text-[12px] text-text-secondary mb-6 animate-fade-in" style={{ animationDelay: "75ms" }}>
+            {SUPPORTED_TYPES_LABEL} · up to 100 MB per file · up to {MAX_BATCH_SIZE} files per upload
+          </p>
+
           <div className="bg-surface border border-border rounded-[12px] overflow-hidden animate-fade-in" style={{ animationDelay: "100ms" }}>
-            <div className="grid grid-cols-[1fr_100px_80px_120px_100px_120px_50px] gap-4 px-5 py-3 border-b border-border text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
+            <div className="grid grid-cols-[1fr_100px_80px_120px_100px_120px_84px] gap-4 px-5 py-3 border-b border-border text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
               <span>Document</span>
               <span>Type</span>
               <span>Pages</span>
@@ -195,7 +295,7 @@ export default function KnowledgePage() {
             {filtered.map((doc) => (
               <div
                 key={doc.id}
-                className="grid grid-cols-[1fr_100px_80px_120px_100px_120px_50px] gap-4 px-5 py-3.5 border-b border-border/50 last:border-0 hover:bg-bg/50 transition-colors items-center group"
+                className="grid grid-cols-[1fr_100px_80px_120px_100px_120px_84px] gap-4 px-5 py-3.5 border-b border-border/50 last:border-0 hover:bg-bg/50 transition-colors items-center group"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0 group-hover:border-primary/20 transition-colors">
@@ -233,7 +333,14 @@ export default function KnowledgePage() {
                   )}
                 </div>
                 <span className="text-[12px] text-text-secondary">{formatDate(doc.updated_at || doc.created_at)}</span>
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-1">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openReupload(doc.id); }}
+                    className="p-1.5 rounded-lg text-text-secondary/40 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Re-upload file (use when the source file changes)"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); confirm("Delete this document permanently?", () => deleteDoc(doc.id), { confirmLabel: "Delete", type: "danger" }); }}
                     className="p-1.5 rounded-lg text-text-secondary/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
@@ -253,32 +360,59 @@ export default function KnowledgePage() {
         </div>
       </main>
 
-      <Modal open={showUpload} onClose={() => setShowUpload(false)} title="Upload Document">
+      <Modal open={showUpload} onClose={closeUpload} title={`Upload Documents${uploadFiles.length > 1 ? ` (${uploadFiles.length})` : ""}`}>
         <div className="px-6 py-5 space-y-4">
+          {uploadIssues.some((i) => !i.filename) && (
+            <div className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-[12px]">
+              {uploadIssues.find((i) => !i.filename)?.error}
+            </div>
+          )}
           <div>
             <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">
-              File
+              Files ({uploadFiles.length}/{MAX_BATCH_SIZE})
             </label>
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-bg border border-border">
-              <FileText className="w-4 h-4 text-text-secondary shrink-0" />
-              <span className="text-[13px] text-text-primary truncate flex-1">{uploadFile?.name}</span>
-              <span className="text-[11px] text-text-secondary shrink-0">
-                {uploadFile ? formatSize(uploadFile.size) : ""}
-              </span>
+            <div className="space-y-2 max-h-56 overflow-y-auto">
+              {uploadFiles.map((f, i) => {
+                const err = uploadErrorFor(f.name);
+                return (
+                  <div key={`${f.name}-${i}`} className={`px-4 py-2.5 rounded-xl border ${err ? "bg-red-50/50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20" : "bg-bg border-border"}`}>
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-4 h-4 text-text-secondary shrink-0" />
+                      <span className="text-[13px] text-text-primary truncate flex-1">{f.name}</span>
+                      <span className="text-[11px] text-text-secondary shrink-0">
+                        {formatSize(f.size)}
+                      </span>
+                      <button
+                        onClick={() => removeUploadFile(i)}
+                        className="p-1 rounded-md text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
+                        title="Remove file"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    {err && <p className="text-[11px] text-red-600 dark:text-red-400 mt-1.5">{err}</p>}
+                  </div>
+                );
+              })}
+              {uploadFiles.length === 0 && (
+                <p className="text-[13px] text-text-secondary">No files selected.</p>
+              )}
             </div>
           </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">
-              Display Name
-            </label>
-            <input
-              type="text"
-              value={uploadName}
-              onChange={(e) => setUploadName(e.target.value)}
-              placeholder="Document name"
-              className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[13px] font-mono text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:ring-2 focus:border-primary/40 focus:ring-primary/10 transition-all"
-            />
-          </div>
+          {uploadFiles.length === 1 && (
+            <div>
+              <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">
+                Display Name
+              </label>
+              <input
+                type="text"
+                value={uploadName}
+                onChange={(e) => setUploadName(e.target.value)}
+                placeholder="Document name"
+                className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[13px] font-mono text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:ring-2 focus:border-primary/40 focus:ring-primary/10 transition-all"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">
               Collection
@@ -294,12 +428,15 @@ export default function KnowledgePage() {
               ))}
             </select>
           </div>
+          <p className="text-[11px] text-text-secondary leading-relaxed">
+            {UPLOAD_LIMITS_TEXT}
+          </p>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 border-t border-border">
-          <Button variant="secondary" onClick={() => setShowUpload(false)}>Cancel</Button>
-          <Button loading={uploading} disabled={!uploadFile} onClick={handleUpload}>
+          <Button variant="secondary" onClick={closeUpload}>Cancel</Button>
+          <Button loading={uploading} disabled={!uploadFiles.length} onClick={handleUpload}>
             <Upload className="w-4 h-4" />
-            Upload
+            Upload{uploadFiles.length > 1 ? ` ${uploadFiles.length}` : ""}
           </Button>
         </div>
       </Modal>

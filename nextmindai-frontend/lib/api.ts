@@ -87,11 +87,16 @@ export async function api<T = unknown>(
   return res.json();
 }
 
-export function apiUpload(path: string, file: File, extra?: Record<string, string>): Promise<unknown> {
+export function apiUpload(path: string, file: File | File[], extra?: Record<string, string>): Promise<unknown> {
   const { access } = getTokens();
   const form = new FormData();
-  form.append("file", file);
-  form.append("name", file.name);
+  const files = Array.isArray(file) ? file : [file];
+  if (files.length === 1 && !Array.isArray(file)) {
+    form.append("file", files[0]);
+    form.append("name", files[0].name);
+  } else {
+    files.forEach((f) => form.append("files", f));
+  }
   if (extra) {
     Object.entries(extra).forEach(([k, v]) => {
       if (v) form.append(k, v);
@@ -99,6 +104,20 @@ export function apiUpload(path: string, file: File, extra?: Record<string, strin
   }
   return fetch(`${API_BASE}${ensureSlash(path)}`, {
     method: "POST",
+    headers: access ? { Authorization: `Bearer ${access}` } : undefined,
+    body: form,
+  }).then(async (res) => {
+    if (!res.ok) throw await res.json();
+    return res.json();
+  });
+}
+
+export function apiReupload(path: string, file: File): Promise<unknown> {
+  const { access } = getTokens();
+  const form = new FormData();
+  form.append("file", file);
+  return fetch(`${API_BASE}${ensureSlash(path)}`, {
+    method: "PATCH",
     headers: access ? { Authorization: `Bearer ${access}` } : undefined,
     body: form,
   }).then(async (res) => {
