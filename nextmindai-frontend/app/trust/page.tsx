@@ -60,6 +60,53 @@ export default function TrustPage() {
       <section className="pb-12">
         <div className="mx-auto max-w-[1120px] px-5">
           <h2 className="text-[22px] font-semibold tracking-tight text-[#0D2B22] mb-2">
+            SOC 2 audit readiness
+          </h2>
+          <p className="text-[14px] text-[#0D2B22]/65 mb-6 max-w-[600px]">
+            We are working toward a SOC 2 Type II examination. Below is the live
+            status of each control area — updated as work ships. No certification
+            is claimed until an independent auditor issues its report.
+          </p>
+          <div className="rounded-2xl border border-[#0D2B22]/10 bg-white/70 backdrop-blur-xl overflow-hidden">
+            {[
+              { area: "Logical access (CC6.1)", status: "Implemented", note: "Owner-scoped data access, rotating short-lived sessions, login throttling, server-side logout." },
+              { area: "Credentials (CC6.2)", status: "Implemented", note: "Salted password hashing, encrypted provider keys, masked display. MFA planned." },
+              { area: "Encryption (CC6.3)", status: "Implemented", note: "Encrypted secrets, TLS database, expiring file links, hardened production config." },
+              { area: "Boundaries (CC6.6)", status: "Implemented", note: "Private storage, local indexing pipeline, minimal third-party data flow." },
+              { area: "Monitoring (CC7.2)", status: "Implemented", note: "Security events logged without PII; live public status page." },
+              { area: "Change control (CC8.1)", status: "In progress", note: "Versioned migrations in place; gated CI pipeline being added." },
+              { area: "Risk & vendors (CC3/CC9)", status: "In progress", note: "Subprocessor list published; formal risk assessment and DPAs underway." },
+              { area: "Incident response (CC7.3–7.5)", status: "Planned", note: "Documented runbook and backup-restore verification scheduled next." },
+            ].map((row, i, arr) => (
+              <div
+                key={row.area}
+                className={`grid sm:grid-cols-[220px_130px_1fr] gap-1 sm:gap-4 px-6 py-5 items-start ${i < arr.length - 1 ? "border-b border-[#0D2B22]/10" : ""}`}
+              >
+                <span className="text-[14px] font-semibold text-[#0D2B22]">{row.area}</span>
+                <span
+                  className={`inline-flex w-fit items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+                    row.status === "Implemented"
+                      ? "bg-[#2A7D5F]/10 text-[#2A7D5F]"
+                      : row.status === "In progress"
+                        ? "bg-amber-500/10 text-amber-700"
+                        : "bg-[#0D2B22]/5 text-[#0D2B22]/60"
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    row.status === "Implemented" ? "bg-[#2A7D5F]" : row.status === "In progress" ? "bg-amber-500" : "bg-[#0D2B22]/40"
+                  }`} />
+                  {row.status}
+                </span>
+                <span className="text-[13px] leading-relaxed text-[#0D2B22]/65">{row.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-12">
+        <div className="mx-auto max-w-[1120px] px-5">
+          <h2 className="text-[22px] font-semibold tracking-tight text-[#0D2B22] mb-2">
             Subprocessors
           </h2>
           <p className="text-[14px] text-[#0D2B22]/65 mb-6 max-w-[600px]">
