@@ -36,6 +36,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Features", href: "#features" },
       { label: "How it works", href: "#how" },
       { label: "Providers", href: "#providers" },
+      { label: "Use cases", href: "/#usecases" },
       { label: "Knowledge base", href: "/knowledge" },
       { label: "Collections", href: "/collections" },
     ],
@@ -55,8 +56,9 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     links: [
       { label: "Supported file types", href: "#features" },
       { label: "Hybrid search guide", href: "#how" },
+      { label: "Documentation", href: "/docs" },
+      { label: "API reference", href: "/docs/api-reference" },
       { label: "Security", href: "/security" },
-      { label: "API documentation", href: "#" },
       { label: "Changelog", href: "/changelog" },
       { label: "Community", href: "#" },
     ],
@@ -189,10 +191,10 @@ export default function MegaFooter() {
           <p className="text-[12px] text-[#9FCEBE]/60">
             © 2026 NextMind. All rights reserved.
           </p>
-          <div className="flex items-center gap-2 text-[12px] text-[#9FCEBE]/60">
+          <Link href="/status" className="flex items-center gap-2 text-[12px] text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">
             <span className="w-2 h-2 rounded-full bg-[#D4F53C] animate-pulse-dot" />
             All systems operational
-          </div>
+          </Link>
           <div className="flex items-center gap-5 text-[12px]">
             <Link href="/privacy" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Privacy</Link>
             <Link href="/terms" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Terms</Link>
