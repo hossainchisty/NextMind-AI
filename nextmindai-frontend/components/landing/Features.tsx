@@ -37,28 +37,38 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="relative bg-[#060F0C] py-20 md:py-28 scroll-mt-20">
-      <div className="mx-auto max-w-[1120px] px-5">
-        <p className="text-[12px] font-semibold tracking-[0.2em] text-[#D4F53C] uppercase mb-3">
+    <section id="features" className="relative bg-[#F2FFEE] py-20 md:py-28 scroll-mt-20 overflow-hidden">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(13,43,34,0.08) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 20%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 20%, transparent 75%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-[1120px] px-5">
+        <p className="text-[12px] font-semibold tracking-[0.2em] text-[#2A7D5F] uppercase mb-3">
           Features
         </p>
-        <h2 className="text-[30px] md:text-[40px] font-semibold tracking-tight text-[#F2FFEE] mb-3 max-w-[560px]">
+        <h2 className="text-[30px] md:text-[40px] font-semibold tracking-tight text-[#0D2B22] mb-3 max-w-[560px]">
           Everything you need to talk to your knowledge
         </h2>
-        <p className="text-[15px] text-[#9FCEBE] mb-12 max-w-[520px]">
+        <p className="text-[15px] text-[#0D2B22]/65 mb-12 max-w-[520px]">
           A complete retrieval pipeline and workspace — not another chatbot wrapper.
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="group rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 hover:bg-white/[0.07] hover:border-[#D4F53C]/30 hover:-translate-y-1 transition-all duration-300"
+              className="group rounded-2xl border border-[#0D2B22]/10 bg-white/70 backdrop-blur-xl p-6 shadow-[0_2px_16px_rgba(13,43,34,0.05)] hover:bg-white hover:border-[#2A7D5F]/40 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(13,43,34,0.12)] transition-all duration-300"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#D4F53C]/10 text-[#D4F53C] flex items-center justify-center mb-4 group-hover:bg-[#D4F53C] group-hover:text-[#060F0C] transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-[#0D2B22] text-[#D4F53C] flex items-center justify-center mb-4 group-hover:bg-[#D4F53C] group-hover:text-[#060F0C] transition-colors">
                 <Icon className="w-5 h-5" />
               </div>
-              <h3 className="text-[16px] font-semibold text-[#F2FFEE] mb-2">{title}</h3>
-              <p className="text-[13px] leading-relaxed text-[#9FCEBE]">{body}</p>
+              <h3 className="text-[16px] font-semibold text-[#0D2B22] mb-2">{title}</h3>
+              <p className="text-[13px] leading-relaxed text-[#0D2B22]/65">{body}</p>
             </div>
           ))}
         </div>

@@ -95,27 +95,27 @@ export default function Workflow() {
         </div>
       </section>
 
-      <section id="providers" className="relative bg-[#060F0C] py-16 md:py-20 scroll-mt-20 overflow-hidden">
+      <section id="providers" className="relative bg-[#F2FFEE] py-16 md:py-20 scroll-mt-20 overflow-hidden border-t border-[#0D2B22]/10">
         <div className="mx-auto max-w-[1120px] px-5 text-center mb-10">
-          <p className="text-[12px] font-semibold tracking-[0.2em] text-[#D4F53C] uppercase mb-3">
+          <p className="text-[12px] font-semibold tracking-[0.2em] text-[#2A7D5F] uppercase mb-3">
             Providers
           </p>
-          <h2 className="text-[26px] md:text-[32px] font-semibold tracking-tight text-[#F2FFEE] mb-3">
+          <h2 className="text-[26px] md:text-[32px] font-semibold tracking-tight text-[#0D2B22] mb-3">
             Bring your own keys
           </h2>
-          <p className="text-[14px] text-[#9FCEBE] max-w-[480px] mx-auto">
+          <p className="text-[14px] text-[#0D2B22]/65 max-w-[480px] mx-auto">
             Connect API keys from 23+ providers and switch models per chat — including free tiers.
           </p>
         </div>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060F0C] to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060F0C] to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#F2FFEE] to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#F2FFEE] to-transparent z-10" />
           <div className="flex w-max animate-marquee gap-3 px-3">
             {showLogos
               ? [...providers!, ...providers!].map((p, i) => (
                   <span
                     key={`${p.value}-${i}`}
-                    className="shrink-0 inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md text-[13px] font-medium text-[#F2FFEE]/80"
+                    className="shrink-0 inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full border border-[#0D2B22]/10 bg-white/70 backdrop-blur-md text-[13px] font-medium text-[#0D2B22]/80 shadow-[0_2px_12px_rgba(13,43,34,0.06)]"
                   >
                     {!broken.has(p.value) && p.logo_url ? (
                       <img
@@ -123,10 +123,10 @@ export default function Workflow() {
                         alt={`${p.label} logo`}
                         loading="lazy"
                         onError={() => markBroken(p.value)}
-                        className="w-7 h-7 rounded-full object-cover bg-white shrink-0"
+                        className="w-7 h-7 rounded-full object-cover bg-white ring-1 ring-black/5 shrink-0"
                       />
                     ) : (
-                      <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[11px] font-bold text-[#F2FFEE] shrink-0">
+                      <span className="w-7 h-7 rounded-full bg-[#0D2B22]/5 flex items-center justify-center text-[11px] font-bold text-[#0D2B22] shrink-0">
                         {p.label[0]}
                       </span>
                     )}
@@ -136,7 +136,7 @@ export default function Workflow() {
               : FALLBACK_PROVIDERS.concat(FALLBACK_PROVIDERS).map((p, i) => (
                   <span
                     key={`${p}-${i}`}
-                    className="shrink-0 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md text-[13px] font-medium text-[#F2FFEE]/80"
+                    className="shrink-0 px-5 py-2.5 rounded-full border border-[#0D2B22]/10 bg-white/70 backdrop-blur-md text-[13px] font-medium text-[#0D2B22]/80"
                   >
                     {p}
                   </span>

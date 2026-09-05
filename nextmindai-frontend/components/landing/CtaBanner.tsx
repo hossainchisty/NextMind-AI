@@ -9,7 +9,7 @@ export default function CtaBanner() {
   const href = !loading && user ? "/chat" : "/register";
 
   return (
-    <section className="relative bg-[#060F0C] pb-20 md:pb-28 pt-4">
+    <section className="relative bg-[#F2FFEE] pb-20 md:pb-28 pt-4">
       <div className="mx-auto max-w-[1120px] px-5">
         <div className="relative overflow-hidden rounded-3xl bg-[#D4F53C] px-8 py-14 md:p-16 text-center">
           <div
