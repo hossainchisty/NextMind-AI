@@ -64,6 +64,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     title: "Company",
     links: [
       { label: "About", href: "/about" },
+      { label: "Leadership", href: "/leadership" },
       { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy policy", href: "/privacy" },
