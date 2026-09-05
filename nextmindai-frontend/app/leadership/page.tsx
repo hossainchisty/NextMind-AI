@@ -33,13 +33,13 @@ export default function LeadershipPage() {
       <section className="pb-20">
         <div className="mx-auto max-w-[1120px] px-5">
           <div className="grid md:grid-cols-[320px_1fr] gap-6 items-stretch">
-            {/* Photo placeholder — founder image goes here */}
-            <div className="rounded-3xl border-2 border-dashed border-[#0D2B22]/20 bg-white/50 backdrop-blur-xl min-h-[380px] flex flex-col items-center justify-center gap-3 p-8 text-center">
-              <span className="w-24 h-24 rounded-full bg-[#0D2B22] text-[#D4F53C] flex items-center justify-center text-[32px] font-bold">
-                HC
-              </span>
-              <p className="text-[13px] font-medium text-[#0D2B22]">Founder photo</p>
-              <p className="text-[12px] text-[#0D2B22]/55">Coming soon</p>
+            {/* Founder photo */}
+            <div className="rounded-3xl overflow-hidden border border-[#0D2B22]/10 min-h-[380px] relative bg-white/50">
+              <img
+                src="/leadership/Hossain%20Chisty.jpg"
+                alt="Hossain Chisty, Founder of NextMind"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </div>
 
             {/* Founder card */}
