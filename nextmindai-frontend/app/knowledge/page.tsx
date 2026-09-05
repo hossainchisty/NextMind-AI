@@ -422,7 +422,7 @@ export default function KnowledgePage() {
           </div>
 
           {/* Toolbar */}
-          <div className="flex items-center gap-3 mb-3 animate-fade-in" style={{ animationDelay: "50ms" }}>
+          <div className="relative z-30 flex items-center gap-3 mb-3 animate-fade-in" style={{ animationDelay: "50ms" }}>
             <div className="flex-1 relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary/50" />
               <input
