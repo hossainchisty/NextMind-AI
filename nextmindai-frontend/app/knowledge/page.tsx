@@ -97,6 +97,8 @@ export default function KnowledgePage() {
   const [uploadIssues, setUploadIssues] = useState<FileIssue[]>([]);
   const [serverErrors, setServerErrors] = useState<FileIssue[]>([]);
   const [dragOver, setDragOver] = useState(false);
+  const [pageDragOver, setPageDragOver] = useState(false);
+  const dragDepth = useRef(0);
 
   const collectionMenuRef = useRef<HTMLDivElement>(null);
   useClickOutside(collectionMenuRef, () => setShowFiltersMenu(false));
@@ -210,15 +212,20 @@ export default function KnowledgePage() {
   }
 
   function openUpload() {
+    setUploadFiles([]);
+    setUploadName("");
+    setUploadCollection("");
+    setUploadIssues([]);
+    setServerErrors([]);
+    setShowUpload(true);
+  }
+
+  function browseFiles() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = UPLOAD_ACCEPT;
     input.multiple = true;
-    input.onchange = () => {
-      addFiles(Array.from(input.files || []));
-      setUploadCollection("");
-      setShowUpload(true);
-    };
+    input.onchange = () => addFiles(Array.from(input.files || []));
     input.click();
   }
 
@@ -384,7 +391,37 @@ export default function KnowledgePage() {
   ];
 
   return (
-    <div className="flex h-screen bg-bg overflow-hidden">
+    <div
+      className="flex h-screen bg-bg overflow-hidden"
+      onDragEnter={(e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
+        e.preventDefault();
+        dragDepth.current += 1;
+        setPageDragOver(true);
+      }}
+      onDragOver={(e) => e.preventDefault()}
+      onDragLeave={(e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
+        dragDepth.current = Math.max(0, dragDepth.current - 1);
+        if (dragDepth.current === 0) setPageDragOver(false);
+      }}
+      onDrop={(e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
+        e.preventDefault();
+        dragDepth.current = 0;
+        setPageDragOver(false);
+        if (showUpload) return; // modal dropzone handles it
+        const files = Array.from(e.dataTransfer.files || []);
+        if (!files.length) return;
+        setUploadFiles([]);
+        setUploadName("");
+        setUploadCollection("");
+        setUploadIssues([]);
+        setServerErrors([]);
+        addFiles(files);
+        setShowUpload(true);
+      }}
+    >
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[960px] mx-auto px-8 py-10">
@@ -688,6 +725,18 @@ export default function KnowledgePage() {
         </div>
       </main>
 
+      {pageDragOver && (
+        <div className="fixed inset-0 z-[90] bg-bg/80 backdrop-blur-sm flex items-center justify-center pointer-events-none p-8">
+          <div className="w-full max-w-[560px] px-6 py-16 rounded-2xl border-2 border-dashed border-primary/60 bg-surface text-center shadow-xl">
+            <Upload className="w-8 h-8 mx-auto mb-3 text-primary" />
+            <p className="text-[16px] font-semibold text-text-primary mb-1">Drop files to upload</p>
+            <p className="text-[12px] text-text-secondary">
+              {SUPPORTED_TYPES_LABEL} · up to 100 MB each · up to {MAX_BATCH_SIZE} files
+            </p>
+          </div>
+        </div>
+      )}
+
       <Modal open={showUpload} onClose={closeUpload} title={`Upload Documents${uploadFiles.length > 1 ? ` (${uploadFiles.length})` : ""}`}>
         <div className="px-6 py-5 space-y-4">
           {uploadIssues.some((i) => !i.filename) && (
@@ -696,18 +745,12 @@ export default function KnowledgePage() {
             </div>
           )}
           <div
-            onClick={() => {
-              const input = document.createElement("input");
-              input.type = "file";
-              input.accept = UPLOAD_ACCEPT;
-              input.multiple = true;
-              input.onchange = () => addFiles(Array.from(input.files || []));
-              input.click();
-            }}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onClick={browseFiles}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
             onDrop={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               setDragOver(false);
               addFiles(Array.from(e.dataTransfer.files || []));
             }}
@@ -719,7 +762,7 @@ export default function KnowledgePage() {
           >
             <Upload className="w-5 h-5 mx-auto mb-2 text-text-secondary" />
             <p className="text-[13px] font-medium text-text-primary">
-              Drag &amp; drop files here, or click to browse
+              Drag &amp; drop files here, or <span className="text-primary underline underline-offset-2">browse files</span>
             </p>
             <p className="text-[11px] text-text-secondary mt-1">
               {SUPPORTED_TYPES_LABEL} · up to {MAX_BATCH_SIZE} files
