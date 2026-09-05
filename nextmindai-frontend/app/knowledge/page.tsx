@@ -764,9 +764,6 @@ export default function KnowledgePage() {
             <p className="text-[13px] font-medium text-text-primary">
               Drag &amp; drop files here, or <span className="text-primary underline underline-offset-2">browse files</span>
             </p>
-            <p className="text-[11px] text-text-secondary mt-1">
-              {SUPPORTED_TYPES_LABEL} · up to {MAX_BATCH_SIZE} files
-            </p>
           </div>
           {uploadFiles.length > 0 && (
             <div>
