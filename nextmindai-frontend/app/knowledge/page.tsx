@@ -5,6 +5,7 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import { api, apiUpload, apiReupload } from "@/lib/api";
 import {
   UPLOAD_ACCEPT,
+  UPLOAD_LIMITS_TEXT,
   SUPPORTED_TYPES_LABEL,
   MAX_BATCH_SIZE,
   validateFiles,
@@ -23,6 +24,7 @@ import {
   Folder,
   RefreshCw,
   X,
+  Plus,
   FileStack,
   CircleCheck,
   Loader,
@@ -563,15 +565,18 @@ export default function KnowledgePage() {
               )}
             </div>
             <Button onClick={openUpload} disabled={uploading}>
-              <Upload className="w-4 h-4" />
-              {uploading ? "Uploading..." : "Upload"}
+              {uploading ? (
+                <>Uploading...</>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  New Knowledge Base
+                </>
+              )}
             </Button>
           </div>
 
-          <div className="flex items-center justify-between mb-4 animate-fade-in" style={{ animationDelay: "75ms" }}>
-            <p className="text-[12px] text-text-secondary">
-              {SUPPORTED_TYPES_LABEL} · up to 100 MB per file · up to {MAX_BATCH_SIZE} files per upload
-            </p>
+          <div className="flex items-center justify-end mb-4 animate-fade-in" style={{ animationDelay: "75ms" }}>
             <p className="text-[12px] text-text-secondary shrink-0 ml-4">
               {filtered.length} of {docs.length} · {formatSize(stats.bytes)} used
             </p>
@@ -763,6 +768,9 @@ export default function KnowledgePage() {
             <Upload className="w-5 h-5 mx-auto mb-2 text-text-secondary" />
             <p className="text-[13px] font-medium text-text-primary">
               Drag &amp; drop files here, or <span className="text-primary underline underline-offset-2">browse files</span>
+            </p>
+            <p className="text-[11px] text-text-secondary mt-1.5 leading-relaxed">
+              {UPLOAD_LIMITS_TEXT}
             </p>
           </div>
           {uploadFiles.length > 0 && (
