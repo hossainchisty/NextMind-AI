@@ -51,10 +51,10 @@ export default function Security() {
           {items.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6"
+              className="group rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 hover:bg-white/[0.07] hover:border-[#D4F53C]/30 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#D4F53C]/10 text-[#D4F53C] flex items-center justify-center mb-4">
-                <Icon className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-2xl bg-[#D4F53C] text-[#060F0C] flex items-center justify-center mb-4 shadow-[0_0_24px_rgba(212,245,60,0.25)] ring-1 ring-white/20">
+                <Icon className="w-6 h-6" strokeWidth={2} />
               </div>
               <h3 className="text-[15px] font-semibold text-[#F2FFEE] mb-2">{title}</h3>
               <p className="text-[13px] leading-relaxed text-[#9FCEBE]">{body}</p>
