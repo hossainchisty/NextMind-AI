@@ -59,6 +59,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Documentation", href: "/docs" },
       { label: "API reference", href: "/docs/api-reference" },
       { label: "Security", href: "/security" },
+      { label: "Trust Center", href: "/trust" },
       { label: "Changelog", href: "/changelog" },
       { label: "Community", href: "#" },
     ],
