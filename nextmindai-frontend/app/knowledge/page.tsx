@@ -62,7 +62,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All statuses" },
-  { value: "indexed", label: "Indexed" },
+  { value: "indexed", label: "Success" },
   { value: "active", label: "In progress" },
   { value: "failed", label: "Failed" },
 ];
@@ -393,7 +393,7 @@ export default function KnowledgePage() {
 
   const statCards: { label: string; value: string; icon: typeof FileStack; filter: StatusFilter; active: boolean }[] = [
     { label: "Documents", value: String(stats.total), icon: FileStack, filter: "all", active: statusFilter === "all" },
-    { label: "Indexed", value: String(stats.indexed), icon: CircleCheck, filter: "indexed", active: statusFilter === "indexed" },
+    { label: "Success", value: String(stats.indexed), icon: CircleCheck, filter: "indexed", active: statusFilter === "indexed" },
     { label: "In progress", value: String(stats.active), icon: Loader, filter: "active", active: statusFilter === "active" },
     { label: "Failed", value: String(stats.failed), icon: TriangleAlert, filter: "failed", active: statusFilter === "failed" },
   ];
@@ -675,7 +675,7 @@ export default function KnowledgePage() {
                   {doc.status === "completed" ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent-green/10 text-accent-green text-[11px] font-medium">
                       <Check className="w-3 h-3" />
-                      Indexed
+                      Success
                     </span>
                   ) : doc.status === "failed" ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-[11px] font-medium">
