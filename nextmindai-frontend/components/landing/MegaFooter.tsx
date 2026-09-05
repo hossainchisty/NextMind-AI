@@ -56,7 +56,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Supported file types", href: "#features" },
       { label: "Hybrid search guide", href: "#how" },
       { label: "API documentation", href: "#" },
-      { label: "Changelog", href: "#" },
+      { label: "Changelog", href: "/changelog" },
       { label: "Community", href: "#" },
     ],
   },
