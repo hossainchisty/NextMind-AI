@@ -54,7 +54,7 @@ def get_llm_provider(user=None, provider_value=None, model=None):
             from apps.accounts.models import UserAPIKey
             user_key = UserAPIKey.objects.filter(user=user, provider__value=provider_value, is_active=True).first()
             if user_key:
-                client = openai.OpenAI(api_key=user_key.api_key, base_url=user_key.provider.endpoint)
+                client = openai.OpenAI(api_key=user_key.get_api_key(), base_url=user_key.provider.endpoint)
                 return _ProviderStub(client, model or getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini"))
         except Exception:
             pass
@@ -65,7 +65,7 @@ def get_llm_provider(user=None, provider_value=None, model=None):
             from apps.accounts.models import UserAPIKey
             user_key = UserAPIKey.objects.filter(user=user, is_active=True).first()
             if user_key:
-                client = openai.OpenAI(api_key=user_key.api_key, base_url=user_key.provider.endpoint)
+                client = openai.OpenAI(api_key=user_key.get_api_key(), base_url=user_key.provider.endpoint)
                 return _ProviderStub(client, model or getattr(conf.settings, "LLM_MODEL", "gpt-4o-mini"))
         except Exception:
             pass

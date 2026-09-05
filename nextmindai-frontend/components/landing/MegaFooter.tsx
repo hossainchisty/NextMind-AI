@@ -55,6 +55,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     links: [
       { label: "Supported file types", href: "#features" },
       { label: "Hybrid search guide", href: "#how" },
+      { label: "Security", href: "/security" },
       { label: "API documentation", href: "#" },
       { label: "Changelog", href: "/changelog" },
       { label: "Community", href: "#" },
@@ -195,7 +196,7 @@ export default function MegaFooter() {
           <div className="flex items-center gap-5 text-[12px]">
             <Link href="/privacy" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Privacy</Link>
             <Link href="/terms" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Terms</Link>
-            <Link href="/privacy#security" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Security</Link>
+            <Link href="/security" className="text-[#9FCEBE]/60 hover:text-[#F2FFEE] transition-colors">Security</Link>
           </div>
         </div>
       </div>

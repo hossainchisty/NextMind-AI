@@ -14,7 +14,7 @@ const sections: { id?: string; title: string; paragraphs: string[] }[] = [
     paragraphs: [
       "Account data: your name, email address, and authentication credentials when you register and sign in.",
       "Content you provide: documents you upload, collections you create, conversations you hold, and settings you configure.",
-      "Provider credentials: API keys you connect for third-party AI providers. These are stored so the app can call providers on your behalf.",
+      "Provider credentials: API keys you connect for third-party AI providers. These are encrypted at rest, decrypted only in memory when calling a provider on your behalf, and never shown back to you in full — only masked values appear in the app.",
       "Operational data: basic logs needed for security, debugging, and billing (for example, request timestamps and error traces).",
     ],
   },

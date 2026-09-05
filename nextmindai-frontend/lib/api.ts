@@ -167,3 +167,26 @@ export function apiReupload(path: string, file: File): Promise<unknown> {
     return res.json();
   });
 }
+
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  const { access } = getTokens();
+  let res = await fetch(`${API_BASE}${ensureSlash(path)}`, {
+    headers: access ? { Authorization: `Bearer ${access}` } : undefined,
+  });
+  if (res.status === 401 && getTokens().refresh) {
+    const newAccess = await refreshAccessToken();
+    if (newAccess) {
+      res = await fetch(`${API_BASE}${ensureSlash(path)}`, {
+        headers: { Authorization: `Bearer ${newAccess}` },
+      });
+    }
+  }
+  if (!res.ok) throw await res.json().catch(() => ({ status: res.status }));
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}

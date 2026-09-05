@@ -94,3 +94,8 @@ class UserAPIKey(TimeStampedModel):
 
     def __str__(self):
         return f"{self.user.email} — {self.provider.label}"
+
+    def get_api_key(self) -> str:
+        """Return the decrypted provider key (stored Fernet-encrypted)."""
+        from apps.accounts.services.vault import decrypt_api_key
+        return decrypt_api_key(self.api_key)

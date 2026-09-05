@@ -80,6 +80,7 @@ class UserAPIKeySerializer(serializers.ModelSerializer):
         model = UserAPIKey
         fields = ["id", "provider", "provider_detail", "api_key", "api_key_masked", "is_active", "created_at"]
         read_only_fields = ["id", "created_at"]
+        extra_kwargs = {"api_key": {"write_only": True}}
 
     def validate_provider(self, value):
         try:
@@ -89,13 +90,20 @@ class UserAPIKeySerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        from apps.accounts.services.vault import encrypt_api_key
+
         provider_value = validated_data.pop("provider")
         provider = Provider.objects.get(value=provider_value)
         validated_data["provider"] = provider
         validated_data["id"] = uuid.uuid4()
+        validated_data["api_key"] = encrypt_api_key(validated_data["api_key"])
         return super().create(validated_data)
 
     def get_api_key_masked(self, obj):
-        if len(obj.api_key) > 8:
-            return obj.api_key[:4] + "****" + obj.api_key[-4:]
+        try:
+            plaintext = obj.get_api_key()
+        except ValueError:
+            return "****"
+        if len(plaintext) > 8:
+            return plaintext[:4] + "****" + plaintext[-4:]
         return "****"

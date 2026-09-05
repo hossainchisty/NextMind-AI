@@ -106,6 +106,88 @@ class MeView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         return Response(success_response(data=serializer.data))
 
+    def delete(self, request, *args, **kwargs):
+        from apps.accounts.tasks import delete_account_task
+        delete_account_task.delay(str(request.user.id))
+        return Response(
+            success_response(message="Account deletion started. Your data will be removed shortly."),
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+class ExportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from django.http import JsonResponse
+
+        from apps.conversations.models import Conversation
+        from apps.documents.models import Document
+        from apps.knowledge.models import Collection
+
+        user = request.user
+        payload = {
+            "exported_at": __import__("django.utils.timezone", fromlist=["now"]).now().isoformat(),
+            "profile": {
+                "id": str(user.id),
+                "email": user.email,
+                "name": user.name,
+                "created_at": user.created_at.isoformat() if user.created_at else None,
+            },
+            "collections": [
+                {
+                    "id": str(c.id),
+                    "name": c.name,
+                    "description": c.description,
+                    "created_at": c.created_at.isoformat() if c.created_at else None,
+                }
+                for c in Collection.objects.filter(user=user)
+            ],
+            "documents": [
+                {
+                    "id": str(d.id),
+                    "name": d.name,
+                    "original_filename": d.original_filename,
+                    "file_type": d.file_type,
+                    "file_size": d.file_size,
+                    "status": d.status,
+                    "page_count": d.page_count,
+                    "collection": str(d.collection_id) if d.collection_id else None,
+                    "created_at": d.created_at.isoformat() if d.created_at else None,
+                }
+                for d in Document.objects.filter(user=user)
+            ],
+            "conversations": [
+                {
+                    "id": str(conv.id),
+                    "title": conv.title,
+                    "collection": str(conv.collection_id) if conv.collection_id else None,
+                    "created_at": conv.created_at.isoformat() if conv.created_at else None,
+                    "messages": [
+                        {
+                            "role": m.role,
+                            "content": m.content,
+                            "created_at": m.created_at.isoformat() if m.created_at else None,
+                        }
+                        for m in conv.messages.all().order_by("created_at")
+                    ],
+                }
+                for conv in Conversation.objects.filter(user=user).prefetch_related("messages")
+            ],
+            "providers": [
+                {
+                    "provider": key.provider.value,
+                    "label": key.provider.label,
+                    "is_active": key.is_active,
+                    "connected_at": key.created_at.isoformat() if key.created_at else None,
+                }
+                for key in UserAPIKey.objects.filter(user=user).select_related("provider")
+            ],
+        }
+        response = JsonResponse(payload, json_dumps_params={"indent": 2})
+        response["Content-Disposition"] = 'attachment; filename="nextmind-export.json"'
+        return response
+
 
 class UserAPIKeyListCreateView(generics.ListCreateAPIView):
     serializer_class = UserAPIKeySerializer
