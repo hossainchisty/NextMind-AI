@@ -1,11 +1,17 @@
 "use client";
 
-import { Linkedin, Mail, ArrowRight } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import SitePage from "@/components/landing/SitePage";
 
 // TODO: replace with Hossain's real LinkedIn profile URL.
 const FOUNDER_LINKEDIN_URL = "https://www.linkedin.com/";
+
+function LinkedinIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+  );
+}
 
 export default function LeadershipPage() {
   return (
@@ -63,7 +69,7 @@ export default function LeadershipPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-[#D4F53C] text-[#060F0C] text-[14px] font-semibold hover:bg-[#E0FF52] transition-colors"
                   >
-                    <Linkedin className="w-4 h-4" /> Connect on LinkedIn
+                    <LinkedinIcon className="w-4 h-4" /> Connect on LinkedIn
                   </a>
                   <Link
                     href="/contact"
