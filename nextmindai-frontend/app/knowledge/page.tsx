@@ -614,6 +614,24 @@ export default function KnowledgePage() {
           )}
 
           <div className="bg-surface border border-border rounded-[12px] overflow-hidden animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-border">
+              {activeCollection !== "All" ? (
+                <Folder className="w-4 h-4 text-primary shrink-0" />
+              ) : (
+                <FileStack className="w-4 h-4 text-primary shrink-0" />
+              )}
+              <h2 className="text-[14px] font-semibold text-text-primary truncate">
+                {activeCollection === "All" ? "All documents" : activeCollection}
+              </h2>
+              <span className="text-[12px] text-text-secondary shrink-0">
+                {filtered.length} item{filtered.length === 1 ? "" : "s"}
+              </span>
+              {statusFilter !== "all" && (
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+                  {STATUS_OPTIONS.find((o) => o.value === statusFilter)?.label}
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-[28px_1fr_100px_80px_120px_100px_120px_84px] gap-4 px-5 py-3 border-b border-border text-[11px] font-semibold tracking-wider text-text-secondary uppercase">
               <input
                 type="checkbox"
