@@ -39,6 +39,9 @@ export default function Security() {
             <h2 className="text-[30px] md:text-[40px] font-semibold tracking-tight text-[#F2FFEE] max-w-[520px]">
               Your data, defended by design
             </h2>
+            <p className="text-[14px] text-[#9FCEBE] mt-3 max-w-[520px]">
+              Our SOC 2 Type II audit is currently underway with an independent auditor.
+            </p>
           </div>
           <Link
             href="/security"
