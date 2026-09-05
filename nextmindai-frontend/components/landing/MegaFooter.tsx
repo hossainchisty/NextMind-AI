@@ -67,6 +67,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy policy", href: "/privacy" },
+      { label: "GDPR compliance", href: "/gdpr" },
       { label: "Terms of service", href: "/terms" },
     ],
   },

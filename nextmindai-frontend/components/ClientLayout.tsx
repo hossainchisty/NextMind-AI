@@ -11,7 +11,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const publicPaths = ["/", "/login", "/register", "/about", "/blog", "/contact", "/privacy", "/terms"];
+  const publicPaths = ["/", "/login", "/register", "/about", "/blog", "/contact", "/privacy", "/terms", "/gdpr"];
   const isPublic = publicPaths.includes(pathname) || pathname.startsWith("/blog/");
 
   useEffect(() => {
