@@ -23,10 +23,23 @@ const steps = [
   },
 ];
 
-const providers = [
-  "OpenAI", "Anthropic", "Gemini", "DeepSeek", "Groq", "Mistral",
-  "xAI", "Qwen", "Zhipu", "MiniMax", "Meta", "Cohere",
-  "Perplexity", "Together", "OpenRouter", "Fireworks",
+const providers: { name: string; color: string }[] = [
+  { name: "OpenAI", color: "#10A37F" },
+  { name: "Anthropic", color: "#D97757" },
+  { name: "Gemini", color: "#4796E3" },
+  { name: "DeepSeek", color: "#4D6BFE" },
+  { name: "Groq", color: "#F55036" },
+  { name: "Mistral", color: "#FF7000" },
+  { name: "xAI", color: "#E5E5E5" },
+  { name: "Qwen", color: "#615CED" },
+  { name: "Zhipu", color: "#3E6BE0" },
+  { name: "MiniMax", color: "#E5484D" },
+  { name: "Meta", color: "#0064E0" },
+  { name: "Cohere", color: "#39594D" },
+  { name: "Perplexity", color: "#20B8CD" },
+  { name: "Together", color: "#5B9DFF" },
+  { name: "OpenRouter", color: "#8E8EA0" },
+  { name: "Fireworks", color: "#EE3324" },
 ];
 
 export default function Workflow() {
@@ -78,10 +91,16 @@ export default function Workflow() {
           <div className="flex w-max animate-marquee gap-3 px-3">
             {[...providers, ...providers].map((p, i) => (
               <span
-                key={`${p}-${i}`}
-                className="shrink-0 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md text-[13px] font-medium text-[#F2FFEE]/80"
+                key={`${p.name}-${i}`}
+                className="shrink-0 inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md text-[13px] font-medium text-[#F2FFEE]/80"
               >
-                {p}
+                <span
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+                  style={{ backgroundColor: p.color }}
+                >
+                  {p.name[0]}
+                </span>
+                {p.name}
               </span>
             ))}
           </div>
