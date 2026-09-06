@@ -272,6 +272,21 @@ class DocumentUploadAPITest(TestCase):
         self.assertIn("Maximum batch size", response.json()["message"])
         self.assertEqual(Document.objects.filter(user=self.user).count(), 0)
 
+    def test_list_ordering_by_size(self):
+        from apps.documents.models import Document
+
+        for name, size in [("small.txt", 10), ("big.txt", 90), ("mid.txt", 50)]:
+            Document.objects.create(
+                user=self.user, name=name, original_filename=name,
+                file_type="txt", file_size=size,
+            )
+        response = self.client.get(
+            "/api/v1/documents/?ordering=-file_size", **self._auth()
+        )
+        self.assertEqual(response.status_code, 200)
+        names = [d["name"] for d in response.json()["data"]]
+        self.assertEqual(names, ["big.txt", "mid.txt", "small.txt"])
+
     @patch("apps.documents.tasks.process_document_task.delay")
     @patch("apps.documents.services.storage.upload_to_r2")
     def test_batch_rejects_other_users_collection(self, mock_upload, mock_delay):

@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from rest_framework import generics, permissions, status
+from rest_framework import filters, generics, permissions, status
 from rest_framework.response import Response
 
 from apps.core.constants import MAX_UPLOAD_BATCH_SIZE
@@ -15,6 +15,9 @@ logger = logging.getLogger("apps")
 
 class DocumentListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["file_size", "created_at", "name"]
+    ordering = ["-created_at"]
 
     def get_serializer_class(self):
         if self.request.method == "POST":

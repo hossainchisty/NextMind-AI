@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { HardDrive, FileText, ArrowUpRight } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { HardDrive, FileText, ArrowUpRight, Trash2 } from "lucide-react";
 
 interface BreakdownRow {
   file_type: string;
@@ -17,6 +18,13 @@ interface StorageData {
   percent: number;
   document_count: number;
   breakdown: BreakdownRow[];
+}
+
+interface LargestDoc {
+  id: string;
+  name: string;
+  file_type: string;
+  file_size: number;
 }
 
 const TYPE_STYLES: Record<string, string> = {
@@ -44,13 +52,38 @@ function barColor(percent: number): string {
 }
 
 export default function StoragePage() {
+  const { toast, confirm } = useToast();
   const [data, setData] = useState<StorageData | null>(null);
+  const [largest, setLargest] = useState<LargestDoc[]>([]);
+
+  const loadAll = useCallback(async () => {
+    try {
+      const [storageRes, docsRes] = await Promise.all([
+        api<{ data: StorageData }>("auth/me/storage/"),
+        api<{ data: LargestDoc[] }>("documents/?ordering=-file_size&limit=10"),
+      ]);
+      setData(storageRes.data);
+      setLargest(docsRes.data || []);
+    } catch {
+      /* empty */
+    }
+  }, []);
 
   useEffect(() => {
-    api<{ data: StorageData }>("auth/me/storage/").then((res) => {
-      setData(res.data);
-    }).catch(() => {});
-  }, []);
+    loadAll();
+  }, [loadAll]);
+
+  async function handleDelete(doc: LargestDoc) {
+    confirm(`Delete "${doc.name}" permanently to free ${formatSize(doc.file_size)}?`, async () => {
+      try {
+        await api(`documents/${doc.id}/`, { method: "DELETE" });
+        toast("Document deleted", "success");
+        await loadAll();
+      } catch {
+        toast("Failed to delete document", "error");
+      }
+    }, { confirmLabel: "Delete", type: "danger" });
+  }
 
   return (
     <div className="animate-fade-in">
@@ -143,6 +176,40 @@ export default function StoragePage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-surface border border-border rounded-2xl p-6">
+          <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-1">
+            Largest files
+          </h2>
+          <p className="text-[12px] text-text-secondary mb-4">
+            Free up space by removing files you no longer need.
+          </p>
+          {largest.length === 0 ? (
+            <p className="text-[13px] text-text-secondary py-4 text-center">Nothing to clean up.</p>
+          ) : (
+            <div className="space-y-1">
+              {largest.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-bg transition-colors group"
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${TYPE_STYLES[doc.file_type] || "bg-bg text-text-secondary"}`}>
+                    <span className="text-[8px] font-bold">{doc.file_type.slice(0, 4).toUpperCase()}</span>
+                  </div>
+                  <span className="text-[13px] text-text-primary truncate flex-1">{doc.name}</span>
+                  <span className="text-[12px] text-text-secondary shrink-0">{formatSize(doc.file_size)}</span>
+                  <button
+                    onClick={() => handleDelete(doc)}
+                    className="p-1.5 rounded-lg text-text-secondary/50 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all shrink-0"
+                    title={`Delete ${doc.name}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>
