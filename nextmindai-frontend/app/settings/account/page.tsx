@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { api } from "@/lib/api";
+import { api, setTokens } from "@/lib/api";
+import { Eye, EyeOff } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -9,6 +10,7 @@ interface UserProfile {
   name: string;
   avatar: string;
   avatar_url: string | null;
+  has_usable_password: boolean;
 }
 
 export default function AccountPage() {
@@ -18,6 +20,14 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingPassword, setEditingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -63,6 +73,44 @@ export default function AccountPage() {
     } catch {}
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleChangePassword() {
+    setPwError("");
+    setPwSuccess(false);
+    if (newPassword !== confirmPassword) {
+      setPwError("New passwords do not match");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      const res = await api<{ data: { access: string; refresh: string } }>("auth/password/change/", {
+        method: "POST",
+        json: {
+          current_password: currentPassword,
+          new_password: newPassword,
+          new_password_confirm: confirmPassword,
+        },
+      });
+      setTokens(res.data.access, res.data.refresh);
+      setUser((prev) => (prev ? { ...prev, has_usable_password: true } : null));
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setEditingPassword(false);
+      setPwSuccess(true);
+      setTimeout(() => setPwSuccess(false), 3000);
+    } catch (err: unknown) {
+      const data = err as { message?: string; errors?: Record<string, string[]> };
+      const firstFieldError = data.errors ? Object.values(data.errors).flat()[0] : undefined;
+      setPwError(
+        typeof firstFieldError === "string"
+          ? firstFieldError
+          : data.message || "Failed to change password"
+      );
+    } finally {
+      setPwSaving(false);
+    }
   }
 
   return (
@@ -168,12 +216,86 @@ export default function AccountPage() {
 
         {/* Password */}
         <div className="bg-surface border border-border rounded-2xl p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-1">
             <h2 className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Password</h2>
-            <button className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors">
-              Change Password
-            </button>
+            {!editingPassword && (
+              <button
+                onClick={() => { setEditingPassword(true); setPwError(""); setPwSuccess(false); }}
+                className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                {user?.has_usable_password ? "Change Password" : "Set Password"}
+              </button>
+            )}
           </div>
+          {!user?.has_usable_password && !editingPassword && (
+            <p className="text-[12px] text-text-secondary mt-1">
+              You signed in with Google — set a password to also sign in with email.
+            </p>
+          )}
+          {editingPassword ? (
+            <div className="space-y-3 mt-4 max-w-[400px]">
+              {user?.has_usable_password && (
+                <div>
+                  <label className="block text-[13px] font-medium text-text-primary mb-1.5">Current Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPw ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      autoComplete="current-password"
+                      className="w-full px-4 py-3 pr-11 rounded-xl bg-bg border border-border text-[14px] text-text-primary focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(!showPw)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-text-secondary/60 hover:text-text-primary transition-colors"
+                    >
+                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div>
+                <label className="block text-[13px] font-medium text-text-primary mb-1.5">New Password</label>
+                <input
+                  type={showPw ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Min 8 characters"
+                  className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[14px] text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-medium text-text-primary mb-1.5">Confirm New Password</label>
+                <input
+                  type={showPw ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-[14px] text-text-primary focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                />
+              </div>
+              {pwError && <p className="text-[13px] text-red-500">{pwError}</p>}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleChangePassword}
+                  disabled={pwSaving || !newPassword || !confirmPassword}
+                  className="px-5 py-2.5 rounded-xl bg-btn text-btn-text text-[13px] font-medium disabled:opacity-50 hover:bg-btn-hover transition-colors"
+                >
+                  {pwSaving ? "Saving..." : "Save Password"}
+                </button>
+                <button
+                  onClick={() => { setEditingPassword(false); setPwError(""); setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); }}
+                  className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            pwSuccess && <p className="mt-3 text-[13px] text-accent-green">Password updated! Other sessions were signed out.</p>
+          )}
         </div>
       </div>
     </div>

@@ -28,14 +28,18 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     avatar_url = serializers.SerializerMethodField()
+    has_usable_password = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "email", "name", "avatar", "avatar_url", "created_at", "updated_at"]
-        read_only_fields = ["id", "email", "avatar_url", "created_at", "updated_at"]
+        fields = ["id", "email", "name", "avatar", "avatar_url", "has_usable_password", "created_at", "updated_at"]
+        read_only_fields = ["id", "email", "avatar_url", "has_usable_password", "created_at", "updated_at"]
 
     def get_avatar_url(self, obj):
         return obj.avatar_url()
+
+    def get_has_usable_password(self, obj):
+        return obj.has_usable_password()
 
     def update(self, instance, validated_data):
         avatar_file = self.context["request"].FILES.get("avatar")
@@ -60,6 +64,35 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        from django.contrib.auth import authenticate
+        from django.contrib.auth.password_validation import validate_password
+
+        request = self.context.get("request")
+        user = request.user if request else None
+        if user is None or not user.is_authenticated:
+            raise serializers.ValidationError("Authentication required.")
+
+        if attrs["new_password"] != attrs["new_password_confirm"]:
+            raise serializers.ValidationError(
+                {"new_password_confirm": "New passwords do not match."}
+            )
+        validate_password(attrs["new_password"], user)
+
+        if user.has_usable_password():
+            current = attrs.get("current_password", "")
+            if not current or authenticate(email=user.email, password=current) is None:
+                raise serializers.ValidationError(
+                    {"current_password": "Current password is incorrect."}
+                )
+        return attrs
 
 
 class ProviderSerializer(serializers.ModelSerializer):

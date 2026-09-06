@@ -6,6 +6,7 @@ urlpatterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("password/change/", views.PasswordChangeView.as_view(), name="password_change"),
     path("oauth/providers/", oauth.OAuthProvidersView.as_view(), name="oauth_providers"),
     path("oauth/login/<str:backend>/", oauth.oauth_begin, name="oauth_begin"),
     path("oauth/<str:backend>/callback/", oauth.oauth_complete, name="oauth_complete"),

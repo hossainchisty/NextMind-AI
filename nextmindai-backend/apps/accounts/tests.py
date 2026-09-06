@@ -524,3 +524,98 @@ class OAuthCompleteViewTest(TestCase):
             response = self.client.get("/api/v1/auth/oauth/google-oauth2/callback/")
         self.assertEqual(response.status_code, 302)
         self.assertIn("/login?error=oauth_failed", response["Location"])
+
+
+class PasswordChangeTest(TestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        self.user = User.objects.create_user(
+            email="pw@example.com", password="oldpass123", name="Pw User"
+        )
+        from rest_framework_simplejwt.tokens import RefreshToken
+        self.refresh = str(RefreshToken.for_user(self.user))
+        self.access = str(RefreshToken.for_user(self.user).access_token)
+
+    def _auth(self):
+        return {"HTTP_AUTHORIZATION": f"Bearer {self.access}"}
+
+    def _change(self, payload, auth=True):
+        kwargs = self._auth() if auth else {}
+        return self.client.post(
+            "/api/v1/auth/password/change/",
+            payload,
+            content_type="application/json",
+            **kwargs,
+        )
+
+    def test_change_with_correct_current_password(self):
+        response = self._change({
+            "current_password": "oldpass123",
+            "new_password": "brandnew456",
+            "new_password_confirm": "brandnew456",
+        })
+        self.assertEqual(response.status_code, 200)
+        body = response.json()["data"]
+        self.assertIn("access", body)
+        self.assertIn("refresh", body)
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("brandnew456"))
+
+        # Old sessions are revoked.
+        reuse = self.client.post(
+            "/api/v1/auth/token/refresh/",
+            {"refresh": self.refresh},
+            content_type="application/json",
+        )
+        self.assertEqual(reuse.status_code, 401)
+
+    def test_change_with_wrong_current_password(self):
+        response = self._change({
+            "current_password": "nottherightone",
+            "new_password": "brandnew456",
+            "new_password_confirm": "brandnew456",
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_with_mismatched_confirm(self):
+        response = self._change({
+            "current_password": "oldpass123",
+            "new_password": "brandnew456",
+            "new_password_confirm": "different789",
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_with_weak_password(self):
+        response = self._change({
+            "current_password": "oldpass123",
+            "new_password": "password",
+            "new_password_confirm": "password",
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_oauth_user_sets_password_without_current(self):
+        oauth_user = User.objects.create_user(email="oauth@example.com", password="pass1234")
+        oauth_user.set_unusable_password()
+        oauth_user.save()
+        from rest_framework_simplejwt.tokens import RefreshToken
+        token = str(RefreshToken.for_user(oauth_user).access_token)
+
+        response = self.client.post(
+            "/api/v1/auth/password/change/",
+            {"new_password": "brandnew456", "new_password_confirm": "brandnew456"},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        self.assertEqual(response.status_code, 200)
+        oauth_user.refresh_from_db()
+        self.assertTrue(oauth_user.check_password("brandnew456"))
+
+    def test_change_requires_auth(self):
+        response = self._change({
+            "current_password": "oldpass123",
+            "new_password": "brandnew456",
+            "new_password_confirm": "brandnew456",
+        }, auth=False)
+        self.assertEqual(response.status_code, 401)

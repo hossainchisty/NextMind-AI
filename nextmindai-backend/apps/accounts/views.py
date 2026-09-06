@@ -1,3 +1,5 @@
+import logging
+
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import generics, permissions, status
@@ -9,6 +11,8 @@ from apps.core.utils import error_response, success_response
 
 from .models import Provider, UserAPIKey
 from .serializers import LoginSerializer, ProviderSerializer, RegisterSerializer, UserAPIKeySerializer, UserSerializer
+
+logger = logging.getLogger("apps")
 
 User = get_user_model()
 
@@ -108,6 +112,43 @@ class LogoutView(APIView):
             except Exception:
                 pass
         return Response(success_response(message="Logged out"))
+
+
+class PasswordChangeView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from .serializers import PasswordChangeSerializer
+
+        serializer = PasswordChangeSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        user.set_password(serializer.validated_data["new_password"])
+        user.save(update_fields=["password"])
+
+        try:
+            from rest_framework_simplejwt.token_blacklist.models import (
+                BlacklistedToken,
+                OutstandingToken,
+            )
+            for outstanding in OutstandingToken.objects.filter(user=user):
+                BlacklistedToken.objects.get_or_create(token=outstanding)
+        except Exception as e:
+            logger.error("Failed to revoke sessions for %s: %s", user.id, e)
+
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            success_response(
+                data={
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                },
+                message="Password changed",
+            )
+        )
 
 
 class MeView(generics.RetrieveUpdateAPIView):
