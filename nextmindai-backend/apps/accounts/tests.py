@@ -360,6 +360,7 @@ class DeleteAccountTest(TestCase):
 
 
 class OAuthProvidersViewTest(TestCase):
+    @override_settings(GOOGLE_CLIENT_ID="", GOOGLE_CLIENT_SECRET="")
     def test_reports_disabled_without_config(self):
         response = self.client.get("/api/v1/auth/oauth/providers/")
         self.assertEqual(response.status_code, 200)
