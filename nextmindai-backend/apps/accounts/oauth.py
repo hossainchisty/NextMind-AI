@@ -67,18 +67,17 @@ def oauth_complete(request, backend):
     except AuthException as e:
         logger.warning("OAuth complete failed for %s: %s", backend, e)
         return _oauth_failed()
-    if isinstance(result, HttpResponseBase):
-        return result
 
     user = captured.get("user")
-    if user is None or not user.is_active:
-        return _oauth_failed()
-
-    refresh = RefreshToken.for_user(user)
-    return _frontend_redirect("/auth/callback", {
-        "access": str(refresh.access_token),
-        "refresh": str(refresh),
-    })
+    if user is not None and user.is_active:
+        refresh = RefreshToken.for_user(user)
+        return _frontend_redirect("/auth/callback", {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        })
+    if isinstance(result, HttpResponseBase):
+        return result
+    return _oauth_failed()
 
 
 class OAuthProvidersView(APIView):

@@ -9,7 +9,11 @@ logger = logging.getLogger("apps")
 
 def require_verified_email(strategy, backend, response, *args, **kwargs):
     """Refuse Google logins whose email address is not verified."""
-    if backend.name == "google-oauth2" and not response.get("verified_email", False):
+    if backend.name != "google-oauth2":
+        return
+    # Google userinfo v3 uses `email_verified`; accept the legacy key too.
+    verified = response.get("verified_email", response.get("email_verified", False))
+    if not verified:
         logger.warning("OAuth login refused: unverified Google email")
         raise AuthForbidden(backend)
 

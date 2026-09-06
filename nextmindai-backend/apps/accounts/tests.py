@@ -394,6 +394,9 @@ class OAuthPipelineTest(TestCase):
         self.assertIsNone(require_verified_email(
             None, self._backend(), {"verified_email": True}
         ))
+        self.assertIsNone(require_verified_email(
+            None, self._backend(), {"email_verified": True}
+        ))
 
     def test_unverified_email_rejected(self):
         from social_core.exceptions import AuthForbidden
