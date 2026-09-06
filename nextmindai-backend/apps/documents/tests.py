@@ -290,6 +290,94 @@ class DocumentUploadAPITest(TestCase):
         mock_upload.assert_not_called()
         mock_delay.assert_not_called()
 
+    @override_settings(USER_STORAGE_QUOTA_BYTES=100)
+    @patch("apps.documents.tasks.process_document_task.delay")
+    @patch("apps.documents.services.storage.upload_to_r2")
+    def test_upload_rejected_over_quota(self, mock_upload, mock_delay):
+        from apps.documents.models import Document
+
+        Document.objects.create(
+            user=self.user, name="old.txt", original_filename="old.txt",
+            file_type="txt", file_size=90,
+        )
+        response = self.client.post(
+            "/api/v1/documents/",
+            {"files": [SimpleUploadedFile("big.txt", b"x" * 20, content_type="text/plain")]},
+            **self._auth(),
+        )
+        self.assertEqual(response.status_code, 400)
+        files_errors = response.json()["errors"]["files"]
+        self.assertEqual(len(files_errors), 1)
+        self.assertIn("quota", files_errors[0]["error"].lower())
+        self.assertEqual(Document.objects.filter(user=self.user).count(), 1)
+        mock_upload.assert_not_called()
+        mock_delay.assert_not_called()
+
+    @override_settings(USER_STORAGE_QUOTA_BYTES=100)
+    @patch("apps.documents.tasks.process_document_task.delay")
+    @patch("apps.documents.services.storage.upload_to_r2")
+    def test_batch_partial_success_when_quota_hit(self, mock_upload, mock_delay):
+        from apps.documents.models import Document
+
+        response = self.client.post(
+            "/api/v1/documents/",
+            {"files": [
+                SimpleUploadedFile("ok.txt", b"x" * 60, content_type="text/plain"),
+                SimpleUploadedFile("over.txt", b"y" * 60, content_type="text/plain"),
+            ]},
+            **self._auth(),
+        )
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()["data"]
+        self.assertEqual(len(payload["documents"]), 1)
+        self.assertEqual(len(payload["errors"]), 1)
+        self.assertIn("quota", payload["errors"][0]["error"].lower())
+
+    @override_settings(USER_STORAGE_QUOTA_BYTES=100)
+    def test_reupload_same_size_allowed_at_full_quota(self):
+        from rest_framework.test import APIClient
+
+        from apps.documents.models import Document
+
+        doc = Document.objects.create(
+            user=self.user, name="full.txt", original_filename="full.txt",
+            file_key="old/full.txt", file_type="txt", file_size=100,
+        )
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        with patch("apps.documents.services.storage.upload_to_r2"), \
+                patch("apps.documents.services.storage.delete_from_r2"), \
+                patch("apps.documents.tasks.process_document_task.delay"):
+            response = client.patch(
+                f"/api/v1/documents/{doc.id}/",
+                {"file": SimpleUploadedFile("full.txt", b"z" * 100, content_type="text/plain")},
+                format="multipart",
+            )
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(USER_STORAGE_QUOTA_BYTES=100)
+    def test_reupload_larger_file_rejected_over_quota(self):
+        from rest_framework.test import APIClient
+
+        from apps.documents.models import Document
+
+        doc = Document.objects.create(
+            user=self.user, name="small.txt", original_filename="small.txt",
+            file_key="old/small.txt", file_type="txt", file_size=10,
+        )
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        with patch("apps.documents.services.storage.upload_to_r2") as mock_upload, \
+                patch("apps.documents.services.storage.delete_from_r2"), \
+                patch("apps.documents.tasks.process_document_task.delay"):
+            response = client.patch(
+                f"/api/v1/documents/{doc.id}/",
+                {"file": SimpleUploadedFile("big.txt", b"z" * 101, content_type="text/plain")},
+                format="multipart",
+            )
+        self.assertEqual(response.status_code, 400)
+        mock_upload.assert_not_called()
+
     @patch("apps.documents.tasks.process_document_task.delay")
     @patch("apps.documents.services.storage.delete_from_r2")
     @patch("apps.documents.services.storage.upload_to_r2")

@@ -226,7 +226,7 @@ LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")
 
 MAX_UPLOAD_SIZE = int(os.environ.get("MAX_UPLOAD_SIZE", "104857600"))
 MAX_UPLOAD_BATCH_SIZE = int(os.environ.get("MAX_UPLOAD_BATCH_SIZE", "40"))
-USER_STORAGE_QUOTA_BYTES = int(os.environ.get("USER_STORAGE_QUOTA_BYTES", str(1024 ** 3)))
+USER_STORAGE_QUOTA_BYTES = int(os.environ.get("USER_STORAGE_QUOTA_BYTES", str(512 * 1024 * 1024)))
 
 CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.environ.get("CHUNK_OVERLAP", "150"))

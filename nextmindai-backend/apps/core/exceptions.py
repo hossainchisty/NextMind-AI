@@ -25,11 +25,21 @@ class BadRequestError(APIException):
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     if response is not None:
+        data = response.data
+        if isinstance(data, dict):
+            message = data.get("detail", "Error")
+            errors = {
+                k: v for k, v in data.items() if k != "detail"
+            }
+        elif isinstance(data, list) and data:
+            message = str(data[0])
+            errors = {}
+        else:
+            message = "Error"
+            errors = {}
         response.data = {
             "success": False,
-            "message": response.data.get("detail", "Error"),
-            "errors": {
-                k: v for k, v in response.data.items() if k != "detail"
-            },
+            "message": message,
+            "errors": errors,
         }
     return response

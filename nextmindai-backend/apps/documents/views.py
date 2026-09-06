@@ -166,6 +166,11 @@ class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
         validator = DocumentFileSerializer(data={"file": new_file})
         validator.is_valid(raise_exception=True)
 
+        from .serializers import validate_storage_quota
+        validate_storage_quota(
+            request.user, new_file.size, exclude_bytes=instance.file_size or 0
+        )
+
         content_type = getattr(new_file, "content_type", "") or "application/octet-stream"
         file_type = infer_file_type(new_file.name, content_type) or "txt"
         old_key = instance.file_key

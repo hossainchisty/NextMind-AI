@@ -20,6 +20,22 @@ def validate_uploaded_file(value):
     return value
 
 
+def validate_storage_quota(user, additional_bytes, exclude_bytes=0):
+    """Reject uploads that would push the user past their R2 storage quota."""
+    from django.conf import settings
+    from django.db.models import Sum
+
+    quota = getattr(settings, "USER_STORAGE_QUOTA_BYTES", 512 * 1024 * 1024)
+    used = (
+        Document.objects.filter(user=user).aggregate(total=Sum("file_size"))["total"] or 0
+    )
+    if used - exclude_bytes + additional_bytes > quota:
+        quota_mb = quota // (1024 * 1024)
+        raise serializers.ValidationError(
+            f"Storage quota exceeded. You have {quota_mb}MB total storage."
+        )
+
+
 class DocumentSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
 
@@ -49,7 +65,11 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at"]
 
     def validate_file(self, value):
-        return validate_uploaded_file(value)
+        validate_uploaded_file(value)
+        request = self.context.get("request") if hasattr(self, "context") else None
+        if request is not None:
+            validate_storage_quota(request.user, value.size)
+        return value
 
     def validate_collection(self, value):
         request = self.context.get("request") if hasattr(self, "context") else None

@@ -57,7 +57,7 @@ export const docs: DocArticle[] = [
     body: [
       {
         paragraphs: [
-          "Supported file types: PDF, DOCX, TXT, CSV, MD, XLSX, JSON, HTML. Maximum file size is 100 MB per file, and you can upload up to 40 files in one batch.",
+          "Supported file types: PDF, DOCX, TXT, CSV, MD, XLSX, JSON, HTML. Maximum file size is 100 MB per file, up to 40 files per batch, within a 512 MB total storage quota per account. Uploads that would exceed the quota are rejected with a clear error.",
         ],
       },
       {

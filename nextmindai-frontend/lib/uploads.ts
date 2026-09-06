@@ -10,6 +10,7 @@ export const MAX_BATCH_SIZE = 40; // files per upload
 export const UPLOAD_LIMITS_TEXT =
   `Supported file types: ${SUPPORTED_TYPES_LABEL}. Maximum file size: 100 MB per file. ` +
   `Maximum batch size: ${MAX_BATCH_SIZE} files per upload. ` +
+  `512 MB total storage per account. ` +
   `If the source file changes, you need to re-upload it.`;
 
 export interface FileIssue {
