@@ -47,6 +47,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     def avatar_url(self) -> Optional[str]:
         from apps.documents.services.storage import get_signed_url
         if self.avatar:
+            if self.avatar.startswith("https://"):
+                return self.avatar
             return get_signed_url(self.avatar, expires_in=86400)
         return None
 

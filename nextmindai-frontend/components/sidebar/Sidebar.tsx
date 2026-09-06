@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { BrainNodeIcon } from "@/components/ui/Icons";
+import UserAvatar from "@/components/ui/UserAvatar";
 import {
   MessageSquare,
   FileText,
@@ -22,10 +23,6 @@ export default function Sidebar({}: SidebarProps) {
   const [knowledgeExpanded, setKnowledgeExpanded] = useState(true);
 
   const isActive = (path: string) => pathname === path;
-
-  const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
-    : "?";
 
   return (
     <aside className="w-[260px] h-full flex flex-col bg-surface border-r border-border overflow-hidden">
@@ -110,9 +107,7 @@ export default function Sidebar({}: SidebarProps) {
 
         {user && (
           <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-bg/50 border border-border/50">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold shrink-0">
-              {initials}
-            </div>
+            <UserAvatar name={user.name} avatarUrl={user.avatar_url} />
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium text-text-primary truncate">{user.name}</div>
               <div className="text-[11px] text-text-secondary truncate">{user.email}</div>

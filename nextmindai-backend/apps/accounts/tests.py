@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, RequestFactory, override_settings, override_settings
+from django.test import TestCase, RequestFactory, override_settings
 
 User = get_user_model()
 
@@ -444,6 +444,51 @@ class OAuthPipelineTest(TestCase):
         result = get_or_create_user(None, {}, self._backend(), user=existing)
         self.assertFalse(result["is_new"])
         self.assertEqual(result["user"].id, existing.id)
+
+    def test_signup_uses_google_photo_url(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        result = get_or_create_user(
+            None,
+            {"email": "pic@example.com", "fullname": "Pic User"},
+            self._backend(),
+            response={"picture": "https://lh3.googleusercontent.com/a/photo123"},
+        )
+        user = result["user"]
+        self.assertEqual(user.avatar, "https://lh3.googleusercontent.com/a/photo123")
+        self.assertEqual(user.avatar_url(), "https://lh3.googleusercontent.com/a/photo123")
+
+    def test_non_google_picture_url_skipped(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        result = get_or_create_user(
+            None,
+            {"email": "evil@example.com", "fullname": "Evil"},
+            self._backend(),
+            response={"picture": "https://attacker.example/pic.jpg"},
+        )
+        self.assertEqual(result["user"].avatar, "")
+
+    def test_existing_avatar_never_overwritten(self):
+        from apps.accounts.pipeline import get_or_create_user
+
+        existing = User.objects.create_user(email="keep@example.com", password="pass1234")
+        existing.avatar = "avatars/keep/custom.png"
+        existing.save(update_fields=["avatar"])
+        result = get_or_create_user(
+            None, {}, self._backend(), user=existing,
+            response={"picture": "https://lh3.googleusercontent.com/a/other"},
+        )
+        self.assertEqual(result["user"].avatar, "avatars/keep/custom.png")
+
+    def test_r2_key_avatars_still_use_signed_urls(self):
+        from unittest.mock import patch
+
+        user = User.objects.create_user(email="r2@example.com", password="pass1234")
+        user.avatar = "avatars/r2/custom.png"
+        with patch("apps.documents.services.storage.get_signed_url", return_value="https://signed-url") as mock_sign:
+            self.assertEqual(user.avatar_url(), "https://signed-url")
+        mock_sign.assert_called_once_with("avatars/r2/custom.png", expires_in=86400)
 
 
 class OAuthCompleteViewTest(TestCase):

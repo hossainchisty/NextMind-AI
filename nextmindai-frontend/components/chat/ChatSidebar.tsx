@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/Toast";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { BrainNodeIcon } from "@/components/ui/Icons";
+import UserAvatar from "@/components/ui/UserAvatar";
 import {
   Plus,
   MessageSquare,
@@ -118,9 +119,6 @@ function ChatItem({ chat, isActive, onSelect, onRename, onDelete, collapsed }: {
 export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename, onDelete, collapsed, onToggle }: Props) {
   const { user, logout } = useAuth();
   const { confirm } = useToast();
-  const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
-    : "?";
 
   return (
     <aside className={`${collapsed ? "w-[68px]" : "w-[260px]"} h-full flex flex-col bg-surface border-r border-border overflow-hidden shrink-0 transition-all duration-300 ease-in-out`}>
@@ -196,9 +194,7 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
         </a>
         {user && !collapsed && (
           <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-bg/50 border border-border/50">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold shrink-0">
-              {initials}
-            </div>
+            <UserAvatar name={user.name} avatarUrl={user.avatar_url} />
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium text-text-primary truncate">{user.name}</div>
               <div className="text-[11px] text-text-secondary truncate">{user.email}</div>
@@ -216,9 +212,9 @@ export default function ChatSidebar({ chats, activeId, onSelect, onNew, onRename
           <div className="flex justify-center" title={`${user.name} - Sign out`}>
             <button
               onClick={() => confirm("Sign out?", () => { logout(); window.location.href = "/login"; }, { confirmLabel: "Sign out", type: "danger" })}
-              className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 transition-colors"
+              className="rounded-full hover:opacity-80 transition-opacity"
             >
-              {initials}
+              <UserAvatar name={user.name} avatarUrl={user.avatar_url} size="md" />
             </button>
           </div>
         )}

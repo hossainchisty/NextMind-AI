@@ -43,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
             import uuid as uuid_pkg
             from apps.documents.services.storage import upload_to_r2, delete_from_r2
 
-            if instance.avatar:
+            if instance.avatar and not instance.avatar.startswith("https://"):
                 try:
                     delete_from_r2(instance.avatar)
                 except Exception:
