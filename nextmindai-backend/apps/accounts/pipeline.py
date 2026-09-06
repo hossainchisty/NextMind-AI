@@ -61,3 +61,4 @@ def _import_social_avatar(user, response):
         return
     user.avatar = picture
     user.save(update_fields=["avatar"])
+    logger.info("Set social avatar for %s", user.email)
