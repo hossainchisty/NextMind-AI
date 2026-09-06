@@ -619,3 +619,58 @@ class PasswordChangeTest(TestCase):
             "new_password_confirm": "brandnew456",
         }, auth=False)
         self.assertEqual(response.status_code, 401)
+
+
+class StorageViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="storage@example.com", password="pass1234")
+        from rest_framework_simplejwt.tokens import RefreshToken
+        self.token = str(RefreshToken.for_user(self.user).access_token)
+
+    def test_storage_sums_usage_and_breakdown(self):
+        from django.conf import settings
+
+        from apps.documents.models import Document
+
+        Document.objects.create(
+            user=self.user, name="a.pdf", original_filename="a.pdf",
+            file_type="pdf", file_size=1000,
+        )
+        Document.objects.create(
+            user=self.user, name="b.pdf", original_filename="b.pdf",
+            file_type="pdf", file_size=3000,
+        )
+        Document.objects.create(
+            user=self.user, name="c.txt", original_filename="c.txt",
+            file_type="txt", file_size=1000,
+        )
+
+        response = self.client.get(
+            "/api/v1/auth/me/storage/",
+            HTTP_AUTHORIZATION=f"Bearer {self.token}",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+        self.assertEqual(data["used_bytes"], 5000)
+        self.assertEqual(data["quota_bytes"], settings.USER_STORAGE_QUOTA_BYTES)
+        self.assertEqual(data["document_count"], 3)
+        self.assertAlmostEqual(
+            data["percent"], round(5000 / settings.USER_STORAGE_QUOTA_BYTES * 100, 1)
+        )
+        by_type = {row["file_type"]: row for row in data["breakdown"]}
+        self.assertEqual(by_type["pdf"], {"file_type": "pdf", "bytes": 4000, "count": 2})
+        self.assertEqual(by_type["txt"], {"file_type": "txt", "bytes": 1000, "count": 1})
+
+    def test_storage_empty_for_new_user(self):
+        response = self.client.get(
+            "/api/v1/auth/me/storage/",
+            HTTP_AUTHORIZATION=f"Bearer {self.token}",
+        )
+        data = response.json()["data"]
+        self.assertEqual(data["used_bytes"], 0)
+        self.assertEqual(data["percent"], 0)
+        self.assertEqual(data["breakdown"], [])
+
+    def test_storage_requires_auth(self):
+        response = self.client.get("/api/v1/auth/me/storage/")
+        self.assertEqual(response.status_code, 401)

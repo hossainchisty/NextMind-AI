@@ -12,6 +12,7 @@ urlpatterns = [
     path("oauth/<str:backend>/callback/", oauth.oauth_complete, name="oauth_complete"),
     path("token/refresh/", views.TokenRefreshView.as_view(), name="token_refresh"),
     path("me/", views.MeView.as_view(), name="me"),
+    path("me/storage/", views.StorageView.as_view(), name="storage"),
     path("me/export/", views.ExportView.as_view(), name="export"),
     path("providers/", views.ProviderListView.as_view(), name="provider_list"),
     path("models/", views.UserModelsView.as_view(), name="user_models"),

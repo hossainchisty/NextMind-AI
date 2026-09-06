@@ -172,6 +172,40 @@ class MeView(generics.RetrieveUpdateAPIView):
         )
 
 
+class StorageView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from django.conf import settings
+        from django.db.models import Count, Sum
+
+        from apps.documents.models import Document
+
+        rows = (
+            Document.objects.filter(user=request.user)
+            .values("file_type")
+            .annotate(total_bytes=Sum("file_size"), count=Count("id"))
+            .order_by("-total_bytes")
+        )
+        breakdown = [
+            {
+                "file_type": row["file_type"],
+                "bytes": row["total_bytes"] or 0,
+                "count": row["count"],
+            }
+            for row in rows
+        ]
+        used = sum(item["bytes"] for item in breakdown)
+        quota = getattr(settings, "USER_STORAGE_QUOTA_BYTES", 1024 ** 3)
+        return Response(success_response(data={
+            "used_bytes": used,
+            "quota_bytes": quota,
+            "percent": round(used / quota * 100, 1) if quota else 0,
+            "document_count": sum(item["count"] for item in breakdown),
+            "breakdown": breakdown,
+        }))
+
+
 class ExportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/sidebar/Sidebar";
-import { User, Settings, CreditCard, Wallet, KeyRound, Database } from "lucide-react";
+import { User, Settings, CreditCard, Wallet, KeyRound, Database, HardDrive } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
   user: User,
@@ -12,6 +12,7 @@ const iconMap: Record<string, React.ElementType> = {
   wallet: Wallet,
   key: KeyRound,
   data: Database,
+  storage: HardDrive,
 };
 
 interface NavItem {
@@ -33,6 +34,7 @@ const sections: NavSection[] = [
       { label: "Profile", href: "/settings/account", icon: "user" },
       { label: "Preferences", href: "/settings/account/preferences", icon: "settings" },
       { label: "Billing and Plans", href: "/settings/account/billing", icon: "credit" },
+      { label: "Storage", href: "/settings/account/storage", icon: "storage" },
       { label: "Credits", href: "/settings/account/credits", icon: "wallet" },
     ],
   },
